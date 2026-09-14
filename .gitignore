@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.pytest_cache/
+.coverage
+
+# Ambiente e segredos
+.env
+.env.local
+*.pem
+*.key
+
+# Logisim
+*.circ.bak
+*.circ~
+
+# Sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editores
+.vscode/
+.idea/
+*.swp
