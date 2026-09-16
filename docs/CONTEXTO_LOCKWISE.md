@@ -240,10 +240,10 @@ Memorial em `docs/fisica.md`, organizado por grandeza (sinal, corrente/tensão, 
 Seção 9 do memorial tem as respostas prontas para a sabatina ("por que não ligou a trava direto na porta?", "para que serve o diodo?", "como escolheu o resistor de base?").
 
 ### Fase B — Gateway ✅ CONCLUÍDA (16/09/2026)
-`gateway/lockwise_gateway/`, Python 3.11+, zero dependências (só `pytest` para testes). 69 testes.
+`gateway/lockwise_gateway/`, Python 3.11+, zero dependências (só `pytest` para testes). 103 testes.
 
 Decisões tomadas:
-- **Gêmeo digital**, não integração com o Logisim (não existe caminho suportado). Dois modelos: `circuito.py` (equações da netlist, porta a porta) e `estados.py`+`maquina.py` (padrão **State**). `test_equivalencia.py` prova netlist ≡ State em todos os 2048 casos (16 estados × 128 entradas) e reproduz as sequências das figuras 05–13 (`referencia/sequencias.json`).
+- **Gêmeo digital**, não integração com o Logisim (não existe caminho suportado). Dois modelos: `circuito.py` (equações da netlist, porta a porta) e `estados.py`+`maquina.py` (padrão **State**). `test_equivalencia.py` prova netlist ≡ State em todos os 2048 casos (16 estados × 128 entradas) e reproduz as sequências das figuras 05–13 (`referencia/sequencias.json`). `test_netlist.py` + `tests/logisim.py` leem o `.circ` real, simulam o grafo de portas e provam que ele ≡ `circuito.py` nos 2048 casos — a transcrição manual deixou de ser um ponto de confiança.
 - Eventos só em transição: `LIBERADO` (energia_mj 18200, usuario_id 1), `NEGADO` (energia 0, usuario null), `BLOQUEADO` + alerta `BLOQUEIO`, RESET → alerta `DESBLOQUEIO_ADMIN`. Campo extra `tentativa` (1–3) no payload de `/acessos`. Senhas erradas não são transmitidas.
 - Transporte: `urllib`, retry 0,5/1/2 s em conexão/5xx, fila offline JSONL reenviada no início e no comando `fila`, 4xx não repete. `X-API-Key` por variável de ambiente. `momento` preservado no reenvio.
 - CLI (`python -m lockwise_gateway.cli`): comandos por pino (`senha`, `confirma`, `clk`…) e macros (`tentar`, `fechar`, `desbloquear`); `--roteiro`, `--timeout-fisico` (TIMEOUT sozinho após 5,16 s), modo eco sem API.
@@ -359,6 +359,6 @@ Cada integrante sendo arguido pelos outros. É a fase mais ignorada e a que o re
 
 > Estou desenvolvendo o LOCKWISE, um sistema de controle de acesso para a ExpoTech 2026.2 da UniFECAF (categoria INTERFACE, Engenharia da Computação). Leia o arquivo `docs/CONTEXTO_LOCKWISE.md` do repositório, que contém todo o histórico, decisões técnicas, equações do circuito e o plano das fases restantes.
 >
-> A eletrônica está concluída (circuito Logisim + 14 evidências), a física também (`docs/fisica.md`, energia por liberação 18 200 mJ) e o gateway também (`gateway/`, gêmeo digital com prova de equivalência, 69 testes).
+> A eletrônica está concluída (circuito Logisim + 14 evidências), a física também (`docs/fisica.md`, energia por liberação 18 200 mJ) e o gateway também (`gateway/`, gêmeo digital com prova de equivalência contra o .circ real, 103 testes).
 >
 > Quero seguir pela Fase [X]. Antes de escrever código, confirme comigo as decisões de projeto que ainda estiverem em aberto.
