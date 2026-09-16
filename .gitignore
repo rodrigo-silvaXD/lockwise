@@ -30,3 +30,8 @@ fila_offline.jsonl
 *.egg-info/
 dist/
 build/
+
+# Backend
+backend/.venv/
+*.db
+.env

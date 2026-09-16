@@ -33,8 +33,8 @@ O projeto atravessa cinco camadas, e o mesmo dado — o evento de acesso — per
 | Eletrônica digital | Concluída |
 | Física aplicada | Concluída |
 | Gateway | Concluído |
-| Backend e banco | Não iniciado |
-| Arquitetura e padrões | Não iniciado |
+| Backend e banco | Concluído (local; deploy na Fase F) |
+| Arquitetura e padrões | Código concluído (State, Strategy, Observer, SOLID); documentação C4 pendente |
 | Nuvem e CI/CD | Não iniciado |
 | Pesquisa operacional | Não iniciado |
 
@@ -54,7 +54,7 @@ lockwise/
 │   ├── otimizacao.md              modelo matemático
 │   └── evidencias/                14 figuras da simulação
 ├── gateway/                       gêmeo digital do circuito + POST para a API
-├── backend/                       API e banco
+├── backend/                       API FastAPI: State, Strategy, Observer + Postgres
 ├── otimizacao/                    modelo PuLP
 └── .github/workflows/             pipeline de CI/CD
 ```
@@ -137,6 +137,20 @@ Cada transição gera um evento: `LIBERADO` (com `energia_mj = 18200`), `NEGADO`
 cd gateway && python -m pytest          # 103 testes
 python -m lockwise_gateway.cli          # painel de pinos em modo eco
 ```
+
+---
+
+## O backend
+
+[`backend/`](backend/) é a API que recebe os eventos do gateway, persiste o histórico e expõe a **demanda horária** (entrada da otimização) e o **estado da fechadura** (para o painel). FastAPI + SQLAlchemy; SQLite local, Postgres gerenciado em produção.
+
+Três padrões GoF, cada um com trabalho real: **State** projeta o estado da fechadura a partir dos eventos (a mesma FSM do circuito, pela terceira vez); **Strategy** é a política de supervisão que decide quando avisar alguém — `limite`, `horario`, `composta` — trocada por variável de ambiente; **Observer** avisa log e webhook quando um alerta nasce. SOLID está mapeado princípio a princípio no README do backend.
+
+```bash
+cd backend && .venv/Scripts/python -m pytest      # 69 testes, inclusive a demo ponta a ponta
+```
+
+O teste `test_ponta_a_ponta.py` sobe a API real, roda o gateway real com `roteiros/demo.txt` e confere no banco: é a demo automatizada.
 
 ---
 
