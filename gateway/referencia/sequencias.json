@@ -1,0 +1,75 @@
+{
+  "_comentario": [
+    "Sequências de referência extraídas da simulação em Logisim-evolution 4.1.0.",
+    "Cada passo aplica os pinos indicados e pulsa CLK uma vez; 'esperado' é o que a",
+    "simulação mostra APÓS a borda: estado (nome do LED aceso) e contador (ERROS_C1 ERROS_C0).",
+    "As figuras citadas estão em docs/evidencias/. Pinos omitidos valem 0.",
+    "A senha gravada é 1011."
+  ],
+  "sequencias": [
+    {
+      "nome": "acesso liberado na primeira tentativa",
+      "figuras": ["fig05_aguardando", "fig06_verificando", "fig07_liberado", "fig08_retorno-timeout"],
+      "passos": [
+        {"pinos": {"senha": "1011", "confirma": 1}, "esperado": {"estado": "VERIFICANDO", "contador": "00"}},
+        {"pinos": {"senha": "1011"},               "esperado": {"estado": "LIBERADO",    "contador": "00"}},
+        {"pinos": {"senha": "1011", "timeout": 1}, "esperado": {"estado": "AGUARDANDO",  "contador": "00"}}
+      ]
+    },
+    {
+      "nome": "bloqueio na terceira tentativa incorreta",
+      "figuras": ["fig09_primeiro-erro", "fig10_segundo-erro", "fig11_terceiro-erro-bloqueio"],
+      "passos": [
+        {"pinos": {"senha": "0000", "confirma": 1}, "esperado": {"estado": "VERIFICANDO", "contador": "00"}},
+        {"pinos": {"senha": "0000"},               "esperado": {"estado": "AGUARDANDO",  "contador": "01"}},
+        {"pinos": {"senha": "0000", "confirma": 1}, "esperado": {"estado": "VERIFICANDO", "contador": "01"}},
+        {"pinos": {"senha": "0000"},               "esperado": {"estado": "AGUARDANDO",  "contador": "10"}},
+        {"pinos": {"senha": "0000", "confirma": 1}, "esperado": {"estado": "VERIFICANDO", "contador": "10"}},
+        {"pinos": {"senha": "0000"},               "esperado": {"estado": "BLOQUEADO",   "contador": "11"}}
+      ]
+    },
+    {
+      "nome": "saturação do contador e desbloqueio administrativo",
+      "figuras": ["fig12_saturacao", "fig13_desbloqueio-administrativo"],
+      "passos": [
+        {"pinos": {"senha": "0000", "confirma": 1}, "esperado": {"estado": "VERIFICANDO", "contador": "00"}},
+        {"pinos": {"senha": "0000"},               "esperado": {"estado": "AGUARDANDO",  "contador": "01"}},
+        {"pinos": {"senha": "0000", "confirma": 1}, "esperado": {"estado": "VERIFICANDO", "contador": "01"}},
+        {"pinos": {"senha": "0000"},               "esperado": {"estado": "AGUARDANDO",  "contador": "10"}},
+        {"pinos": {"senha": "0000", "confirma": 1}, "esperado": {"estado": "VERIFICANDO", "contador": "10"}},
+        {"pinos": {"senha": "0000"},               "esperado": {"estado": "BLOQUEADO",   "contador": "11"}},
+        {"pinos": {"senha": "0000", "confirma": 1}, "esperado": {"estado": "BLOQUEADO",   "contador": "11"}},
+        {"pinos": {"senha": "1011", "confirma": 1}, "esperado": {"estado": "BLOQUEADO",   "contador": "11"}},
+        {"pinos": {"senha": "0000"},               "esperado": {"estado": "BLOQUEADO",   "contador": "11"}},
+        {"pinos": {"reset": 1},                    "esperado": {"estado": "AGUARDANDO",  "contador": "00"}}
+      ]
+    },
+    {
+      "nome": "acerto após dois erros zera o contador uma borda depois de LIBERADO",
+      "figuras": [],
+      "passos": [
+        {"pinos": {"senha": "0000", "confirma": 1}, "esperado": {"estado": "VERIFICANDO", "contador": "00"}},
+        {"pinos": {"senha": "0000"},               "esperado": {"estado": "AGUARDANDO",  "contador": "01"}},
+        {"pinos": {"senha": "0000", "confirma": 1}, "esperado": {"estado": "VERIFICANDO", "contador": "01"}},
+        {"pinos": {"senha": "0000"},               "esperado": {"estado": "AGUARDANDO",  "contador": "10"}},
+        {"pinos": {"senha": "1011", "confirma": 1}, "esperado": {"estado": "VERIFICANDO", "contador": "10"}},
+        {"pinos": {"senha": "1011"},               "esperado": {"estado": "LIBERADO",    "contador": "10"}},
+        {"pinos": {"senha": "1011"},               "esperado": {"estado": "LIBERADO",    "contador": "00"}},
+        {"pinos": {"senha": "1011", "timeout": 1}, "esperado": {"estado": "AGUARDANDO",  "contador": "00"}}
+      ]
+    },
+    {
+      "nome": "senha quase certa (1010, 1111, 0011) é rejeitada",
+      "figuras": ["fig03_comparador"],
+      "passos": [
+        {"pinos": {"senha": "1010", "confirma": 1}, "esperado": {"estado": "VERIFICANDO", "contador": "00"}},
+        {"pinos": {"senha": "1010"},               "esperado": {"estado": "AGUARDANDO",  "contador": "01"}},
+        {"pinos": {"senha": "1111", "confirma": 1}, "esperado": {"estado": "VERIFICANDO", "contador": "01"}},
+        {"pinos": {"senha": "1111"},               "esperado": {"estado": "AGUARDANDO",  "contador": "10"}},
+        {"pinos": {"reset": 1},                    "esperado": {"estado": "AGUARDANDO",  "contador": "00"}},
+        {"pinos": {"senha": "0011", "confirma": 1}, "esperado": {"estado": "VERIFICANDO", "contador": "00"}},
+        {"pinos": {"senha": "0011"},               "esperado": {"estado": "AGUARDANDO",  "contador": "01"}}
+      ]
+    }
+  ]
+}

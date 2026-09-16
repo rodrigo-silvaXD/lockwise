@@ -158,24 +158,26 @@ O diagrama temporal em [`evidencias/fig14_diagrama.png`](evidencias/fig14_diagra
 
 Para que a máquina de estados funcione, o sinal em cada entrada D precisa estar estável um pouco antes da borda de clock (tempo de *setup*, t_su ≈ 20 ns). O sinal nasce na saída Q de um flip-flop, atravessa a lógica combinacional e chega à entrada D de outro. O período mínimo de clock é a soma dos atrasos do **caminho mais longo**.
 
-O caminho mais longo do LOCKWISE não está na máquina de estados, mas no contador de tentativas, porque DC0 depende de E, que depende de ERRO, que depende da decodificação do estado:
+O caminho mais longo do LOCKWISE passa pelo sinal de limiar E: a decodificação do estado alimenta ERRO, que alimenta E, que alimenta a entrada D0 pelo termo de bloqueio. Como o flip-flop já fornece Q̄ diretamente, não há inversor no início do caminho:
 
 ```
-Q1 ─▷ NOT ─▷ AND (VERIFICANDO = Q̄1·Q0) ─▷ AND (ERRO = VER·ĪGUAL) ─▷ OR (C0+ERRO)
-   ─▷ AND (E = C1·(...)) ─▷ NOT (Ē) ─▷ AND (EN = ERRO·Ē) ─▷ XOR (C0⊕EN) ─▷ AND (·CLR) ─▷ DC0
+Q1,Q0 ─▷ AND (VERIFICANDO = Q̄1·Q0) ─▷ AND (ERRO = VER·ĪGUAL) ─▷ OR (C0 + ERRO)
+      ─▷ AND (E = C1·…) ─▷ AND (NE = ĪGUAL·E) ─▷ AND3 (B2 = Q̄1·Q0·NE) ─▷ OR3 (D0)
 ```
 
-Nove níveis de porta. Somando os atrasos máximos de folha de dados (19 ns por porta simples, 23 ns para o XOR):
+Sete níveis de porta. Somando os atrasos máximos de folha de dados (19 ns por porta de duas entradas, 22 ns para AND de três, 25 ns para OR de três):
 
 ```
 t_FF(CLK→Q)        =  31 ns
-t_lógica           =  8 × 19 ns + 23 ns = 175 ns
+t_lógica           =  5 × 19 ns + 22 ns + 25 ns = 142 ns
 t_su               =  20 ns
 ─────────────────────────────
-T_mín              = 226 ns    →    f_máx = 1 / 226 ns ≈ 4,4 MHz
+T_mín              = 193 ns    →    f_máx = 1 / 193 ns ≈ 5,2 MHz
 ```
 
-O clock do LOCKWISE é acionado manualmente, a menos de 10 Hz. A margem é superior a **400 000 vezes**. Isso significa que:
+O caminho do contador (VERIFICANDO → ERRO → EN → G → X1 → DC1, seis níveis, 118 ns) é um pouco mais curto e não é o limitante.
+
+O clock do LOCKWISE é acionado manualmente, a menos de 10 Hz. A margem é superior a **500 000 vezes**. Isso significa que:
 
 1. o circuito pode ser montado com fiação longa, protoboard e componentes de qualquer lote, sem risco de violação de *setup*;
 2. **glitches** na lógica combinacional — pulsos espúrios de nanossegundos que aparecem quando várias entradas de uma porta mudam quase ao mesmo tempo — são irrelevantes, porque se extinguem centenas de milhares de vezes antes da próxima borda. Esta é a razão física para a decisão de projeto síncrono registrada no README.
