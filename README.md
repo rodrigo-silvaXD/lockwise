@@ -129,12 +129,12 @@ O Logisim simula a lógica; o memorial [`docs/fisica.md`](docs/fisica.md) descre
 
 ## O gateway
 
-O Logisim não fala HTTP. O gateway ([`gateway/`](gateway/)) é **a mesma máquina de estados do circuito, escrita em Python** — e a equivalência é provada por teste, não por afirmação: para os 16 estados possíveis dos flip-flops × 128 combinações de pinos, as equações extraídas da netlist e o padrão State produzem o mesmo próximo estado (2048 casos), e as sequências das figuras de evidência reproduzem exatamente o que a simulação mostra.
+O Logisim não fala HTTP. O gateway ([`gateway/`](gateway/)) é **a mesma máquina de estados do circuito, escrita em Python** — e a equivalência é provada por teste, não por afirmação: um leitor de `.circ` simula o grafo de portas do arquivo real, e para os 16 estados possíveis dos flip-flops × 128 combinações de pinos ele, as equações transcritas e o padrão State produzem o mesmo próximo estado (2048 casos); as sequências das figuras de evidência reproduzem exatamente o que a simulação mostra.
 
 Cada transição gera um evento: `LIBERADO` (com `energia_mj = 18200`), `NEGADO`, `BLOQUEADO` (+ alerta) ou `DESBLOQUEIO_ADMIN`. Retry com backoff, fila offline em disco e autenticação por `X-API-Key`. Zero dependências.
 
 ```bash
-cd gateway && python -m pytest          # 69 testes
+cd gateway && python -m pytest          # 103 testes
 python -m lockwise_gateway.cli          # painel de pinos em modo eco
 ```
 
