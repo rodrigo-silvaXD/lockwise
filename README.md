@@ -52,6 +52,7 @@ lockwise/
 │   ├── fisica.md                  memorial de cálculos
 │   ├── arquitetura.md             C4 e padrões de projeto
 │   ├── otimizacao.md              modelo matemático
+│   ├── adr/                       registros de decisão (por quê de cada escolha)
 │   └── evidencias/                14 figuras da simulação
 ├── gateway/                       gêmeo digital do circuito + POST para a API
 ├── backend/                       API FastAPI: State, Strategy, Observer + Postgres
@@ -170,6 +171,12 @@ Selecione a ferramenta de mão (Poke Tool) e clique nos pinos. A máquina de est
 Com senha incorreta, repita três vezes: CONFIRMA liga, pulse o CLK, CONFIRMA desliga, pulse o CLK. O contador evolui `00` → `01` → `10` e, na terceira tentativa, BLOQUEADO acende com o contador em `11`.
 
 Para desbloquear: ligue RESET e pulse o CLK.
+
+---
+
+## Por que as coisas são assim
+
+Cada decisão que moldou o projeto — do tema à política de autenticação — tem um registro em [`docs/adr/`](docs/adr/): o que estava em jogo, o que escolhemos, o que descartamos e o que isso custa. Se a pergunta é "por que vocês fizeram desse jeito?", a resposta está lá.
 
 ---
 
