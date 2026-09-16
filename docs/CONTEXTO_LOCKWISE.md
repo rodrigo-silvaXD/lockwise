@@ -87,13 +87,15 @@ D0 = Q̄1·Q̄0·C + Q̄1·Q0·ĪGUAL·E + Q1·Q0·R̄
 
 ### Contador de tentativas (sequencial, 2 flip-flops D)
 ```
-E    = C1 · (C0 + ERRO)      sinal de limiar, antecipado
 ERRO = VERIFICANDO · ĪGUAL
-EN   = ERRO · Ē              habilitação com saturação
-DC0  = (C0 ⊕ EN) · CLR
-DC1  = (C1 ⊕ (C0 · EN)) · CLR
+E    = C1 · (C0 + ERRO)      sinal de limiar, antecipado
+EN   = ERRO · ¬(C1 · C0)     habilitação com saturação (contador cheio desabilita)
 CLR  = LIBERADO + RESET
+DC0  = (C0 ⊕ EN) · C̄LR
+DC1  = (C1 ⊕ (C0 · EN)) · C̄LR
 ```
+
+> Equações extraídas da netlist do `.circ` em 16/09/2026 (análise de conectividade feita para o gateway). A versão anterior deste documento e do README trazia `EN = ERRO·Ē` e `·CLR` — com essas, o contador ficaria em `10` no bloqueio, contradizendo a fig. 11. O circuito estava certo; a documentação, não.
 
 ### As duas perguntas prováveis na sabatina
 
@@ -101,7 +103,7 @@ CLR  = LIBERADO + RESET
 O contador só atinge `11` *depois* da borda de clock. Se o bloqueio dependesse apenas do valor armazenado, a FSM veria `E = 0` no instante do terceiro erro e bloquearia só no quarto. A expressão antecipa o limiar.
 
 **Por que o contador satura em vez de transbordar?**
-Com `EN = ERRO · Ē`, o próprio sinal de limiar desabilita a contagem. Sem isso, o quarto erro levaria `11` de volta a `00`, liberando novas tentativas indevidamente.
+Com `EN = ERRO · ¬(C1·C0)`, o contador cheio desabilita a própria contagem. Sem isso, um erro a mais levaria `11` de volta a `00`, liberando novas tentativas indevidamente.
 
 ### Geometria do Logisim-evolution 4.1.0 (para gerar novos `.circ`)
 
@@ -163,7 +165,7 @@ lockwise/
 │   ├── fisica.md                  CONCLUÍDO
 │   ├── arquitetura.md             A FAZER
 │   └── otimizacao.md              A FAZER
-├── gateway/                       A FAZER
+├── gateway/                       CONCLUÍDO
 ├── backend/                       A FAZER
 ├── otimizacao/                    A FAZER
 └── .github/workflows/             A FAZER
@@ -237,10 +239,17 @@ Memorial em `docs/fisica.md`, organizado por grandeza (sinal, corrente/tensão, 
 
 Seção 9 do memorial tem as respostas prontas para a sabatina ("por que não ligou a trava direto na porta?", "para que serve o diodo?", "como escolheu o resistor de base?").
 
-### Fase B — Gateway (≈1 dia)
-`gateway/gateway.py`. Replica a FSM do circuito em Python usando o padrão **State**. Lê o evento de acesso, monta o payload (momento, usuário, resultado, energia em mJ) e faz `POST /acessos` com retry.
+### Fase B — Gateway ✅ CONCLUÍDA (16/09/2026)
+`gateway/lockwise_gateway/`, Python 3.11+, zero dependências (só `pytest` para testes). 69 testes.
 
-Incluir teste de **equivalência**: roda as mesmas sequências no modelo Python e compara com a tabela de referência extraída da simulação. Isso vira uma seção do relatório e responde "como o circuito conversa com a nuvem?".
+Decisões tomadas:
+- **Gêmeo digital**, não integração com o Logisim (não existe caminho suportado). Dois modelos: `circuito.py` (equações da netlist, porta a porta) e `estados.py`+`maquina.py` (padrão **State**). `test_equivalencia.py` prova netlist ≡ State em todos os 2048 casos (16 estados × 128 entradas) e reproduz as sequências das figuras 05–13 (`referencia/sequencias.json`).
+- Eventos só em transição: `LIBERADO` (energia_mj 18200, usuario_id 1), `NEGADO` (energia 0, usuario null), `BLOQUEADO` + alerta `BLOQUEIO`, RESET → alerta `DESBLOQUEIO_ADMIN`. Campo extra `tentativa` (1–3) no payload de `/acessos`. Senhas erradas não são transmitidas.
+- Transporte: `urllib`, retry 0,5/1/2 s em conexão/5xx, fila offline JSONL reenviada no início e no comando `fila`, 4xx não repete. `X-API-Key` por variável de ambiente. `momento` preservado no reenvio.
+- CLI (`python -m lockwise_gateway.cli`): comandos por pino (`senha`, `confirma`, `clk`…) e macros (`tentar`, `fechar`, `desbloquear`); `--roteiro`, `--timeout-fisico` (TIMEOUT sozinho após 5,16 s), modo eco sem API.
+- `roteiros/demo.txt` é o ensaio da demo.
+
+**Contrato que o backend precisa honrar** (Fase C): `POST /acessos` com `{momento, usuario_id, resultado, tentativa, energia_mj}` e `POST /alertas` com `{tipo, momento}`; responder 201; aceitar `X-API-Key`; `tipo ∈ {BLOQUEIO, DESBLOQUEIO_ADMIN}`. A coluna `tentativa SMALLINT` deve entrar na tabela `acesso`.
 
 ### Fase C — Backend (≈3 a 4 dias)
 `backend/` em Python com FastAPI.
@@ -277,6 +286,7 @@ CREATE TABLE acesso (
     usuario_id  INTEGER REFERENCES usuario(id),
     momento     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     resultado   VARCHAR(20) NOT NULL,   -- LIBERADO | NEGADO | BLOQUEADO
+    tentativa   SMALLINT NOT NULL,      -- 1, 2 ou 3 (vem do gateway)
     energia_mj  INTEGER
 );
 
@@ -349,6 +359,6 @@ Cada integrante sendo arguido pelos outros. É a fase mais ignorada e a que o re
 
 > Estou desenvolvendo o LOCKWISE, um sistema de controle de acesso para a ExpoTech 2026.2 da UniFECAF (categoria INTERFACE, Engenharia da Computação). Leia o arquivo `docs/CONTEXTO_LOCKWISE.md` do repositório, que contém todo o histórico, decisões técnicas, equações do circuito e o plano das fases restantes.
 >
-> A eletrônica está concluída: circuito em Logisim-evolution com comparador de senha, máquina de estados de quatro estados e contador de tentativas, mais 14 figuras de evidência. A física também: memorial de cálculos em `docs/fisica.md`, com a energia por liberação (18 200 mJ) que o backend grava em `energia_mj`.
+> A eletrônica está concluída (circuito Logisim + 14 evidências), a física também (`docs/fisica.md`, energia por liberação 18 200 mJ) e o gateway também (`gateway/`, gêmeo digital com prova de equivalência, 69 testes).
 >
 > Quero seguir pela Fase [X]. Antes de escrever código, confirme comigo as decisões de projeto que ainda estiverem em aberto.

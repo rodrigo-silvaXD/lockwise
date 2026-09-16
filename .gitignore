@@ -26,3 +26,7 @@ desktop.ini
 .vscode/
 .idea/
 *.swp
+fila_offline.jsonl
+*.egg-info/
+dist/
+build/

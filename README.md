@@ -32,7 +32,7 @@ O projeto atravessa cinco camadas, e o mesmo dado — o evento de acesso — per
 |---|---|
 | Eletrônica digital | Concluída |
 | Física aplicada | Concluída |
-| Gateway | Não iniciado |
+| Gateway | Concluído |
 | Backend e banco | Não iniciado |
 | Arquitetura e padrões | Não iniciado |
 | Nuvem e CI/CD | Não iniciado |
@@ -53,7 +53,7 @@ lockwise/
 │   ├── arquitetura.md             C4 e padrões de projeto
 │   ├── otimizacao.md              modelo matemático
 │   └── evidencias/                14 figuras da simulação
-├── gateway/                       ponte entre circuito e nuvem
+├── gateway/                       gêmeo digital do circuito + POST para a API
 ├── backend/                       API e banco
 ├── otimizacao/                    modelo PuLP
 └── .github/workflows/             pipeline de CI/CD
@@ -94,18 +94,19 @@ D0 = Q̄1·Q̄0·C + Q̄1·Q0·ĪGUAL·E + Q1·Q0·R̄
 **Contador de tentativas (sequencial).** Dois flip-flops D com saturação:
 
 ```
+ERRO = VERIFICANDO · ĪGUAL
 E    = C1 · (C0 + ERRO)
-EN   = ERRO · Ē
-DC0  = (C0 ⊕ EN) · CLR
-DC1  = (C1 ⊕ (C0 · EN)) · CLR
+EN   = ERRO · ¬(C1 · C0)
 CLR  = LIBERADO + RESET
+DC0  = (C0 ⊕ EN) · C̄LR
+DC1  = (C1 ⊕ (C0 · EN)) · C̄LR
 ```
 
 ### Duas decisões de projeto
 
 **Por que o bloqueio usa `E = C1·(C0 + ERRO)` e não o valor do contador.** O contador só atinge `11` após a borda de clock. Se o sinal de bloqueio dependesse apenas do valor armazenado, a máquina de estados veria `E = 0` no instante do terceiro erro e só bloquearia no quarto. A expressão antecipa a condição de limiar, garantindo o bloqueio na terceira tentativa.
 
-**Por que o contador satura em vez de transbordar.** Com `EN = ERRO · Ē`, o próprio sinal de limiar desabilita a contagem. Sem isso, o quarto erro levaria o contador de `11` de volta a `00`, liberando indevidamente novas tentativas.
+**Por que o contador satura em vez de transbordar.** Com `EN = ERRO · ¬(C1·C0)`, o contador cheio desabilita a própria contagem. Sem isso, um novo erro levaria o contador de `11` de volta a `00`, liberando indevidamente novas tentativas. Na sequência normal o estado BLOQUEADO já impede novos erros (ERRO exige VERIFICANDO); a saturação garante o comportamento correto mesmo fora dela.
 
 ---
 
@@ -123,6 +124,19 @@ O Logisim simula a lógica; o memorial [`docs/fisica.md`](docs/fisica.md) descre
 | Diodo 1N4007 em antiparalelo com a bobina | v = −L·di/dt chegaria a centenas de volts contra V_CEO = 45 V; o diodo limita a 12,8 V |
 | Trava aberta por 5,16 s | NE555 monoestável: T = RC·ln 3 com 470 kΩ e 10 µF |
 | **Energia por liberação: 18 200 mJ** | 3,53 W × 5,16 s — é o valor gravado em `energia_mj` a cada acesso liberado |
+
+---
+
+## O gateway
+
+O Logisim não fala HTTP. O gateway ([`gateway/`](gateway/)) é **a mesma máquina de estados do circuito, escrita em Python** — e a equivalência é provada por teste, não por afirmação: para os 16 estados possíveis dos flip-flops × 128 combinações de pinos, as equações extraídas da netlist e o padrão State produzem o mesmo próximo estado (2048 casos), e as sequências das figuras de evidência reproduzem exatamente o que a simulação mostra.
+
+Cada transição gera um evento: `LIBERADO` (com `energia_mj = 18200`), `NEGADO`, `BLOQUEADO` (+ alerta) ou `DESBLOQUEIO_ADMIN`. Retry com backoff, fila offline em disco e autenticação por `X-API-Key`. Zero dependências.
+
+```bash
+cd gateway && python -m pytest          # 69 testes
+python -m lockwise_gateway.cli          # painel de pinos em modo eco
+```
 
 ---
 
