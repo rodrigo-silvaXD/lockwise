@@ -164,7 +164,8 @@ lockwise/
 │   ├── eletronica.md              A FAZER
 │   ├── fisica.md                  CONCLUÍDO
 │   ├── arquitetura.md             A FAZER
-│   └── otimizacao.md              A FAZER
+│   ├── otimizacao.md              A FAZER
+│   └── adr/                       21 registros de decisão, alimentados a cada fase
 ├── gateway/                       CONCLUÍDO
 ├── backend/                       CONCLUÍDO (local)
 ├── otimizacao/                    A FAZER
@@ -313,6 +314,11 @@ Regra: teoria antes, evidência depois.
 Cada integrante sendo arguido pelos outros. É a fase mais ignorada e a que o regulamento trata com mais dureza: respostas vagas eliminam a elegibilidade do **grupo inteiro**.
 
 ---
+
+## 10b. Regras de processo (16/09/2026)
+
+- Todo bloco de trabalho concluído vira commit + push imediato. Nada fica só local.
+- Toda decisão de arquitetura vira uma ADR em `docs/adr/`, no mesmo commit do código. Índice em `docs/adr/README.md`. ADR aceita não se reescreve; decisão revertida ganha ADR nova. Ver ADR 0021.
 
 ## 11. Riscos conhecidos
 
