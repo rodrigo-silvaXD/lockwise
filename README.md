@@ -31,7 +31,7 @@ O projeto atravessa cinco camadas, e o mesmo dado — o evento de acesso — per
 | Camada | Situação |
 |---|---|
 | Eletrônica digital | Concluída |
-| Física aplicada | Em andamento |
+| Física aplicada | Concluída |
 | Gateway | Não iniciado |
 | Backend e banco | Não iniciado |
 | Arquitetura e padrões | Não iniciado |
@@ -106,6 +106,23 @@ CLR  = LIBERADO + RESET
 **Por que o bloqueio usa `E = C1·(C0 + ERRO)` e não o valor do contador.** O contador só atinge `11` após a borda de clock. Se o sinal de bloqueio dependesse apenas do valor armazenado, a máquina de estados veria `E = 0` no instante do terceiro erro e só bloquearia no quarto. A expressão antecipa a condição de limiar, garantindo o bloqueio na terceira tentativa.
 
 **Por que o contador satura em vez de transbordar.** Com `EN = ERRO · Ē`, o próprio sinal de limiar desabilita a contagem. Sem isso, o quarto erro levaria o contador de `11` de volta a `00`, liberando indevidamente novas tentativas.
+
+---
+
+## A física
+
+O Logisim simula a lógica; o memorial [`docs/fisica.md`](docs/fisica.md) descreve a implementação física de referência e justifica, com cálculo, o que a lógica sozinha não explica.
+
+| Decisão | Número que a sustenta |
+|---|---|
+| Pull-down de 10 kΩ em cada entrada | entrada CMOS é um capacitor de ~5 pF: 12,5 pC bastam para levá-la ao nível indefinido |
+| Filtro RC + Schmitt só no clock | τ = 10 ms filtra *bounce* de até 5 ms; as demais entradas são amostradas na borda |
+| 220 Ω em série com cada LED | 13,6 mA ideal, 11,1 mA com a resistência de saída real da porta |
+| Transistor BC337 acionando a trava | bobina exige 300 mA; porta 74HC fornece 25 mA no máximo absoluto |
+| R_B = 1 kΩ na base | ganho forçado ≈ 80, três vezes abaixo do h_FE mínimo, garante saturação (V_CE = 0,3 V, P_Q = 91 mW) |
+| Diodo 1N4007 em antiparalelo com a bobina | v = −L·di/dt chegaria a centenas de volts contra V_CEO = 45 V; o diodo limita a 12,8 V |
+| Trava aberta por 5,16 s | NE555 monoestável: T = RC·ln 3 com 470 kΩ e 10 µF |
+| **Energia por liberação: 18 200 mJ** | 3,53 W × 5,16 s — é o valor gravado em `energia_mj` a cada acesso liberado |
 
 ---
 
