@@ -32,7 +32,7 @@ O último item produz o número que atravessa todo o projeto: a **energia por li
 | `TRAVA_ABERTA` | LED + resistor 220 Ω **e** estágio de potência (BC337 + 1N4007 + solenoide 12 V) | 4 |
 | Portas e flip-flops | Família CMOS 74HC alimentada em 5 V | 2.1 |
 
-A composição do circuito simulado — 21 portas AND, 6 OR, 7 NOT, 3 XOR e 5 flip-flops D — corresponde a cerca de 12 circuitos integrados da família 74HC.
+A composição do circuito simulado — 20 portas AND (15 de duas entradas, 5 de três), 5 OR (3 de duas, 2 de três), 6 NOT, 2 XOR e 4 flip-flops D — corresponde a 12 circuitos integrados da família 74HC: 4× 74HC08, 2× 74HC11, 1× 74HC32, 1× 74HC4075, 1× 74HC04, 1× 74HC86 e 2× 74HC74.
 
 ### 1.3 Parâmetros adotados
 
@@ -509,7 +509,7 @@ Uma única fonte externa de 12 V alimenta a trava diretamente e a lógica atrav�
 | Base do BC337 | 4,3 mA | seção 4.4, só no estado LIBERADO |
 | Pull-downs, 7 chaves fechadas | 3,5 mA | seção 2.2, pior caso |
 | NE555 em repouso | 3 mA | folha de dados (TLC555: < 1 mA) |
-| ≈ 12 CIs 74HC, estáticos | 0,2 mA | ≤ 20 µA por CI; dinâmico desprezível a < 10 Hz |
+| 12 CIs 74HC, estáticos | 0,2 mA | ≤ 20 µA por CI; dinâmico desprezível a < 10 Hz |
 | **Total** | **≈ 56 mA** | |
 
 ```
@@ -568,7 +568,7 @@ Uma fonte de **12 V / 1 A** (12 W) oferece margem de 2,8× sobre o pico. Um capa
 
 | Qtd | Componente | Função |
 |---|---|---|
-| ≈ 12 | CIs 74HC (04, 08, 11, 32, 86, 74) | lógica do circuito simulado |
+| 12 | CIs 74HC (4× 08, 2× 11, 32, 4075, 04, 86, 2× 74) | lógica do circuito simulado |
 | 1 | 74HC14 | Schmitt-trigger do clock |
 | 1 | NE555 ou TLC555 | temporizador TIMEOUT |
 | 1 | BC337-40 | chave de potência da trava |

@@ -22,13 +22,14 @@ Só biblioteca padrão. Python 3.11+.
 | [`circuito.py`](lockwise_gateway/circuito.py) | As equações booleanas do `.circ`, porta a porta, com a coordenada de cada porta no comentário | Gêmeo da **netlist**. Não sabe o que é senha ou tentativa; sabe pinos, portas e flip-flops. |
 | [`estados.py`](lockwise_gateway/estados.py) + [`maquina.py`](lockwise_gateway/maquina.py) | Padrão **State**: uma classe por estado, um contador com as regras do hardware, eventos nas transições | Gêmeo **semântico**. É o que o backend vai espelhar. |
 
-[`tests/test_equivalencia.py`](tests/test_equivalencia.py) prova que os dois são a mesma máquina em três níveis:
+[`tests/test_equivalencia.py`](tests/test_equivalencia.py) e [`tests/test_netlist.py`](tests/test_netlist.py) provam que os dois são a mesma máquina — e que ambos são o circuito — em quatro níveis:
 
 1. **Exaustivo** — para os 16 estados possíveis dos flip-flops × 128 combinações de pinos, o próximo estado da netlist é idêntico ao do padrão State. 2048 casos, todo o espaço.
 2. **Saídas** — os sete pinos de saída coincidem em todos os estados e entradas.
 3. **Simulação** — as sequências de [`referencia/sequencias.json`](referencia/sequencias.json), extraídas das figuras de evidência, produzem nos dois modelos exatamente o estado e o contador que o Logisim mostra.
+4. **O arquivo `.circ`** — [`tests/logisim.py`](tests/logisim.py) lê `circuito/lockwise_completo.circ`, reconstrói as conexões (fios, túneis, portas dos componentes) e simula o grafo de portas sem saber nada sobre o LOCKWISE. O próximo estado e as saídas coincidem com `circuito.py` nos 2048 casos.
 
-Se alguém alterar uma porta no `.circ` e esquecer o Python, ou vice-versa, o teste quebra.
+Se alguém mover uma porta no Logisim e esquecer o Python, o nível 4 quebra. Se alterar o Python e esquecer o Logisim, os níveis 1 a 4 quebram.
 
 ### As equações, extraídas da netlist
 
@@ -146,6 +147,7 @@ python -m pytest
 
 | Arquivo | Cobre |
 |---|---|
+| `test_netlist.py` + `logisim.py` | o `.circ` lido e simulado ≡ `circuito.py` (2048 casos), estrutura do circuito |
 | `test_equivalencia.py` | netlist ≡ State (2048 casos), saídas, sequências da simulação |
 | `test_circuito.py` | comparador, bloqueio antecipado, saturação, reset |
 | `test_maquina.py` | eventos por transição, energia, usuário, payloads |
