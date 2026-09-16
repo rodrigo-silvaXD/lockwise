@@ -1,0 +1,29 @@
+# Roteiro de ensaio da demo LOCKWISE
+# Cada linha e um gesto na Poke Tool do Logisim. Execute o mesmo gesto la.
+#   python -m lockwise_gateway.cli --roteiro roteiros/demo.txt
+
+estado
+
+# 1. Acesso liberado na primeira tentativa (figs 05-08)
+senha 1011
+confirma on
+clk                 # AGUARDANDO -> VERIFICANDO
+confirma off
+clk                 # VERIFICANDO -> LIBERADO   => POST /acessos LIBERADO 18200 mJ
+timeout on
+clk                 # LIBERADO -> AGUARDANDO
+timeout off
+
+# 2. Tres tentativas incorretas (figs 09-11)
+tentar 0000         # NEGADO, tentativa 1
+tentar 1111         # NEGADO, tentativa 2
+tentar 0011         # BLOQUEADO, tentativa 3  => POST /acessos + POST /alertas BLOQUEIO
+
+# 3. Senha certa nao adianta durante o bloqueio (fig 12)
+tentar 1011         # permanece BLOQUEADO, contador saturado em 11
+
+# 4. Desbloqueio administrativo (fig 13)
+desbloquear         # BLOQUEADO -> AGUARDANDO   => POST /alertas DESBLOQUEIO_ADMIN
+
+estado
+sair
