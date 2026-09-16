@@ -166,7 +166,7 @@ lockwise/
 │   ├── arquitetura.md             A FAZER
 │   └── otimizacao.md              A FAZER
 ├── gateway/                       CONCLUÍDO
-├── backend/                       A FAZER
+├── backend/                       CONCLUÍDO (local)
 ├── otimizacao/                    A FAZER
 └── .github/workflows/             A FAZER
 ```
@@ -181,8 +181,8 @@ Pendência no README: preencher a tabela de Equipe.
 |---|---|---|
 | 1 | Eletrônica digital e analógica: circuito funcional simulado, sensor ou atuador, lógica digital | **Cumprido** (entregue acima do mínimo: combinacional *e* sequencial) |
 | 2 | Física: justificativa do comportamento físico com cálculos documentados | **Cumprido** (`docs/fisica.md`) |
-| 3 | Arquitetura: C4 ou UML, ≥2 padrões GoF, SOLID no backend | Não iniciado |
-| 4 | Cloud: deploy real, banco gerenciado, variáveis seguras, CI/CD | Não iniciado |
+| 3 | Arquitetura: C4 ou UML, ≥2 padrões GoF, SOLID no backend | **Código cumprido** (3 padrões + SOLID em `backend/`); C4 pendente (Fase E) |
+| 4 | Cloud: deploy real, banco gerenciado, variáveis seguras, CI/CD | Backend pronto para deploy; nuvem e pipeline pendentes (Fase F) |
 | 5 | Operations Research: problema de otimização modelado e resolvido | Não iniciado |
 
 ---
@@ -251,56 +251,25 @@ Decisões tomadas:
 
 **Contrato que o backend precisa honrar** (Fase C): `POST /acessos` com `{momento, usuario_id, resultado, tentativa, energia_mj}` e `POST /alertas` com `{tipo, momento}`; responder 201; aceitar `X-API-Key`; `tipo ∈ {BLOQUEIO, DESBLOQUEIO_ADMIN}`. A coluna `tentativa SMALLINT` deve entrar na tabela `acesso`.
 
-### Fase C — Backend (≈3 a 4 dias)
-`backend/` em Python com FastAPI.
+### Fase C — Backend ✅ CONCLUÍDA (16/09/2026) · Fase D — Banco ✅ CONCLUÍDA (local)
+`backend/lockwise_api/`, FastAPI + SQLAlchemy 2 + Pydantic 2, venv em `backend/.venv`. 69 testes.
 
-Padrões GoF obrigatórios (mínimo 2):
-- **State** — espelha a FSM do circuito. A justificativa é técnica: o hardware *é* uma máquina de estados.
-- **Strategy** — política de bloqueio intercambiável (três tentativas, bloqueio progressivo, horário restrito).
-- *(opcional)* **Observer** — notificação ao administrador.
+Decisões tomadas:
+- **Três padrões GoF com trabalho real**: State (`dominio/estados.py`) = projeção do estado da fechadura a partir dos eventos, LIBERADO expira sozinho após 5,16 s; Strategy (`dominio/politicas.py`) = política de supervisão `limite` | `horario` | `composta` | `nenhuma`, por `LOCKWISE_POLITICA`; Observer (`dominio/notificacao.py`) = `LogObservador` + `WebhookObservador` opcional.
+- Camadas: rotas → `dependencias.py` (composição) → `servicos.py` → `repositorios.py` (Protocols) → domínio. SOLID mapeado no `backend/README.md`.
+- **Escrita exige `X-API-Key`, leitura aberta.** Sem chave configurada, escrita responde **503** (falha fechada; 5xx faz o gateway enfileirar).
+- **Evento inconsistente é aceito e anotado** em `/fechadura.avisos`, nunca rejeitado com 4xx.
+- **Demanda horária em hora local** (`LOCKWISE_FUSO`, padrão America/Sao_Paulo), 24 faixas sempre presentes, com `energia_mj` somada — é a d_h da Fase G.
+- Respostas sempre em UTC explícito (`Z`), mesmo com SQLite.
+- Banco: `schema.sql` de referência; `create_all` + semente `usuario(1, 'Morador', 1011)` idempotente no arranque. Colunas novas: `acesso.tentativa`, `alerta.detalhe`, `alerta.acesso_id`. Tipos de alerta da nuvem: `TENTATIVAS_SUSPEITAS`, `ACESSO_FORA_DO_HORARIO`.
+- `DATABASE_URL` `postgres://` (Render) é normalizada para `postgresql+psycopg://`; `psycopg[binary]` já está nas dependências.
+- **`tests/test_ponta_a_ponta.py`** sobe uvicorn real, roda o gateway real com `roteiros/demo.txt` e confere: 4 acessos, 3 alertas, 18 200 mJ na hora certa, fechadura em AGUARDANDO. É a demo automatizada.
 
-SOLID mapeado princípio a princípio, **apontando linha de código**. "Aplicamos SOLID" sem evidência não conta.
+Rotas: `POST/GET /acessos`, `GET /acessos/demanda-horaria`, `POST/GET /alertas`, `PATCH /alertas/{id}/resolver`, `GET /fechadura`, `GET /health`, `/docs`. `GET /escala/otimizada` fica para a Fase G.
 
-Rotas:
+Rodar: `LOCKWISE_API_KEY=dev .venv/Scripts/python -m uvicorn lockwise_api.asgi:app --reload` e o gateway com `--api-url http://127.0.0.1:8000`.
 
-| Método | Rota |
-|---|---|
-| POST | `/acessos` |
-| GET | `/acessos?de=&ate=` |
-| GET | `/acessos/demanda-horaria` |
-| POST | `/alertas` |
-| GET | `/escala/otimizada` |
-
-### Fase D — Banco (≈1 dia)
-
-```sql
-CREATE TABLE usuario (
-    id           SERIAL PRIMARY KEY,
-    nome         VARCHAR(100) NOT NULL,
-    codigo_senha SMALLINT NOT NULL,
-    ativo        BOOLEAN DEFAULT TRUE
-);
-
-CREATE TABLE acesso (
-    id          SERIAL PRIMARY KEY,
-    usuario_id  INTEGER REFERENCES usuario(id),
-    momento     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    resultado   VARCHAR(20) NOT NULL,   -- LIBERADO | NEGADO | BLOQUEADO
-    tentativa   SMALLINT NOT NULL,      -- 1, 2 ou 3 (vem do gateway)
-    energia_mj  INTEGER
-);
-
-CREATE TABLE alerta (
-    id        SERIAL PRIMARY KEY,
-    tipo      VARCHAR(30) NOT NULL,
-    momento   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    resolvido BOOLEAN DEFAULT FALSE
-);
-
-CREATE INDEX idx_acesso_momento ON acesso(momento);
-```
-
-A coluna `energia_mj` é o que liga a fase de física à de otimização. Não é enfeite.
+**Pendente da Fase D em produção**: criar o Postgres no Render (Fase F) e apontar `DATABASE_URL`. Nenhuma migração é necessária — `create_all` cria tudo no primeiro arranque.
 
 ### Fase E — Arquitetura (≈1 dia)
 `docs/arquitetura.md` com C4 níveis 1 a 3 em Mermaid ou PlantUML, versionado no repositório. Diagrama feito em ferramenta gráfica externa e não versionado se perde.
@@ -359,6 +328,6 @@ Cada integrante sendo arguido pelos outros. É a fase mais ignorada e a que o re
 
 > Estou desenvolvendo o LOCKWISE, um sistema de controle de acesso para a ExpoTech 2026.2 da UniFECAF (categoria INTERFACE, Engenharia da Computação). Leia o arquivo `docs/CONTEXTO_LOCKWISE.md` do repositório, que contém todo o histórico, decisões técnicas, equações do circuito e o plano das fases restantes.
 >
-> A eletrônica está concluída (circuito Logisim + 14 evidências), a física também (`docs/fisica.md`, energia por liberação 18 200 mJ) e o gateway também (`gateway/`, gêmeo digital com prova de equivalência contra o .circ real, 103 testes).
+> A eletrônica está concluída (circuito Logisim + 14 evidências), a física também (`docs/fisica.md`, energia por liberação 18 200 mJ) o gateway também (`gateway/`, gêmeo digital com prova de equivalência contra o .circ real, 103 testes) e o backend também (`backend/`, FastAPI com State/Strategy/Observer, 69 testes, demo ponta a ponta automatizada). Próximas: E (C4), F (Render + CI/CD), G (PuLP).
 >
 > Quero seguir pela Fase [X]. Antes de escrever código, confirme comigo as decisões de projeto que ainda estiverem em aberto.
