@@ -1,6 +1,6 @@
 # LOCKWISE — Contexto do Projeto
 
-Documento de continuidade. Contém tudo o que foi decidido e construído até 14 de setembro de 2026, para retomar o trabalho em qualquer ferramenta sem perder contexto.
+Documento de continuidade. Contém tudo o que foi decidido e construído até 16 de setembro de 2026, para retomar o trabalho em qualquer ferramenta sem perder contexto.
 
 ---
 
@@ -160,7 +160,7 @@ lockwise/
 ├── docs/
 │   ├── evidencias/                14 figuras + índice
 │   ├── eletronica.md              A FAZER
-│   ├── fisica.md                  A FAZER
+│   ├── fisica.md                  CONCLUÍDO
 │   ├── arquitetura.md             A FAZER
 │   └── otimizacao.md              A FAZER
 ├── gateway/                       A FAZER
@@ -178,7 +178,7 @@ Pendência no README: preencher a tabela de Equipe.
 | # | Requisito | Situação |
 |---|---|---|
 | 1 | Eletrônica digital e analógica: circuito funcional simulado, sensor ou atuador, lógica digital | **Cumprido** (entregue acima do mínimo: combinacional *e* sequencial) |
-| 2 | Física: justificativa do comportamento físico com cálculos documentados | Não iniciado |
+| 2 | Física: justificativa do comportamento físico com cálculos documentados | **Cumprido** (`docs/fisica.md`) |
 | 3 | Arquitetura: C4 ou UML, ≥2 padrões GoF, SOLID no backend | Não iniciado |
 | 4 | Cloud: deploy real, banco gerenciado, variáveis seguras, CI/CD | Não iniciado |
 | 5 | Operations Research: problema de otimização modelado e resolvido | Não iniciado |
@@ -221,15 +221,21 @@ Restam cerca de **8 semanas** até a avaliação.
 
 ## 10. O que falta fazer
 
-### Fase A — Física (≈1 dia)
-Memorial de cálculos em `docs/fisica.md`. Quatro itens:
+### Fase A — Física ✅ CONCLUÍDA (16/09/2026)
+Memorial em `docs/fisica.md`, organizado por grandeza (sinal, corrente/tensão, potência, magnetismo) e cobrindo os três eixos do roteiro — eletrostática, eletrodinâmica, magnetismo. Valores de projeto:
 
-1. **Resistor do LED indicador.** Vcc 5 V, Vf 2,0 V, If 15 mA → R = 200 Ω → comercial 220 Ω. Potência dissipada ≈ 41 mW.
-2. **Estágio de potência da trava.** Solenoide 12 V / 300 mA = 3,6 W. Porta lógica 74HC entrega no máximo ~25 mA, logo é obrigatório transistor. BC337 com β ≈ 100 → Ib = 3 mA → Rb = (5 − 0,7)/0,003 ≈ 1,5 kΩ.
-3. **Diodo de roda livre** (1N4007) contra o pico reverso da indutância: V = −L·di/dt.
-4. **Energia por liberação.** 3,67 W × 5 s ≈ 18,4 J. *Este número reaparece na fase de otimização — guardar.*
+| Item | Valor |
+|---|---|
+| Pull-down das entradas | 10 kΩ |
+| Filtro de clock | 10 kΩ + 1 µF + 74HC14 (τ = 10 ms) |
+| Resistor de LED | 220 Ω → 11,1 mA real |
+| Estágio de potência | BC337-40, R_B = 1 kΩ, I_C = 292,5 mA, V_CE(sat) = 0,3 V, P_Q = 91 mW |
+| Diodo de roda livre | 1N4007, limita coletor a 12,8 V |
+| TIMEOUT | NE555 monoestável, 470 kΩ + 10 µF → T = 5,16 s |
+| **Energia por liberação** | **18 200 mJ** (3,53 W × 5,16 s) — constante `energia_mj` do gateway/backend; eventos NEGADO/BLOQUEADO gravam 0 |
+| Fonte | 12 V / 1 A; pico 354 mA |
 
-Ponto de atenção: um LED com resistor sozinho não sustenta a seção. O transistor e o diodo sustentam. A pergunta provável é "por que você não ligou a trava direto na saída da porta lógica?".
+Seção 9 do memorial tem as respostas prontas para a sabatina ("por que não ligou a trava direto na porta?", "para que serve o diodo?", "como escolheu o resistor de base?").
 
 ### Fase B — Gateway (≈1 dia)
 `gateway/gateway.py`. Replica a FSM do circuito em Python usando o padrão **State**. Lê o evento de acesso, monta o payload (momento, usuário, resultado, energia em mJ) e faz `POST /acessos` com retry.
@@ -334,15 +340,15 @@ Cada integrante sendo arguido pelos outros. É a fase mais ignorada e a que o re
 1. **Demo ao vivo vale 35%.** Precisa ser encadeada de ponta a ponta, não telas separadas. Ensaiar.
 2. **Conhecimento concentrado.** Hoje uma pessoa opera o circuito. O regulamento não aceita divisão em que só um entende o projeto.
 3. **Deploy quebra na véspera.** Subir cedo, mesmo incompleto, e manter o pipeline verde.
-4. **A seção de física ficar rasa.** Sem transistor e diodo, não há "Física para Sistemas Computacionais".
+4. ~~**A seção de física ficar rasa.**~~ Resolvido: `docs/fisica.md` cobre transistor, diodo, RC, temporização e orçamento de potência.
 5. **Vídeo pitch esquecido.** Não aparece no roteiro da INTERFACE, só no regulamento geral.
 
 ---
 
 ## 12. Prompt para retomar em outra ferramenta
 
-> Estou desenvolvendo o LOCKWISE, um sistema de controle de acesso para a ExpoTech 2026.2 da UniFECAF (categoria INTERFACE, Engenharia da Computação). Leia o arquivo `docs/contexto.md` do repositório, que contém todo o histórico, decisões técnicas, equações do circuito e o plano das fases restantes.
+> Estou desenvolvendo o LOCKWISE, um sistema de controle de acesso para a ExpoTech 2026.2 da UniFECAF (categoria INTERFACE, Engenharia da Computação). Leia o arquivo `docs/CONTEXTO_LOCKWISE.md` do repositório, que contém todo o histórico, decisões técnicas, equações do circuito e o plano das fases restantes.
 >
-> A eletrônica está concluída: circuito em Logisim-evolution com comparador de senha, máquina de estados de quatro estados e contador de tentativas, mais 14 figuras de evidência.
+> A eletrônica está concluída: circuito em Logisim-evolution com comparador de senha, máquina de estados de quatro estados e contador de tentativas, mais 14 figuras de evidência. A física também: memorial de cálculos em `docs/fisica.md`, com a energia por liberação (18 200 mJ) que o backend grava em `energia_mj`.
 >
 > Quero seguir pela Fase [X]. Antes de escrever código, confirme comigo as decisões de projeto que ainda estiverem em aberto.
