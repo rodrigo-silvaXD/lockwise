@@ -21,9 +21,12 @@ def health(request: Request, response: Response):
     except Exception as e:  # noqa: BLE001 - qualquer falha de banco e "degradado"
         banco, situacao = f"erro: {type(e).__name__}", "degradado"
         response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+    motor = estado.engine.url.get_backend_name()
     return Saude(
         status=situacao,
         banco=banco,
+        motor=motor,
+        persistente=motor != "sqlite",
         versao=__version__,
         politica=estado.politica.nome,
         observadores=estado.notificador.quantidade,
