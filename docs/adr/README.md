@@ -25,7 +25,7 @@ Regras que seguimos:
 | [0010](0010-gateway-sem-dependencias.md) | Gateway sem dependências externas | gateway | aceita |
 | [0011](0011-contrato-de-eventos.md) | Contrato de eventos: só transições, senhas não transmitidas | gateway | aceita |
 | [0012](0012-entrega-resiliente.md) | Entrega resiliente: retry, fila offline, momento preservado | gateway | aceita |
-| [0013](0013-render-como-provedor-de-nuvem.md) | Render como provedor de nuvem | nuvem | parcialmente substituída pela 0024 |
+| [0013](0013-render-como-provedor-de-nuvem.md) | Render como provedor de nuvem | nuvem | aceita; banco substituído pela 0024 |
 | [0014](0014-fastapi-sqlalchemy-sqlite-postgres.md) | FastAPI e SQLAlchemy; SQLite local, Postgres em produção | backend | aceita |
 | [0015](0015-tres-padroes-gof.md) | Três padrões GoF, cada um com um trabalho real | backend | aceita |
 | [0016](0016-chave-na-escrita-leitura-aberta.md) | Chave só na escrita; leitura aberta; sem chave, 503 | backend | aceita |
