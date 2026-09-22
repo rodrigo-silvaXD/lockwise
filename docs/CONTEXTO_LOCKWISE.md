@@ -183,7 +183,7 @@ Pendência no README: preencher a tabela de Equipe.
 | 1 | Eletrônica digital e analógica: circuito funcional simulado, sensor ou atuador, lógica digital | **Cumprido** (entregue acima do mínimo: combinacional *e* sequencial) |
 | 2 | Física: justificativa do comportamento físico com cálculos documentados | **Cumprido** (`docs/fisica.md`) |
 | 3 | Arquitetura: C4 ou UML, ≥2 padrões GoF, SOLID no backend | **Código cumprido** (3 padrões + SOLID em `backend/`); C4 pendente (Fase E) |
-| 4 | Cloud: deploy real, banco gerenciado, variáveis seguras, CI/CD | Backend pronto para deploy; nuvem e pipeline pendentes (Fase F) |
+| 4 | Cloud: deploy real, banco gerenciado, variáveis seguras, CI/CD | **Cumprido**: API em https://lockwise-api.onrender.com, Postgres na Neon, segredos no painel, CI verde (falta ligar o deploy automático) |
 | 5 | Operations Research: problema de otimização modelado e resolvido | Não iniciado |
 
 ---

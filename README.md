@@ -35,7 +35,7 @@ O projeto atravessa cinco camadas, e o mesmo dado — o evento de acesso — per
 | Gateway | Concluído |
 | Backend e banco | Concluído (local; deploy na Fase F) |
 | Arquitetura e padrões | Código concluído (State, Strategy, Observer, SOLID); documentação C4 pendente |
-| Nuvem e CI/CD | Pipeline pronto; infraestrutura a criar |
+| Nuvem e CI/CD | API no ar; falta ligar o deploy automático |
 | Pesquisa operacional | Não iniciado |
 
 ---
@@ -126,6 +126,17 @@ O Logisim simula a lógica; o memorial [`docs/fisica.md`](docs/fisica.md) descre
 | Diodo 1N4007 em antiparalelo com a bobina | v = −L·di/dt chegaria a centenas de volts contra V_CEO = 45 V; o diodo limita a 12,8 V |
 | Trava aberta por 5,16 s | NE555 monoestável: T = RC·ln 3 com 470 kΩ e 10 µF |
 | **Energia por liberação: 18 200 mJ** | 3,53 W × 5,16 s — é o valor gravado em `energia_mj` a cada acesso liberado |
+
+---
+
+## No ar
+
+A API está publicada em **https://lockwise-api.onrender.com** ([Swagger](https://lockwise-api.onrender.com/docs)), com Postgres gerenciado na Neon. Aplicação no Render, banco na Neon, testes no GitHub Actions — o porquê de cada escolha está em [`docs/adr/`](docs/adr/), e o passo a passo em [`docs/deploy.md`](docs/deploy.md).
+
+```bash
+curl https://lockwise-api.onrender.com/health
+curl https://lockwise-api.onrender.com/fechadura
+```
 
 ---
 

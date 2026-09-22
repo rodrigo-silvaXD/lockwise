@@ -1,7 +1,7 @@
 # ADR 0013 — Render como provedor de nuvem
 
 Data: 2026-09-14 (proposta), a confirmar no deploy
-Situação: aceita para a aplicação; a parte de banco de dados foi substituída pela [ADR 0024](0024-banco-na-neon.md)
+Situação: aceita para a aplicação (API no ar desde 22/09/2026); a parte de banco de dados foi substituída pela [ADR 0024](0024-banco-na-neon.md)
 
 ## Contexto
 
