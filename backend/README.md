@@ -47,7 +47,7 @@ dominio/        State · Strategy · Observer — sem FastAPI, sem SQLAlchemy
 | **I** — interfaces segregadas | `RepositorioDeAcessos`, `RepositorioDeAlertas`, `RepositorioDeUsuarios` são três Protocols em [`repositorios.py`](lockwise_api/repositorios.py). `ServicoDaFechadura` recebe só os dois que usa. |
 | **D** — inversão de dependência | Serviços dependem de Protocols; as classes SQLAlchemy são injetadas em [`dependencias.py`](lockwise_api/dependencias.py). O domínio não importa `sqlalchemy` nem `fastapi`. |
 
-A documentação C4 (Fase E) aponta linhas exatas.
+Os diagramas C4 e o mapeamento completo de SOLID com arquivo e linha estão em [`docs/arquitetura.md`](../docs/arquitetura.md). A afirmação central daquele documento — o domínio não conhece HTTP nem banco — é verificada por [`tests/test_arquitetura.py`](tests/test_arquitetura.py), não só afirmada.
 
 ---
 
@@ -153,6 +153,7 @@ A infraestrutura está em [`render.yaml`](../render.yaml) e o passo a passo em [
 | `test_alertas_fechadura.py` | alertas do gateway, resolver, `/fechadura` via HTTP |
 | `test_demanda.py` | 24 faixas, hora local vs UTC, soma de energia, período, fuso configurável |
 | `test_seguranca_saude.py` | 401, 503 falha fechada, leitura aberta, `/health` 200/503, OpenAPI |
+| `test_arquitetura.py` | as camadas do C4 como restrição executável: domínio puro, serviços sobre Protocols, rotas sem banco |
 | **`test_ponta_a_ponta.py`** | **a demo:** uvicorn real + gateway real + `roteiros/demo.txt` → 4 acessos, 3 alertas, energia na hora certa, fechadura em AGUARDANDO |
 
 O último é a demo ao vivo sem o Logisim na tela. Se ele passa, a apresentação funciona.

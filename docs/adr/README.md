@@ -40,6 +40,7 @@ Regras que seguimos:
 | [0025](0025-tolerar-embrulhos-na-database-url.md) | Tolerar os embrulhos que os painéis põem na string de conexão | nuvem | aceita |
 | [0026](0026-modelo-de-cobertura-com-turnos-sobrepostos.md) | Modelo de cobertura com turnos sobrepostos | otimização | aceita |
 | [0027](0027-historico-sintetico-pela-api-real.md) | Histórico sintético pela máquina de estados e pela API real | otimização | aceita |
+| [0028](0028-c4-em-mermaid-verificado-por-teste.md) | C4 em Mermaid versionado, camadas verificadas por teste | arquitetura | aceita |
 
 ## Modelo para uma ADR nova
 
