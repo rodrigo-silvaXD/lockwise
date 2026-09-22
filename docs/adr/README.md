@@ -37,6 +37,7 @@ Regras que seguimos:
 | [0022](0022-deploy-gatilhado-pelo-ci.md) | Deploy disparado pelo CI, não pelo push | nuvem | aceita |
 | [0023](0023-acordar-a-api-antes-da-demo.md) | Acordar a API antes da demonstração | nuvem | aceita |
 | [0024](0024-banco-na-neon.md) | Postgres na Neon, aplicação no Render | nuvem | aceita |
+| [0025](0025-tolerar-embrulhos-na-database-url.md) | Tolerar os embrulhos que os painéis põem na string de conexão | nuvem | aceita |
 
 ## Modelo para uma ADR nova
 
