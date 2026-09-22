@@ -38,7 +38,7 @@ O primeiro build leva alguns minutos. Ele instala as dependências do `backend/p
 curl https://lockwise-api.onrender.com/health
 ```
 
-Deve responder `{"status":"ok","banco":"ok","motor":"postgresql","persistente":true,...}`. A documentação interativa fica em `/docs`.
+Deve responder `{"status":"ok","banco":"ok","motor":"postgresql","persistente":true,"commit":"...",...}`. A documentação interativa fica em `/docs`, e abrir a raiz da URL no navegador leva direto para lá.
 
 Olhe o `motor`: se vier `"sqlite"` e `"persistente":false`, a `DATABASE_URL` não chegou ao serviço e a API está gravando em disco efêmero, que o Render apaga a cada reinício. Nesse caso, volte ao passo 2.
 

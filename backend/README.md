@@ -62,8 +62,9 @@ A documentação C4 (Fase E) aponta linhas exatas.
 | `GET` | `/alertas?resolvido=` | aberta | |
 | `PATCH` | `/alertas/{id}/resolver` | `X-API-Key` | 404 se não existe |
 | `GET` | `/fechadura` | aberta | estado, tentativas, `trava_fecha_em`, último evento, avisos |
-| `GET` | `/health` | aberta | `{status, banco, motor, persistente, versao, politica, observadores}`; 503 se o banco não responde. `persistente: false` denuncia que está rodando em SQLite — em produção, disco efêmero |
+| `GET` | `/health` | aberta | `{status, banco, motor, persistente, versao, commit, politica, observadores}`; 503 se o banco não responde. `persistente: false` denuncia que está rodando em SQLite — em produção, disco efêmero |
 | `GET` | `/docs` | aberta | Swagger |
+| `GET` | `/` | aberta | redireciona para `/docs` — sem isso, abrir a URL no navegador mostra um 404 |
 
 **Contrato com o gateway** — é exatamente o que `gateway/lockwise_gateway/eventos.py` produz:
 

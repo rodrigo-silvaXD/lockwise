@@ -87,6 +87,9 @@ class Configuracao:
     fuso: str = "America/Sao_Paulo"
     webhook_url: str | None = None
     cors_origins: tuple[str, ...] = field(default=("*",))
+    # O Render injeta RENDER_GIT_COMMIT automaticamente. Serve para o pipeline
+    # confirmar que o deploy trocou mesmo o que esta rodando (ver ADR 0022).
+    commit: str = "desconhecido"
 
     @classmethod
     def do_ambiente(cls, env: dict[str, str] | None = None) -> Configuracao:
@@ -101,4 +104,5 @@ class Configuracao:
             fuso=e.get("LOCKWISE_FUSO", cls.fuso),
             webhook_url=e.get("LOCKWISE_WEBHOOK_URL") or None,
             cors_origins=tuple(o.strip() for o in e.get("LOCKWISE_CORS_ORIGINS", "*").split(",") if o.strip()),
+            commit=(e.get("RENDER_GIT_COMMIT") or e.get("LOCKWISE_COMMIT") or "desconhecido")[:40],
         )
