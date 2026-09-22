@@ -92,6 +92,13 @@ cd gateway
 python -m lockwise_gateway.cli                     # modo eco: imprime os POSTs, sem rede
 ```
 
+Contra a API em produção, no Windows, use o script — ele cuida das variáveis de ambiente:
+
+```powershell
+.\demo.ps1 -Chave "<a chave do painel do Render>"
+.\demo.ps1 -Chave "..." -Roteiro roteiros/demo.txt   # o ensaio completo
+```
+
 ```bash
 export LOCKWISE_API_URL=https://lockwise-api.onrender.com
 export LOCKWISE_API_KEY=...

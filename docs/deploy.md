@@ -59,18 +59,27 @@ Sem eles o workflow de deploy não falha — avisa que faltam e termina. Com ele
 
 ## Apontar o gateway para a nuvem
 
+O gateway roda **na máquina de quem apresenta**, ao lado do Logisim — nunca na nuvem. Ele é o cliente; a API é o servidor.
+
+No Windows, use o script, que evita digitar variável de ambiente na hora da apresentação:
+
+```powershell
+cd gateway
+.\demo.ps1 -Chave "<a chave do passo 4>"
+```
+
+Para rodar o ensaio completo em vez do painel interativo:
+
+```powershell
+.\demo.ps1 -Chave "<a chave do passo 4>" -Roteiro roteiros/demo.txt
+```
+
+Em Linux ou macOS, à mão:
+
 ```bash
 cd gateway
 export LOCKWISE_API_URL=https://lockwise-api.onrender.com
 export LOCKWISE_API_KEY=<a chave do passo 4>
-python -m lockwise_gateway.cli
-```
-
-No Windows, no PowerShell:
-
-```powershell
-$env:LOCKWISE_API_URL = "https://lockwise-api.onrender.com"
-$env:LOCKWISE_API_KEY = "<a chave do passo 4>"
 python -m lockwise_gateway.cli
 ```
 
@@ -84,7 +93,7 @@ Meia hora antes, na ordem:
 
 1. Abrir `https://lockwise-api.onrender.com/health` no navegador. Se demorar, é a hibernação; espere responder.
 2. Conferir que o pipeline está verde na aba Actions do GitHub.
-3. Subir o gateway com as variáveis de ambiente. Ele acorda a API de novo, por garantia.
+3. Subir o gateway com `.\demo.ps1 -Chave "..."`. Ele acorda a API de novo, por garantia.
 4. Abrir o Logisim com `circuito/lockwise_completo.circ`.
 5. Ensaiar uma vez o `roteiros/demo.txt`, e depois limpar o que foi criado, se quiser começar do zero na frente do avaliador.
 
