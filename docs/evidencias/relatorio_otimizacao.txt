@@ -1,0 +1,165 @@
+# Execução real do modelo contra a API em produção — 22/09/2026
+#
+# Gerado por:  python -m lockwise_otimizacao.cli resolver --dias 7 --saida relatorio.txt
+#
+# A linha "Origem" abaixo mostra que a demanda foi lida de
+# https://lockwise-api.onrender.com, ou seja, do Postgres gerenciado na Neon,
+# e não de um arquivo local. O histórico é sintético (ADR 0027), gerado pela
+# máquina de estados do gateway e enviado pela mesma API.
+
+========================================================================
+             LOCKWISE — ESCALA DE VIGILÂNCIA DE MENOR CUSTO             
+========================================================================
+
+O QUE A OTIMIZAÇÃO ECONOMIZA
+────────────────────────────
+  escala ingênua (mesmo efetivo em todo turno)   12 vigilantes   R$  2816.00/dia
+  escala otimizada                                9 vigilantes   R$  2068.00/dia
+
+  economia                                        3 vigilantes   R$   748.00/dia
+  redução de 26.6% no custo diário · R$ 22440.00 por mês
+
+A escala ingênua é o que sai de uma planilha: o mesmo efetivo em todos os
+turnos, dimensionado pelo pior horário. Ela cobre a demanda, mas paga gente
+parada na madrugada para dar conta do fim da tarde.
+
+DEMANDA — de onde vem
+─────────────────────
+Origem: https://lockwise-api.onrender.com/acessos/demanda-horaria?de=2026-09-15T19%3A04%3A11.809798%2B00%3A00
+Período: 7 dia(s) · fuso America/Sao_Paulo
+Total: 933 acessos · 14942.2 J de energia de trava
+
+Um vigilante acompanha 4 acessos por hora (15 min por acesso); a portaria nunca fica com menos de 1.
+
+hora   acessos/dia   vigilantes exigidos (d_h)
+  00h        0.9   1  █
+  01h        0.6   1  █
+  02h        0.3   1  █
+  03h        0.0   1  █
+  04h        0.0   1  █
+  05h        0.4   1  █
+  06h        3.6   1  █
+  07h       10.0   3  ███
+  08h        8.0   2  ██
+  09h        4.6   2  ██
+  10h        4.7   2  ██
+  11h        5.6   2  ██
+  12h        9.6   3  ███
+  13h        6.3   2  ██
+  14h        6.1   2  ██
+  15h        3.9   1  █
+  16h        8.6   3  ███
+  17h       11.9   3  ███
+  18h       14.9   4  ████
+  19h       14.1   4  ████
+  20h        8.3   3  ███
+  21h        5.9   2  ██
+  22h        3.6   1  █
+  23h        1.7   1  █
+
+Pico às 18h com 14.9 acessos/dia.
+
+MODELO — programação linear inteira
+───────────────────────────────────
+Conjuntos   H = {0..23} horas do dia
+            T = {0..5} turnos de 8 h começando a cada 4 h
+
+Parâmetros  a(t,h) = 1 se o turno t cobre a hora h
+            d_h    vigilantes exigidos na hora h
+            c_t    custo de um vigilante no turno t
+            N_max  = 12 vigilantes disponíveis
+
+Variável    x_t ∈ ℤ⁺   vigilantes escalados no turno t
+
+  minimizar    Σ_t c_t · x_t
+
+  sujeito a    Σ_t a(t,h) · x_t ≥ d_h    ∀h ∈ H     (cobertura)
+               Σ_t x_t ≤ N_max                       (equipe)
+               x_t ≥ 0, inteiro          ∀t ∈ T
+
+Turnos de 8 h a cada 4 h fazem cada hora ser coberta por dois turnos.
+Sem essa sobreposição o problema seria trivial: bastaria olhar a maior
+demanda dentro de cada bloco.
+
+Resolvido com CBC (COIN-OR), via PuLP.
+
+ESCALA OTIMIZADA
+────────────────
+turno          custo unitário   vigilantes        custo
+  00h–08h  R$   253.00            1   R$   253.00
+  04h–12h  R$   231.00            2   R$   462.00
+  08h–16h  R$   220.00            0   R$     0.00  —
+  12h–20h  R$   220.00            3   R$   660.00
+  16h–00h  R$   231.00            3   R$   693.00
+  20h–04h  R$   253.00            0   R$     0.00  —
+                          TOTAL            9   R$  2068.00
+
+ESCALA INGÊNUA
+──────────────
+turno          custo unitário   vigilantes        custo
+  00h–08h  R$   253.00            2   R$   506.00
+  04h–12h  R$   231.00            2   R$   462.00
+  08h–16h  R$   220.00            2   R$   440.00
+  12h–20h  R$   220.00            2   R$   440.00
+  16h–00h  R$   231.00            2   R$   462.00
+  20h–04h  R$   253.00            2   R$   506.00
+                          TOTAL           12   R$  2816.00
+
+COBERTURA HORA A HORA
+─────────────────────
+hora  exigido  escalado  folga
+  00h      1        1      +0  ← restrição justa
+  01h      1        1      +0  ← restrição justa
+  02h      1        1      +0  ← restrição justa
+  03h      1        1      +0  ← restrição justa
+  04h      1        3      +2
+  05h      1        3      +2
+  06h      1        3      +2
+  07h      3        3      +0  ← restrição justa
+  08h      2        2      +0  ← restrição justa
+  09h      2        2      +0  ← restrição justa
+  10h      2        2      +0  ← restrição justa
+  11h      2        2      +0  ← restrição justa
+  12h      3        3      +0  ← restrição justa
+  13h      2        3      +1
+  14h      2        3      +1
+  15h      1        3      +2
+  16h      3        6      +3
+  17h      3        6      +3
+  18h      4        6      +2
+  19h      4        6      +2
+  20h      3        3      +0  ← restrição justa
+  21h      2        3      +1
+  22h      1        3      +2
+  23h      1        3      +2
+
+Horas em que a restrição de cobertura está justa: 00h, 01h, 02h, 03h, 07h, 08h, 09h, 10h, 11h, 12h, 20h.
+São elas que determinam o tamanho da equipe — aliviar qualquer outra hora
+não reduziria o custo.
+
+SENSIBILIDADE — e se a capacidade estiver errada?
+─────────────────────────────────────────────────
+K = acessos que um vigilante acompanha por hora
+
+  K   min/acesso   vigilantes   custo/dia    vs. adotado
+  2       30       (não cabe em 12 vigilantes)
+  3       20           11   R$  2519.00   +22%
+  4       15            9   R$  2068.00   +0% ←
+  6       10            6   R$  1386.00   -33%
+  8        7            6   R$  1386.00   -33%
+
+A estimativa adotada é K = 4. Subestimá-la encarece a escala;
+superestimá-la deixa a portaria sem gente na hora do movimento.
+
+A ENERGIA DA TRAVA, E POR QUE ELA NÃO ENTRA NO OBJETIVO
+───────────────────────────────────────────────────────
+O histórico acumula 14942.2 J de acionamento de trava (4.151 Wh),
+o que dá 0.5929 Wh por dia. A R$ 0.80 o kWh, R$ 0.00047436 por dia.
+
+Contra R$ 220.00 de um turno de vigilante, são 5 ordens de
+grandeza de diferença. Incluir esse custo no objetivo seria teatro: não
+mudaria uma única decisão do modelo.
+
+Onde a energia serve de verdade: ela é a assinatura física de cada acesso
+liberado (docs/fisica.md §6 — 12 V × 292,5 mA × 5,16 s = 18 200 mJ). É por
+ela que se confere se o histórico bate com o número de aberturas reais.

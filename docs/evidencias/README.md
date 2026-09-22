@@ -18,3 +18,9 @@ Capturas da simulação do circuito em Logisim-evolution 4.1.0.
 | fig12_saturacao | Saturação do contador em 11 |
 | fig13_desbloqueio-administrativo | Desbloqueio por RESET |
 | fig14_diagrama | Diagrama temporal |
+
+Além das figuras do circuito:
+
+| Arquivo | Conteúdo |
+|---|---|
+| relatorio_otimizacao.txt | Execução do modelo de escala contra a API em produção, com a demanda lida do Postgres na Neon |
