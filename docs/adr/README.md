@@ -34,6 +34,8 @@ Regras que seguimos:
 | [0019](0019-timestamps-em-utc-explicito.md) | Timestamps sempre em UTC explícito | backend | aceita |
 | [0020](0020-teste-ponta-a-ponta-como-demo.md) | Teste ponta a ponta como demo automatizada | backend | aceita |
 | [0021](0021-commit-por-passo-e-adrs.md) | Commit e push a cada passo; ADRs junto do código | processo | aceita |
+| [0022](0022-deploy-gatilhado-pelo-ci.md) | Deploy disparado pelo CI, não pelo push | nuvem | aceita |
+| [0023](0023-acordar-a-api-antes-da-demo.md) | Acordar a API antes da demonstração | nuvem | aceita |
 
 ## Modelo para uma ADR nova
 

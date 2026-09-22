@@ -28,9 +28,8 @@ class ServidorFalso:
         self.requisicoes = []
 
     def __call__(self, req, timeout):
-        self.requisicoes.append(
-            (req.full_url, req.get_method(), dict(req.header_items()), json.loads(req.data))
-        )
+        corpo = json.loads(req.data) if req.data else None  # GET /health nao tem corpo
+        self.requisicoes.append((req.full_url, req.get_method(), dict(req.header_items()), corpo))
         r = self.respostas.pop(0)
         if isinstance(r, Exception):
             raise r
@@ -143,3 +142,37 @@ def test_cliente_eco_nao_usa_rede_e_registra_payloads():
     assert envio.ok and envio.situacao == "simulado"
     assert eco.enviados[0][0] == "/acessos"
     assert "18200" in linhas[0]
+
+
+# ------------------------------------------------------- acordar a API
+
+
+def test_acordar_devolve_true_assim_que_a_api_responde(tmp_path):
+    srv = ServidorFalso(200)
+    esperas: list = []
+    c = cliente(srv, tmp_path, esperas)
+    assert c.acordar(espera_s=30) is True
+    url, metodo, _, _ = srv.requisicoes[0]
+    assert url.endswith("/health") and metodo == "GET"
+    assert esperas == []  # respondeu de primeira, nao dormiu
+
+
+def test_acordar_insiste_enquanto_a_api_hiberna(tmp_path):
+    # tres falhas (servico dormindo) e entao o 200
+    srv = ServidorFalso(fora(), fora(), fora(), 200)
+    esperas: list = []
+    c = cliente(srv, tmp_path, esperas)
+    assert c.acordar(espera_s=30) is True
+    assert len(srv.requisicoes) == 4
+    assert esperas == [2.0, 2.0, 2.0]
+
+
+def test_acordar_desiste_quando_o_tempo_acaba(tmp_path):
+    srv = ServidorFalso(*[fora() for _ in range(50)])
+    c = cliente(srv, tmp_path)  # dormir e no-op, entao o limite e o relogio
+    assert c.acordar(espera_s=0) is False
+    assert len(srv.requisicoes) == 1  # tenta uma vez antes de olhar o relogio
+
+
+def test_cliente_eco_nao_precisa_acordar():
+    assert ClienteEco(saida=lambda s: None).acordar() is True
