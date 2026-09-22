@@ -33,7 +33,7 @@ def test_health_reporta_banco_politica_e_observadores():
     corpo = api.get("/health").json()
     assert corpo == {
         "status": "ok", "banco": "ok", "motor": "sqlite", "persistente": False,
-        "versao": "0.1.0", "politica": "composta", "observadores": 1,
+        "versao": "0.2.0", "politica": "composta", "observadores": 1,
     }
 
 
