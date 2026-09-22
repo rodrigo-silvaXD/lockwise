@@ -105,6 +105,7 @@ python -m lockwise_gateway.cli --timeout-fisico   # TIMEOUT sozinho após 5,16 s
 | `--fila` | `LOCKWISE_FILA` | Arquivo da fila offline (padrão `fila_offline.jsonl`) |
 | `--roteiro arquivo` | — | Executa os comandos do arquivo em vez do teclado |
 | `--timeout-fisico` | — | Dispara TIMEOUT automaticamente 5,16 s após LIBERADO |
+| `--espera-acordar` | — | Segundos esperando a API acordar no arranque (padrão 60; `0` desliga) |
 
 ### Comandos
 
@@ -127,7 +128,9 @@ fechar              timeout on + clk + timeout off       LIBERADO -> AGUARDANDO
 desbloquear         reset on + clk + reset off           BLOQUEADO -> AGUARDANDO
 ```
 
-`estado` mostra pinos, estado, contador e saídas acesas; `fila` reenvia a fila offline; `ajuda`; `sair`.
+`estado` mostra pinos, estado, contador e saídas acesas; `fila` reenvia a fila offline; `acordar` chama `/health` até a API responder; `ajuda`; `sair`.
+
+Apontando para uma API, o gateway acorda o serviço antes de aceitar comandos — o plano gratuito do Render hiberna e a primeira requisição pode levar 30 s (ADR 0023).
 
 ### Roteiro de ensaio
 

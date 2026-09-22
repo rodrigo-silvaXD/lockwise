@@ -44,6 +44,7 @@ class Envio:
 class Cliente(Protocol):
     def enviar(self, evento: Evento) -> Envio: ...
     def reenviar_fila(self) -> tuple[int, int]: ...
+    def acordar(self, espera_s: float = ...) -> bool: ...
 
 
 class ClienteAPI:
@@ -99,6 +100,27 @@ class ClienteAPI:
             return 0
         return sum(1 for l in self.fila.read_text(encoding="utf-8").splitlines() if l.strip())
 
+    def acordar(self, espera_s: float = 60.0) -> bool:
+        """Chama GET /health ate a API responder, ou ate esgotar `espera_s`.
+
+        Servico em plano gratuito hiberna quando fica sem trafego, e a primeira
+        requisicao depois disso pode levar 30 s ou mais — bem mais que o retry
+        de um POST. Chamar isto antes da demo evita que o primeiro acesso do
+        circuito caia na fila so porque a API estava dormindo.
+        """
+        limite = time.monotonic() + espera_s
+        while True:
+            try:
+                req = urllib.request.Request(self.base_url + "/health", method="GET")
+                with self._abrir(req, timeout=self.timeout_s) as resp:
+                    if resp.status == 200:
+                        return True
+            except Exception:  # noqa: BLE001 — qualquer falha aqui e "ainda dormindo"
+                pass
+            if time.monotonic() >= limite:
+                return False
+            self._dormir(2.0)
+
     # ------------------------------------------------------------- interno
 
     def _enviar_com_retry(self, rota: str, payload: dict) -> Envio:
@@ -151,6 +173,9 @@ class ClienteEco:
 
     def reenviar_fila(self) -> tuple[int, int]:
         return 0, 0
+
+    def acordar(self, espera_s: float = 60.0) -> bool:
+        return True
 
 
 def _corpo(e: urllib.error.HTTPError) -> str:

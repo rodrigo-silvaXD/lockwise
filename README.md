@@ -35,7 +35,7 @@ O projeto atravessa cinco camadas, e o mesmo dado — o evento de acesso — per
 | Gateway | Concluído |
 | Backend e banco | Concluído (local; deploy na Fase F) |
 | Arquitetura e padrões | Código concluído (State, Strategy, Observer, SOLID); documentação C4 pendente |
-| Nuvem e CI/CD | Não iniciado |
+| Nuvem e CI/CD | Pipeline pronto; infraestrutura a criar |
 | Pesquisa operacional | Não iniciado |
 
 ---
@@ -57,7 +57,8 @@ lockwise/
 ├── gateway/                       gêmeo digital do circuito + POST para a API
 ├── backend/                       API FastAPI: State, Strategy, Observer + Postgres
 ├── otimizacao/                    modelo PuLP
-└── .github/workflows/             pipeline de CI/CD
+├── .github/workflows/             testes e deploy
+└── render.yaml                    infraestrutura do Render, versionada
 ```
 
 ---

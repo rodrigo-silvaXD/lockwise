@@ -1,0 +1,48 @@
+# Infraestrutura do LOCKWISE no Render, versionada junto do código.
+#
+# Como usar: no painel do Render, New > Blueprint, apontando para este
+# repositorio. O Render le este arquivo e cria o banco e o servico.
+#
+# O que NAO esta aqui: a chave da API. Ela e gerada pelo proprio Render
+# (generateValue) e fica so no painel; nunca passa pelo repositorio.
+
+databases:
+  - name: lockwise-db
+    databaseName: lockwise
+    user: lockwise
+    plan: free
+    postgresMajorVersion: "16"
+
+services:
+  - type: web
+    name: lockwise-api
+    runtime: python
+    plan: free
+    region: oregon
+    rootDir: backend
+    buildCommand: pip install --upgrade pip && pip install -e ".[postgres]"
+    startCommand: uvicorn lockwise_api.asgi:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    # Desligado de proposito: quem manda deployar e o GitHub Actions, depois
+    # que os testes passam (.github/workflows/deploy.yml). Com "commit", o
+    # Render subiria qualquer push, testes quebrados inclusive.
+    autoDeployTrigger: off
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: lockwise-db
+          property: connectionString
+      - key: LOCKWISE_API_KEY
+        generateValue: true      # o Render sorteia; leia no painel para dar ao gateway
+      - key: LOCKWISE_POLITICA
+        value: composta
+      - key: LOCKWISE_LIMITE_TENTATIVAS
+        value: "2"
+      - key: LOCKWISE_JANELA
+        value: 06:00-23:00
+      - key: LOCKWISE_FUSO
+        value: America/Sao_Paulo
+      - key: LOCKWISE_CORS_ORIGINS
+        value: "*"
+      - key: PYTHON_VERSION
+        value: "3.13.13"
