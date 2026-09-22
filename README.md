@@ -36,7 +36,7 @@ O projeto atravessa cinco camadas, e o mesmo dado — o evento de acesso — per
 | Backend e banco | Concluído (local; deploy na Fase F) |
 | Arquitetura e padrões | Código concluído (State, Strategy, Observer, SOLID); documentação C4 pendente |
 | Nuvem e CI/CD | API no ar; falta ligar o deploy automático |
-| Pesquisa operacional | Não iniciado |
+| Pesquisa operacional | Concluída |
 
 ---
 
@@ -56,7 +56,7 @@ lockwise/
 │   └── evidencias/                14 figuras da simulação
 ├── gateway/                       gêmeo digital do circuito + POST para a API
 ├── backend/                       API FastAPI: State, Strategy, Observer + Postgres
-├── otimizacao/                    modelo PuLP
+├── otimizacao/                    modelo PuLP: escala de vigilância de menor custo
 ├── .github/workflows/             testes e deploy
 └── render.yaml                    infraestrutura do Render, versionada
 ```
@@ -164,6 +164,24 @@ cd backend && .venv/Scripts/python -m pytest      # 69 testes, inclusive a demo 
 ```
 
 O teste `test_ponta_a_ponta.py` sobe a API real, roda o gateway real com `roteiros/demo.txt` e confere no banco: é a demo automatizada.
+
+---
+
+## A otimização
+
+O último elo: o histórico que o circuito gerou vira a demanda de um modelo de programação linear inteira, que decide quantos vigilantes escalar em cada turno ao menor custo ([`otimizacao/`](otimizacao/)).
+
+Seis turnos de 8 h começando a cada 4 h — cada hora coberta por dois turnos, o que torna a escolha combinatória. A demanda de cada hora vem de `GET /acessos/demanda-horaria`, convertida em vigilantes pela capacidade estimada de quatro acessos por hora. Resolvido com PuLP e CBC.
+
+| | vigilantes | custo/dia |
+|---|---:|---:|
+| escala ingênua (mesmo efetivo em todo turno) | 12 | R$ 2.816,00 |
+| **escala otimizada** | **9** | **R$ 2.068,00** |
+| economia | 3 | R$ 748,00 (**26,6%**) |
+
+```bash
+cd otimizacao && .venv/Scripts/python -m lockwise_otimizacao.cli resolver --dias 7
+```
 
 ---
 

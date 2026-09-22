@@ -35,3 +35,8 @@ build/
 backend/.venv/
 *.db
 .env
+
+# Otimizacao
+otimizacao/.venv/
+otimizacao/fila_semeadura.jsonl
+otimizacao/relatorio*.txt
