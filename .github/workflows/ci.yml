@@ -44,3 +44,21 @@ jobs:
         # test_ponta_a_ponta.py sobe a API de verdade e roda o gateway real
         # contra ela; por isso o checkout precisa das duas pastas.
         run: python -m pytest -v
+
+  otimizacao:
+    name: otimizacao (modelo de escala)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: instalar o pacote e o solver
+        working-directory: otimizacao
+        run: |
+          pip install --upgrade pip
+          pip install -e ".[dev]"
+      - name: rodar a suite
+        working-directory: otimizacao
+        # Inclui a verificacao por forca bruta de que o CBC achou o otimo.
+        run: python -m pytest -v
