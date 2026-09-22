@@ -39,6 +39,7 @@ macros (as sequencias do README):
 outros:
   estado              pinos, estado, contador e saidas
   fila                reenvia a fila offline
+  acordar             chama /health ate a API responder (plano gratuito hiberna)
   ajuda | sair"""
 
 
@@ -167,6 +168,13 @@ class Interprete:
         enviados, restantes = self.cliente.reenviar_fila()
         self._saida(f"   fila: {enviados} reenviado(s), {restantes} pendente(s)")
 
+    def _cmd_acordar(self, espera: str = "60") -> None:
+        self._saida(f"   acordando a API (ate {espera}s)...")
+        if self.cliente.acordar(float(espera)):
+            self._saida("   API respondeu; pode comecar a demo")
+        else:
+            self._saida("   ! a API nao respondeu a tempo; os eventos irao para a fila")
+
     def _cmd_ajuda(self) -> None:
         self._saida(AJUDA)
 
@@ -224,6 +232,8 @@ def montar_parser() -> argparse.ArgumentParser:
     p.add_argument("--roteiro", type=Path, help="executa os comandos deste arquivo em vez do teclado")
     p.add_argument("--timeout-fisico", action="store_true",
                    help=f"dispara TIMEOUT sozinho {TEMPO_TRAVA_ABERTA_S} s apos LIBERADO, como o NE555")
+    p.add_argument("--espera-acordar", type=float, default=60.0, metavar="SEGUNDOS",
+                   help="quanto esperar a API acordar no arranque (0 desliga)")
     p.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     return p
 
@@ -241,9 +251,12 @@ def main(argv: list[str] | None = None) -> int:
     print(f"LOCKWISE gateway {__version__} - modo {modo}")
     print("senha gravada: 1011 - digite 'ajuda' para os comandos")
 
-    if isinstance(cliente, ClienteAPI) and cliente.tamanho_fila():
-        enviados, restantes = cliente.reenviar_fila()
-        print(f"fila offline: {enviados} reenviado(s), {restantes} pendente(s)")
+    if isinstance(cliente, ClienteAPI):
+        print("acordando a API...", end=" ", flush=True)
+        print("no ar" if cliente.acordar(args.espera_acordar) else "sem resposta (eventos irao para a fila)")
+        if cliente.tamanho_fila():
+            enviados, restantes = cliente.reenviar_fila()
+            print(f"fila offline: {enviados} reenviado(s), {restantes} pendente(s)")
 
     interprete = Interprete(cliente, timeout_fisico=args.timeout_fisico)
     fonte: FonteDeComandos = Roteiro.do_arquivo(args.roteiro) if args.roteiro else Teclado()

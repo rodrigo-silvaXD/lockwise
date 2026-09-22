@@ -133,6 +133,10 @@ LOCKWISE_API_KEY=dev python -m lockwise_gateway.cli --api-url http://127.0.0.1:8
 
 ---
 
+## Deploy
+
+A infraestrutura está em [`render.yaml`](../render.yaml) e o passo a passo em [`docs/deploy.md`](../docs/deploy.md). Em resumo: os testes rodam no GitHub Actions a cada push, e só se passarem o deploy é disparado no Render; o pipeline então espera `/health` responder ok antes de se declarar verde (ADR 0022).
+
 ## Testes
 
 ```bash
