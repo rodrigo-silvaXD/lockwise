@@ -132,6 +132,12 @@ class FechaduraSaida(BaseModel):
 class Saude(BaseModel):
     status: str
     banco: str
+    # Qual motor esta em uso: "postgresql" em producao, "sqlite" em
+    # desenvolvimento. Sem DATABASE_URL o codigo cai no SQLite, que no Render
+    # vive em disco efemero e some a cada reinicio — este campo denuncia isso
+    # de fora, sem precisar abrir o painel.
+    motor: str
+    persistente: bool
     versao: str
     politica: str
     observadores: int
