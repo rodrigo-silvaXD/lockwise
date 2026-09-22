@@ -28,6 +28,7 @@ def health(request: Request, response: Response):
         motor=motor,
         persistente=motor != "sqlite",
         versao=__version__,
+        commit=estado.config.commit,
         politica=estado.politica.nome,
         observadores=estado.notificador.quantidade,
     )

@@ -19,7 +19,7 @@ from .config import Configuracao
 from .db import criar_engine, criar_sessionmaker, iniciar
 from .dominio.notificacao import LogObservador, Notificador, WebhookObservador
 from .dominio.politicas import politica_por_nome
-from .rotas import acessos, alertas, fechadura, saude
+from .rotas import acessos, alertas, fechadura, raiz, saude
 
 DESCRICAO = """\
 Backend do **LOCKWISE** — sistema de controle de acesso da ExpoTech 2026.2 (UniFECAF).
@@ -66,6 +66,7 @@ def criar_app(config: Configuracao | None = None, engine: Engine | None = None) 
         allow_headers=["Content-Type", "X-API-Key"],
     )
 
+    app.include_router(raiz.router)
     app.include_router(saude.router)
     app.include_router(acessos.router)
     app.include_router(alertas.router)

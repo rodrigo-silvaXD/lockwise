@@ -139,5 +139,6 @@ class Saude(BaseModel):
     motor: str
     persistente: bool
     versao: str
+    commit: str
     politica: str
     observadores: int

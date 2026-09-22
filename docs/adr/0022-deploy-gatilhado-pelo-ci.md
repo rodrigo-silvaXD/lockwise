@@ -44,3 +44,5 @@ Na primeira execução com os segredos configurados, o pipeline ficou verde e a 
 Falso positivo é pior que verificação nenhuma: dá confiança sem base. Corrigido para comparar a versão. O job agora lê `__version__` de `backend/lockwise_api/__init__.py` no commit que está sendo publicado e só termina quando o `/health` responde aquela versão. De quebra, exige `"persistente":true`, para que um deploy sem `DATABASE_URL` — que sobe e responde ok em SQLite efêmero — também seja reprovado.
 
 A lição vale além deste caso: uma verificação de deploy precisa checar algo que *muda* com o deploy. `status: ok` não muda; a versão muda.
+
+Logo depois trocamos a versão pela SHA do commit. A versão só muda quando alguém lembra de trocá-la, e um deploy de correção sem bump de versão traria o falso positivo de volta pela porta dos fundos. A SHA muda sempre. O Render injeta `RENDER_GIT_COMMIT` no serviço, o `/health` devolve, e o pipeline espera ver ali exatamente o commit que está publicando.

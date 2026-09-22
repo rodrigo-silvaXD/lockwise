@@ -33,8 +33,21 @@ def test_health_reporta_banco_politica_e_observadores():
     corpo = api.get("/health").json()
     assert corpo == {
         "status": "ok", "banco": "ok", "motor": "sqlite", "persistente": False,
-        "versao": "0.2.0", "politica": "composta", "observadores": 1,
+        "versao": "0.2.0", "commit": "desconhecido", "politica": "composta", "observadores": 1,
     }
+
+
+def test_raiz_leva_para_a_documentacao(api):
+    """Sem isto, abrir a URL no navegador mostra {"detail":"Not Found"}."""
+    r = api.get("/", follow_redirects=False)
+    assert r.status_code in (307, 308) and r.headers["location"] == "/docs"
+    assert api.get("/").status_code == 200  # seguindo o redirecionamento, cai no Swagger
+
+
+def test_health_reporta_o_commit_publicado():
+    from lockwise_api.config import Configuracao
+    assert Configuracao.do_ambiente({"RENDER_GIT_COMMIT": "abc123def456"}).commit == "abc123def456"
+    assert Configuracao.do_ambiente({}).commit == "desconhecido"
 
 
 def test_health_denuncia_sqlite_como_nao_persistente():
