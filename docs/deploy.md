@@ -59,18 +59,27 @@ Sem eles o workflow de deploy não falha — avisa que faltam e termina. Com ele
 
 ## Apontar o gateway para a nuvem
 
+O gateway roda **na máquina da portaria**, ao lado do Logisim — nunca na nuvem. Ele é o cliente; a API é o servidor.
+
+No Windows, use o script, que já define as variáveis de ambiente:
+
+```powershell
+cd gateway
+.\demo.ps1 -Chave "<a chave do passo 4>"
+```
+
+Para rodar a demonstração completa em vez do painel interativo:
+
+```powershell
+.\demo.ps1 -Chave "<a chave do passo 4>" -Roteiro roteiros/demo.txt
+```
+
+Em Linux ou macOS, à mão:
+
 ```bash
 cd gateway
 export LOCKWISE_API_URL=https://lockwise-api.onrender.com
 export LOCKWISE_API_KEY=<a chave do passo 4>
-python -m lockwise_gateway.cli
-```
-
-No Windows, no PowerShell:
-
-```powershell
-$env:LOCKWISE_API_URL = "https://lockwise-api.onrender.com"
-$env:LOCKWISE_API_KEY = "<a chave do passo 4>"
 python -m lockwise_gateway.cli
 ```
 
