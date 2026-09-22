@@ -34,7 +34,7 @@ O projeto atravessa cinco camadas, e o mesmo dado — o evento de acesso — per
 | Física aplicada | Concluída |
 | Gateway | Concluído |
 | Backend e banco | Concluído (local; deploy na Fase F) |
-| Arquitetura e padrões | Código concluído (State, Strategy, Observer, SOLID); documentação C4 pendente |
+| Arquitetura e padrões | Concluída |
 | Nuvem e CI/CD | API no ar; falta ligar o deploy automático |
 | Pesquisa operacional | Concluída |
 
@@ -50,7 +50,7 @@ lockwise/
 ├── docs/
 │   ├── eletronica.md              projeto do circuito
 │   ├── fisica.md                  memorial de cálculos
-│   ├── arquitetura.md             C4 e padrões de projeto
+│   ├── arquitetura.md             C4 níveis 1–4, GoF e SOLID com arquivo:linha
 │   ├── otimizacao.md              modelo matemático
 │   ├── adr/                       registros de decisão (por quê de cada escolha)
 │   └── evidencias/                14 figuras da simulação

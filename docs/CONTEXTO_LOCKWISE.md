@@ -163,7 +163,7 @@ lockwise/
 │   ├── evidencias/                14 figuras + índice
 │   ├── eletronica.md              A FAZER
 │   ├── fisica.md                  CONCLUÍDO
-│   ├── arquitetura.md             A FAZER
+│   ├── arquitetura.md             CONCLUÍDO
 │   ├── otimizacao.md              A FAZER
 │   └── adr/                       21 registros de decisão, alimentados a cada fase
 ├── gateway/                       CONCLUÍDO
@@ -272,12 +272,19 @@ Rodar: `LOCKWISE_API_KEY=dev .venv/Scripts/python -m uvicorn lockwise_api.asgi:a
 
 **Pendente da Fase D em produção**: criar o Postgres no Render (Fase F) e apontar `DATABASE_URL`. Nenhuma migração é necessária — `create_all` cria tudo no primeiro arranque.
 
-### Fase E — Arquitetura (≈1 dia)
-`docs/arquitetura.md` com C4 níveis 1 a 3 em Mermaid ou PlantUML, versionado no repositório. Diagrama feito em ferramenta gráfica externa e não versionado se perde.
+### Fase E — Arquitetura ✅ CONCLUÍDA (22/09/2026)
+`docs/arquitetura.md`, C4 em Mermaid versionado (renderiza no GitHub, muda por PR).
 
-- **Contexto:** Morador / Administrador → LOCKWISE → Notificação
-- **Contêiner:** Circuito → Gateway → API → Banco → Módulo de otimização
-- **Componente:** `AcessoController`, `AcessoService`, `PoliticaBloqueio`, `AcessoRepository`, `NotificadorObserver`
+- **Nível 1 — Contexto**: morador, administrador, LOCKWISE, mensageria opcional.
+- **Nível 2 — Contêiner**: circuito e gateway na máquina da portaria; API no Render e Postgres na Neon; módulo de otimização. A seta circuito→gateway é tracejada de propósito — é o operador replicando os pinos, e quem garante a equivalência é o teste contra o `.circ`.
+- **Nível 3 — Componente**: rotas → dependências → serviços → repositórios → domínio, com os três padrões destacados.
+- **Diagrama de sequência** de um `POST /acessos` que dispara a política, mostrando que o COMMIT vem antes da notificação.
+- **Nível 4 — Código**: diagrama de classes do State.
+- **GoF e SOLID com arquivo:linha**, cada princípio apontando o código. Inclui o que foi descartado e por quê (Factory, Command, Singleton).
+
+Os 5 diagramas foram validados com o parser do Mermaid 11 antes do commit; um `;` dentro de uma Note quebrava o diagrama de sequência.
+
+`backend/tests/test_arquitetura.py` (12 testes) transforma o desenho em restrição executável: lê a AST e falha se `dominio/` importar fastapi/sqlalchemy/pydantic, se importar de fora do domínio, se `servicos.py` tocar em sqlalchemy ou se uma rota falar com o banco direto. Verificado que pega violação de verdade.
 
 ### Fase F — Nuvem e CI/CD (≈2 dias)
 Deploy no free tier (Render recomendado). Variáveis de ambiente em secrets, nunca no repositório. `.github/workflows/deploy.yml` com pytest → build → deploy. Precisa estar **verde** no dia da avaliação.
