@@ -38,7 +38,9 @@ O primeiro build leva alguns minutos. Ele instala as dependências do `backend/p
 curl https://lockwise-api.onrender.com/health
 ```
 
-Deve responder `{"status":"ok","banco":"ok",...}`. A documentação interativa fica em `/docs`.
+Deve responder `{"status":"ok","banco":"ok","motor":"postgresql","persistente":true,...}`. A documentação interativa fica em `/docs`.
+
+Olhe o `motor`: se vier `"sqlite"` e `"persistente":false`, a `DATABASE_URL` não chegou ao serviço e a API está gravando em disco efêmero, que o Render apaga a cada reinício. Nesse caso, volte ao passo 2.
 
 **4. Copiar a chave da API.** No serviço `lockwise-api`, aba **Environment**, a variável `LOCKWISE_API_KEY` foi gerada pelo próprio Render. Copie o valor: é o que o gateway usa para escrever. Não coloque esse valor em nenhum arquivo do repositório.
 

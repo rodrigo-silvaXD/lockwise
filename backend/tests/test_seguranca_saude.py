@@ -32,8 +32,15 @@ def test_health_reporta_banco_politica_e_observadores():
     api = montar(politica="composta")
     corpo = api.get("/health").json()
     assert corpo == {
-        "status": "ok", "banco": "ok", "versao": "0.1.0", "politica": "composta", "observadores": 1,
+        "status": "ok", "banco": "ok", "motor": "sqlite", "persistente": False,
+        "versao": "0.1.0", "politica": "composta", "observadores": 1,
     }
+
+
+def test_health_denuncia_sqlite_como_nao_persistente():
+    """Sem DATABASE_URL o codigo cai no SQLite; em producao isso e disco efemero."""
+    corpo = montar().get("/health").json()
+    assert corpo["motor"] == "sqlite" and corpo["persistente"] is False
 
 
 def test_health_com_banco_indisponivel_e_503(api):
