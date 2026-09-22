@@ -36,3 +36,11 @@ Entre o push e a API atualizada passam alguns minutos: os testes, mais o build, 
 Dois segredos precisam ser configurados no GitHub uma vez: `RENDER_DEPLOY_HOOK_URL` e `LOCKWISE_API_URL`. Estão documentados no README do backend e no próprio workflow.
 
 O passo que espera o `/health` transforma o pipeline em verificação de verdade: não basta o Render aceitar o pedido de deploy, a API precisa responder que está viva e com o banco acessível. Se o deploy subir quebrado, o pipeline fica vermelho e alguém descobre na hora, não na avaliação.
+
+## Atualização de 22/09 — o primeiro deploy automático mostrou um furo
+
+Na primeira execução com os segredos configurados, o pipeline ficou verde e a API continuou na versão antiga. O passo de verificação procurava `"status":"ok"` na resposta do `/health`, e a versão anterior — que segue no ar enquanto a nova é construída — responde exatamente isso. O pipeline aprovou o deploy conferindo o serviço que já estava rodando.
+
+Falso positivo é pior que verificação nenhuma: dá confiança sem base. Corrigido para comparar a versão. O job agora lê `__version__` de `backend/lockwise_api/__init__.py` no commit que está sendo publicado e só termina quando o `/health` responde aquela versão. De quebra, exige `"persistente":true`, para que um deploy sem `DATABASE_URL` — que sobe e responde ok em SQLite efêmero — também seja reprovado.
+
+A lição vale além deste caso: uma verificação de deploy precisa checar algo que *muda* com o deploy. `status: ok` não muda; a versão muda.

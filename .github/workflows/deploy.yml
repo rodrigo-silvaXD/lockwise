@@ -24,6 +24,8 @@ jobs:
     # workflow_run dispara mesmo quando os testes falham; este if e o portao.
     if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     steps:
+      - uses: actions/checkout@v4
+
       - name: conferir se os segredos existem
         id: segredos
         env:
@@ -37,6 +39,21 @@ jobs:
             echo "configurado=sim" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: descobrir qual versao deve ir para o ar
+        if: steps.segredos.outputs.configurado == 'sim'
+        id: versao
+        # A versao de /health vem daqui. E ela que diz se o deploy realmente
+        # trocou o que esta rodando — checar so "status: ok" aprovaria a versao
+        # antiga, que continua respondendo enquanto a nova nao sobe.
+        run: |
+          versao=$(grep -oP '__version__ = "\K[^"]+' backend/lockwise_api/__init__.py)
+          if [ -z "$versao" ]; then
+            echo "::error::Nao consegui ler __version__ de backend/lockwise_api/__init__.py"
+            exit 1
+          fi
+          echo "esperada=$versao" >> "$GITHUB_OUTPUT"
+          echo "Versao esperada no ar apos o deploy: $versao"
+
       - name: pedir o deploy ao Render
         if: steps.segredos.outputs.configurado == 'sim'
         run: curl --fail --silent --show-error "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
@@ -45,17 +62,23 @@ jobs:
         if: steps.segredos.outputs.configurado == 'sim'
         env:
           URL: ${{ secrets.LOCKWISE_API_URL }}
+          ESPERADA: ${{ steps.versao.outputs.esperada }}
         # O plano gratuito hiberna e o build leva alguns minutos; tentamos por
         # ate 10 minutos antes de desistir.
         run: |
           for tentativa in $(seq 1 60); do
             resposta=$(curl --silent --max-time 30 "$URL/health" || true)
-            if echo "$resposta" | grep -q '"status":"ok"'; then
-              echo "API no ar: $resposta"
+            if echo "$resposta" | grep -q "\"versao\":\"$ESPERADA\""; then
+              echo "No ar com a versao $ESPERADA: $resposta"
+              # Postgres em producao; SQLite aqui seria disco efemero.
+              if ! echo "$resposta" | grep -q '"persistente":true'; then
+                echo "::error::A API subiu, mas sem banco persistente. Confira DATABASE_URL no painel do Render."
+                exit 1
+              fi
               exit 0
             fi
             echo "tentativa $tentativa/60 - ainda nao: ${resposta:-sem resposta}"
             sleep 10
           done
-          echo "::error::A API nao respondeu /health com status ok em 10 minutos."
+          echo "::error::A API nao chegou na versao $ESPERADA em 10 minutos. Veja os logs do servico no Render."
           exit 1
