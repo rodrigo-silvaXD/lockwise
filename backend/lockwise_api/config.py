@@ -24,13 +24,57 @@ def _hora(texto: str) -> time:
     return time(int(h), int(m))
 
 
+class UrlDeBancoInvalida(ValueError):
+    pass
+
+
 def normalizar_url_banco(url: str) -> str:
-    """Render e Heroku entregam `postgres://`; SQLAlchemy 2 exige `postgresql+psycopg://`."""
-    if url.startswith("postgres://"):
-        return "postgresql+psycopg://" + url[len("postgres://"):]
-    if url.startswith("postgresql://"):
-        return "postgresql+psycopg://" + url[len("postgresql://"):]
-    return url
+    """Aceita a string de conexao como os paineis a entregam e devolve o que o SQLAlchemy entende.
+
+    Dois ajustes. O primeiro e de formato: Render e Heroku entregam
+    `postgres://` e a Neon `postgresql://`, mas o SQLAlchemy 2 quer
+    `postgresql+psycopg://`.
+
+    O segundo e de embrulho. O painel da Neon oferece a mesma string em varios
+    formatos, e quem copia do formato errado leva junto um `psql ` na frente,
+    aspas em volta ou um `DATABASE_URL=` do formato .env. Nada disso e uma URL,
+    e o erro que o SQLAlchemy dava era um traceback sem pista do que fazer.
+    """
+    texto = url.strip()
+
+    # `psql 'postgresql://...'` (formato psql do painel)
+    if texto.lower().startswith("psql "):
+        texto = texto[5:].strip()
+
+    # `DATABASE_URL=postgresql://...` (formato .env)
+    for prefixo in ("DATABASE_URL=", "database_url="):
+        if texto.startswith(prefixo):
+            texto = texto[len(prefixo):].strip()
+
+    # aspas em volta, de qualquer um dos formatos acima
+    for aspa in ("'", '"'):
+        if len(texto) >= 2 and texto.startswith(aspa) and texto.endswith(aspa):
+            texto = texto[1:-1].strip()
+
+    if "://" not in texto:
+        raise UrlDeBancoInvalida(
+            "DATABASE_URL nao parece uma string de conexao. Esperado algo como "
+            "postgresql://usuario:senha@host/banco?sslmode=require, recebido "
+            f"{_mascarar(texto)!r}. No painel da Neon, use o botao de copiar do "
+            "formato 'Connection string' — o formato psql e o .env vem com "
+            "enfeites, e selecionar com o mouse copia a senha como asteriscos."
+        )
+
+    if texto.startswith("postgres://"):
+        return "postgresql+psycopg://" + texto[len("postgres://"):]
+    if texto.startswith("postgresql://"):
+        return "postgresql+psycopg://" + texto[len("postgresql://"):]
+    return texto
+
+
+def _mascarar(texto: str, visivel: int = 12) -> str:
+    """Primeiros caracteres, o resto escondido. Para a mensagem de erro nao vazar senha."""
+    return texto[:visivel] + ("..." if len(texto) > visivel else "")
 
 
 @dataclass(frozen=True)

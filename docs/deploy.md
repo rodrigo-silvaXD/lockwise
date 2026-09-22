@@ -98,6 +98,8 @@ Durante a apresentação, três janelas: Logisim, gateway e o navegador em `/doc
 
 **O gateway mostra 401.** A chave do gateway e a do Render não são a mesma. Copie de novo do painel.
 
+**O deploy morre no arranque com `Could not parse SQLAlchemy URL`.** O valor de `DATABASE_URL` não é uma URL. O código já aceita os embrulhos comuns (`psql '...'`, `DATABASE_URL=...`, aspas em volta), então o caso que sobra é ter copiado a senha mascarada (`********`) ou só um pedaço da string. Volte ao passo 1 e use o botão de copiar do formato *Connection string*. A partir da versão de 22/09 o log diz isso em português na última linha.
+
 **O deploy falha no passo do `/health`.** Veja os logs do serviço no Render. A causa mais comum é `DATABASE_URL` ausente ou o banco expirado (ver abaixo).
 
 **A API responde `{"status":"degradado"}`.** O processo está vivo mas o banco não responde. Confira se o banco ainda existe no painel.
