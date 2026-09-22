@@ -9,7 +9,7 @@ gateway ──POST /acessos, /alertas──▶  API  ──▶  Postgres (Render
        painel     ◀── GET /fechadura, /alertas, /acessos
 ```
 
-FastAPI · SQLAlchemy 2 · Pydantic 2 · Python 3.11+. SQLite em desenvolvimento e testes; Postgres gerenciado em produção — o mesmo código, sem ramificação.
+FastAPI · SQLAlchemy 2 · Pydantic 2 · Python 3.11+. SQLite em desenvolvimento e testes; Postgres gerenciado (Neon) em produção — o mesmo código, sem ramificação.
 
 ---
 

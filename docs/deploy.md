@@ -13,8 +13,10 @@ GitHub Actions — testes            gateway: 107 testes (inclui a prova contra 
 GitHub Actions — deploy            chama o deploy hook do Render
     │                              e espera /health responder ok (até 10 min)
     ▼
-Render                             lockwise-api + lockwise-db (Postgres)
+Render (lockwise-api)  ─────▶  Neon (Postgres gerenciado)
 ```
+
+A aplicação fica no Render e o banco na Neon. O porquê está na [ADR 0024](adr/0024-banco-na-neon.md): o Render só permite um Postgres gratuito por conta e a nossa já tinha um; de quebra, o plano gratuito da Neon não expira em 90 dias.
 
 A infraestrutura está versionada em [`render.yaml`](../render.yaml) e os workflows em [`.github/workflows/`](../.github/workflows/).
 
@@ -24,11 +26,13 @@ A infraestrutura está versionada em [`render.yaml`](../render.yaml) e os workfl
 
 Precisa ser feito uma vez, por quem tem a conta do Render.
 
-**1. Criar o blueprint.** No painel do Render: **New → Blueprint**, escolha o repositório `lockwise`, confirme. O Render lê o `render.yaml` e cria dois recursos: o banco `lockwise-db` (Postgres 16, plano gratuito) e o serviço `lockwise-api`.
+**1. Criar o banco na Neon.** Em [console.neon.tech](https://console.neon.tech), **New Project**, nome `lockwise`, região São Paulo ou a mais próxima. Copie a **connection string** que aparece — algo como `postgresql://usuario:senha@ep-nome-123.sa-east-1.aws.neon.tech/lockwise?sslmode=require`. Ela contém a senha; trate como segredo.
+
+**2. Criar o blueprint no Render.** **New → Blueprint**, escolha o repositório `lockwise`, confirme. O Render lê o `render.yaml` e cria o serviço `lockwise-api`. Ele vai pedir o valor de `DATABASE_URL`: cole a string da Neon do passo 1.
 
 O primeiro build leva alguns minutos. Ele instala as dependências do `backend/pyproject.toml` e sobe o uvicorn. As tabelas e o usuário morador são criados no arranque, automaticamente — não há migração para rodar.
 
-**2. Anotar a URL.** Algo como `https://lockwise-api.onrender.com`. Confirme que está no ar:
+**3. Anotar a URL.** Algo como `https://lockwise-api.onrender.com`. Confirme que está no ar:
 
 ```bash
 curl https://lockwise-api.onrender.com/health
@@ -36,16 +40,16 @@ curl https://lockwise-api.onrender.com/health
 
 Deve responder `{"status":"ok","banco":"ok",...}`. A documentação interativa fica em `/docs`.
 
-**3. Copiar a chave da API.** No serviço `lockwise-api`, aba **Environment**, a variável `LOCKWISE_API_KEY` foi gerada pelo próprio Render. Copie o valor: é o que o gateway usa para escrever. Não coloque esse valor em nenhum arquivo do repositório.
+**4. Copiar a chave da API.** No serviço `lockwise-api`, aba **Environment**, a variável `LOCKWISE_API_KEY` foi gerada pelo próprio Render. Copie o valor: é o que o gateway usa para escrever. Não coloque esse valor em nenhum arquivo do repositório.
 
-**4. Pegar o deploy hook.** No serviço, **Settings → Deploy Hook**. É uma URL secreta que dispara um deploy quando chamada.
+**5. Pegar o deploy hook.** No serviço, **Settings → Deploy Hook**. É uma URL secreta que dispara um deploy quando chamada.
 
-**5. Configurar os segredos no GitHub.** No repositório, **Settings → Secrets and variables → Actions → New repository secret**, dois segredos:
+**6. Configurar os segredos no GitHub.** No repositório, **Settings → Secrets and variables → Actions → New repository secret**, dois segredos:
 
 | Nome | Valor |
 |---|---|
-| `RENDER_DEPLOY_HOOK_URL` | a URL do passo 4 |
-| `LOCKWISE_API_URL` | a URL do passo 2, sem barra no fim |
+| `RENDER_DEPLOY_HOOK_URL` | a URL do passo 5 |
+| `LOCKWISE_API_URL` | a URL do passo 3, sem barra no fim |
 
 Sem eles o workflow de deploy não falha — avisa que faltam e termina. Com eles, todo push na `main` que passar nos testes publica sozinho.
 
@@ -56,7 +60,7 @@ Sem eles o workflow de deploy não falha — avisa que faltam e termina. Com ele
 ```bash
 cd gateway
 export LOCKWISE_API_URL=https://lockwise-api.onrender.com
-export LOCKWISE_API_KEY=<a chave do passo 3>
+export LOCKWISE_API_KEY=<a chave do passo 4>
 python -m lockwise_gateway.cli
 ```
 
@@ -64,7 +68,7 @@ No Windows, no PowerShell:
 
 ```powershell
 $env:LOCKWISE_API_URL = "https://lockwise-api.onrender.com"
-$env:LOCKWISE_API_KEY = "<a chave do passo 3>"
+$env:LOCKWISE_API_KEY = "<a chave do passo 4>"
 python -m lockwise_gateway.cli
 ```
 
@@ -96,7 +100,9 @@ Durante a apresentação, três janelas: Logisim, gateway e o navegador em `/doc
 
 **A API responde `{"status":"degradado"}`.** O processo está vivo mas o banco não responde. Confira se o banco ainda existe no painel.
 
-**O banco expirou.** O Postgres gratuito do Render expira 90 dias depois de criado. Se isso acontecer antes de 28/11, crie um novo pelo blueprint e reaponte a `DATABASE_URL`. Os dados antigos se perdem — são eventos de teste, não há problema, mas vale gerar histórico novo antes da otimização (Fase G) rodar.
+**A primeira requisição do dia demora um pouco mais.** A Neon suspende o projeto por inatividade e o retoma na primeira conexão; o atraso é de menos de um segundo, somado à hibernação do Render. O comando `acordar` do gateway cobre os dois.
+
+**O banco sumiu ou a conexão foi recusada.** Confira no console da Neon se o projeto ainda existe e se a string de conexão não foi rotacionada. Ao trocar a string, atualize `DATABASE_URL` no painel do Render e faça um deploy novo.
 
 ---
 
@@ -105,7 +111,7 @@ Durante a apresentação, três janelas: Logisim, gateway e o navegador em `/doc
 | Segredo | Onde vive | Quem usa |
 |---|---|---|
 | `LOCKWISE_API_KEY` | painel do Render (gerada lá) | a API para validar, o gateway para escrever |
-| `DATABASE_URL` | painel do Render (ligada ao banco) | a API |
+| `DATABASE_URL` | gerada na Neon, colada no painel do Render | a API |
 | `RENDER_DEPLOY_HOOK_URL` | segredos do GitHub | o workflow de deploy |
 
 Nenhum deles está no repositório. O `.env.example` do backend mostra os nomes das variáveis, nunca os valores.

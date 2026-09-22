@@ -1,17 +1,15 @@
 # Infraestrutura do LOCKWISE no Render, versionada junto do código.
 #
 # Como usar: no painel do Render, New > Blueprint, apontando para este
-# repositorio. O Render le este arquivo e cria o banco e o servico.
+# repositorio. O Render le este arquivo e cria o web service.
 #
-# O que NAO esta aqui: a chave da API. Ela e gerada pelo proprio Render
+# O banco NAO esta aqui: e um Postgres gerenciado na Neon, e a DATABASE_URL
+# e colada a mao no painel do Render (ver docs/deploy.md e ADR 0024). Motivo:
+# o Render so permite um Postgres gratuito por conta, e a conta ja tem um de
+# outro projeto. O free tier da Neon tambem nao expira em 90 dias.
+#
+# A chave da API tambem nao esta aqui: e gerada pelo proprio Render
 # (generateValue) e fica so no painel; nunca passa pelo repositorio.
-
-databases:
-  - name: lockwise-db
-    databaseName: lockwise
-    user: lockwise
-    plan: free
-    postgresMajorVersion: "16"
 
 services:
   - type: web
@@ -29,9 +27,9 @@ services:
     autoDeployTrigger: off
     envVars:
       - key: DATABASE_URL
-        fromDatabase:
-          name: lockwise-db
-          property: connectionString
+        # Cole no painel a string de conexao da Neon. sync:false impede que o
+        # blueprint sobrescreva o valor a cada deploy.
+        sync: false
       - key: LOCKWISE_API_KEY
         generateValue: true      # o Render sorteia; leia no painel para dar ao gateway
       - key: LOCKWISE_POLITICA

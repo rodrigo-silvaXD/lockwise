@@ -1,7 +1,7 @@
 # ADR 0013 — Render como provedor de nuvem
 
 Data: 2026-09-14 (proposta), a confirmar no deploy
-Situação: proposta
+Situação: aceita para a aplicação; a parte de banco de dados foi substituída pela [ADR 0024](0024-banco-na-neon.md)
 
 ## Contexto
 
@@ -31,4 +31,4 @@ O plano gratuito hiberna o serviço após alguns minutos sem tráfego, e a prime
 
 O Postgres gratuito do Render expira 90 dias depois de criado. A avaliação é de 09 a 13/11 e o evento em 28/11; criando o banco em meados de setembro, ele vale até meados de dezembro. Se for criado antes disso, é preciso recriar e reapontar.
 
-A situação desta ADR muda para "aceita" quando a API estiver no ar e o pipeline verde.
+Atualização de 22/09: esta consequência deixou de se aplicar. O provisionamento do banco no Render falhou por limite de conta e o Postgres passou para a Neon, cujo plano gratuito não expira (ADR 0024). O Render segue como provedor da aplicação, e o raciocínio acima sobre AWS, GCP e Azure continua valendo.
