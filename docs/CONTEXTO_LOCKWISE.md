@@ -184,7 +184,7 @@ Pendência no README: preencher a tabela de Equipe.
 | 2 | Física: justificativa do comportamento físico com cálculos documentados | **Cumprido** (`docs/fisica.md`) |
 | 3 | Arquitetura: C4 ou UML, ≥2 padrões GoF, SOLID no backend | **Código cumprido** (3 padrões + SOLID em `backend/`); C4 pendente (Fase E) |
 | 4 | Cloud: deploy real, banco gerenciado, variáveis seguras, CI/CD | **Cumprido**: API em https://lockwise-api.onrender.com, Postgres na Neon, segredos no painel, CI verde (falta ligar o deploy automático) |
-| 5 | Operations Research: problema de otimização modelado e resolvido | Não iniciado |
+| 5 | Operations Research: problema de otimização modelado e resolvido | **Cumprido** (`otimizacao/`, PuLP + CBC, 26,6% de economia) |
 
 ---
 
@@ -282,21 +282,27 @@ Rodar: `LOCKWISE_API_KEY=dev .venv/Scripts/python -m uvicorn lockwise_api.asgi:a
 ### Fase F — Nuvem e CI/CD (≈2 dias)
 Deploy no free tier (Render recomendado). Variáveis de ambiente em secrets, nunca no repositório. `.github/workflows/deploy.yml` com pytest → build → deploy. Precisa estar **verde** no dia da avaliação.
 
-### Fase G — Operations Research (≈2 dias)
-`otimizacao/` com modelo em PuLP, solver CBC. Set covering para escala de vigilância.
+### Fase G — Operations Research ✅ CONCLUÍDA (22/09/2026)
+`otimizacao/lockwise_otimizacao/`, PuLP + CBC, venv própria. 29 testes.
 
-**Conjuntos:** `T` = seis turnos de 4 h; `H` = 24 horas; `a(t,h) = 1` se o turno cobre a hora.
-**Parâmetros:** `c_t` custo do turno (noturno +20%); `d_h = ⌈acessos_h / K⌉` derivado do histórico real.
-**Variável:** `x_t ∈ ℤ⁺`, vigilantes por turno.
+Decisões tomadas:
+- **Turnos de 8 h a cada 4 h**, não 4 h sem sobreposição como o plano original previa. Com 4 h cada hora seria coberta por um turno só e a solução seria trivial (ADR 0026). Agora cada hora é coberta por dois turnos e o problema é combinatório.
+- `d_h = max(presença mínima, ⌈(acessos_h / dias) / K⌉)`, K = 4 acessos por vigilante por hora (15 min de atenção por acesso). A divisão pelos dias é essencial: a rota devolve o acumulado do período.
+- Custo R$ 220 por turno, adicional noturno de 20% **proporcional** às horas entre 22h e 6h.
+- **Energia não entra no objetivo**: 0,6 Wh/dia = R$ 0,0005, cinco ordens de grandeza abaixo de um turno. Entra no relatório como verificação física do histórico.
+- **Histórico sintético** gerado pela máquina de estados do gateway e enviado pela API real (ADR 0027). Cenário: portaria de condomínio (~50 unidades), não porta residencial.
 
+Resultado com 7 dias: **9 vigilantes contra 12 da escala ingênua, R$ 2.068 contra R$ 2.816 por dia — 26,6% de economia**, R$ 22.440/mês.
+
+O relatório (`cli.py resolver --saida`) traz demanda, formulação, as duas escalas, cobertura hora a hora com as restrições justas marcadas, análise de sensibilidade em K e a seção sobre a energia.
+
+Comandos:
 ```
-minimizar  Σ c_t · x_t
-sujeito a  Σ a(t,h) · x_t ≥ d_h   ∀h    (cobertura)
-           Σ x_t ≤ N_max                 (equipe disponível)
-           x_t ≥ 1               ∀t      (nenhum turno vazio)
+python -m lockwise_otimizacao.cli semear --dias 7 --chave <chave>
+python -m lockwise_otimizacao.cli resolver --dias 7 --saida relatorio.txt
 ```
 
-Comparar com a escala ingênua (mesmo número em todos os turnos) e apresentar a economia percentual. Um número concreto vale mais que a explicação do modelo.
+**Pendente**: semear o histórico no banco de produção (precisa da chave da API).
 
 ### Fase H — Documentação e vídeo (≈3 dias)
 Relatório técnico, vídeo pitch de até 3 minutos, README finalizado.
