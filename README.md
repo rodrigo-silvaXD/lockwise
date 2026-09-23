@@ -55,6 +55,7 @@ lockwise/
 │   ├── eletronica.md             tabela-verdade, Karnaugh e transição de estados
 │   ├── adr/                       28 registros de decisão: o porquê de cada escolha
 │   └── evidencias/                14 figuras da simulação + relatório da otimização
+├── site/                          simulador interativo do circuito no navegador
 ├── gateway/                       gêmeo digital do circuito + POST para a API
 ├── backend/                       API FastAPI: State, Strategy, Observer + Postgres
 ├── otimizacao/                    modelo PuLP e o memorial do modelo (README.md)
@@ -202,6 +203,14 @@ Selecione a ferramenta de mão (Poke Tool) e clique nos pinos. A máquina de est
 Com senha incorreta, repita três vezes: CONFIRMA liga, pulse o CLK, CONFIRMA desliga, pulse o CLK. O contador evolui `00` → `01` → `10` e, na terceira tentativa, BLOQUEADO acende com o contador em `11`.
 
 Para desbloquear: ligue RESET e pulse o CLK.
+
+---
+
+## Experimente o circuito
+
+Antes de qualquer coisa: [**abra o simulador**](site/index.html) e clique nos pinos. É o circuito de verdade — as mesmas equações do arquivo em Logisim — rodando no navegador, com uma frase explicando o que cada clique fez.
+
+Ligue S3, S1 e S0 (a senha é `1011`), ligue CONFIRMA e pulse o clock duas vezes. A trava abre.
 
 ---
 

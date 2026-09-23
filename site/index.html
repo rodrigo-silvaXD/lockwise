@@ -1,0 +1,1049 @@
+<title>LOCKWISE Simulador</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --ground: #10161a;
+    --panel: #18212a;
+    --panel-2: #1e2932;
+    --line: #2b3946;
+    --ink: #e8f0f4;
+    --ink-dim: #8aa0ad;
+    --ink-faint: #5d7280;
+    --live: #38e07b;
+    --idle: #1d5c39;
+    --lock: #f5a524;
+    --alarm: #f0544a;
+    --wire: #2f6b4a;
+    --radius: 10px;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .wrap {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding-inline: 20px;
+    padding-block: 0 64px;
+  }
+
+  h1, h2, h3, .display {
+    font-family: "Chakra Petch", "IBM Plex Sans", system-ui, sans-serif;
+    text-wrap: balance;
+  }
+
+  code, .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+
+  /* ---------------------------------------------------------- cabeçalho */
+
+  header {
+    padding-block: 52px 36px;
+    border-bottom: 1px solid var(--line);
+  }
+  .eyebrow {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--live);
+    margin: 0 0 14px;
+  }
+  h1 {
+    font-size: clamp(34px, 6vw, 56px);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin: 0 0 14px;
+    line-height: 1.05;
+  }
+  .lede {
+    font-size: clamp(16px, 2vw, 19px);
+    color: var(--ink-dim);
+    max-width: 62ch;
+    margin: 0;
+  }
+  .lede strong { color: var(--ink); font-weight: 600; }
+
+  /* ------------------------------------------------------------- painel */
+
+  .bancada {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 20px;
+    margin-block: 32px 0;
+  }
+  @media (max-width: 860px) { .bancada { grid-template-columns: 1fr; } }
+
+  .modulo {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+  .modulo h2 {
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 0 0 4px;
+    font-weight: 500;
+  }
+  .modulo .sub {
+    font-size: 13px;
+    color: var(--ink-faint);
+    margin: 0 0 18px;
+  }
+
+  /* ------------------------------------------------------------- teclas */
+
+  .bits { display: flex; gap: 10px; }
+  .bit {
+    flex: 1;
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px 6px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .15s, background .15s, transform .08s;
+    font-family: inherit;
+    color: inherit;
+  }
+  .bit:hover { border-color: var(--wire); }
+  .bit:active { transform: translateY(1px); }
+  .bit .nome {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    color: var(--ink-faint);
+    letter-spacing: .06em;
+    display: block;
+  }
+  .bit .valor {
+    font-family: "Chakra Petch", monospace;
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--idle);
+    transition: color .15s, text-shadow .15s;
+  }
+  .bit[aria-pressed="true"] { border-color: var(--live); background: #16301f; }
+  .bit[aria-pressed="true"] .valor { color: var(--live); text-shadow: 0 0 14px rgba(56,224,123,.55); }
+
+  .senha-eco {
+    margin-top: 14px;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: var(--ink-faint);
+  }
+  .senha-eco .mono { font-size: 17px; color: var(--ink); letter-spacing: .12em; }
+
+  .chaves { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; }
+  .chave {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 11px 14px;
+    cursor: pointer;
+    text-align: left;
+    color: inherit;
+    font-family: inherit;
+    font-size: 14px;
+    transition: border-color .15s, background .15s;
+  }
+  .chave:hover { border-color: var(--wire); }
+  .chave[aria-pressed="true"] { border-color: var(--live); background: #16301f; }
+  .chave .led-mini {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--idle); flex: none;
+    transition: background .15s, box-shadow .15s;
+  }
+  .chave[aria-pressed="true"] .led-mini { background: var(--live); box-shadow: 0 0 10px var(--live); }
+  .chave .rotulo { font-family: "IBM Plex Mono", monospace; font-weight: 600; letter-spacing: .04em; }
+  .chave .desc { color: var(--ink-faint); font-size: 12.5px; margin-left: auto; text-align: right; }
+
+  .clk {
+    margin-top: 14px;
+    width: 100%;
+    background: linear-gradient(180deg, #2a3b48, #1f2d38);
+    border: 1px solid #3d5666;
+    border-radius: 8px;
+    padding: 16px;
+    cursor: pointer;
+    color: var(--ink);
+    font-family: "Chakra Petch", sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    transition: transform .08s, box-shadow .2s, border-color .2s;
+  }
+  .clk:hover { border-color: var(--live); box-shadow: 0 0 22px rgba(56,224,123,.18); }
+  .clk:active { transform: translateY(2px); }
+  .clk .hint { display: block; font-family: "IBM Plex Sans", sans-serif; font-size: 12px; font-weight: 400; color: var(--ink-faint); letter-spacing: 0; margin-top: 3px; }
+  .clk.pulsando { animation: pulso .4s ease; }
+  @keyframes pulso {
+    0% { box-shadow: 0 0 0 0 rgba(56,224,123,.5); }
+    100% { box-shadow: 0 0 0 26px rgba(56,224,123,0); }
+  }
+
+  /* ---------------------------------------------------------- fechadura */
+
+  .porta-area { display: flex; gap: 18px; align-items: center; }
+  @media (max-width: 460px) { .porta-area { flex-direction: column; align-items: stretch; } }
+
+  .porta {
+    width: 118px; height: 168px; flex: none;
+    border: 2px solid var(--line);
+    border-radius: 6px;
+    background: var(--panel-2);
+    position: relative;
+    overflow: hidden;
+    transition: border-color .4s;
+  }
+  .porta .folha {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, #243441, #1a242d);
+    transform-origin: left center;
+    transition: transform .65s cubic-bezier(.4,0,.2,1);
+    border-right: 2px solid var(--line);
+  }
+  .porta .macaneta {
+    position: absolute; right: 14px; top: 50%; width: 9px; height: 9px;
+    border-radius: 50%; background: var(--ink-faint); transform: translateY(-50%);
+    transition: background .3s;
+  }
+  .porta .vao {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at left center, rgba(245,165,36,.35), transparent 70%);
+    opacity: 0;
+    transition: opacity .5s;
+  }
+  .porta.aberta .folha { transform: perspective(420px) rotateY(-62deg); }
+  .porta.aberta .vao { opacity: 1; }
+  .porta.aberta { border-color: var(--lock); }
+  .porta.aberta .macaneta { background: var(--lock); }
+  .porta.travada { border-color: var(--alarm); animation: tranca .45s ease; }
+  @keyframes tranca { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+
+  .estado-atual { flex: 1; min-width: 0; }
+  .estado-nome {
+    font-family: "Chakra Petch", sans-serif;
+    font-size: clamp(24px, 4vw, 34px);
+    font-weight: 700;
+    letter-spacing: .01em;
+    line-height: 1.1;
+    margin: 0 0 4px;
+    transition: color .3s;
+  }
+  .estado-bits { font-family: "IBM Plex Mono", monospace; font-size: 13px; color: var(--ink-faint); }
+  .estado-bits b { color: var(--ink-dim); font-weight: 600; }
+
+  .leds { display: flex; flex-direction: column; gap: 7px; margin-top: 20px; }
+  .led-linha { display: flex; align-items: center; gap: 11px; font-size: 13px; }
+  .led {
+    width: 13px; height: 13px; border-radius: 50%; flex: none;
+    background: var(--idle);
+    border: 1px solid rgba(255,255,255,.08);
+    transition: background .2s, box-shadow .2s;
+  }
+  .led.on { background: var(--live); box-shadow: 0 0 12px var(--live); }
+  .led.on.amb { background: var(--lock); box-shadow: 0 0 12px var(--lock); }
+  .led.on.red { background: var(--alarm); box-shadow: 0 0 12px var(--alarm); }
+  .led-linha .nome { font-family: "IBM Plex Mono", monospace; font-size: 12px; letter-spacing: .03em; color: var(--ink-dim); }
+  .led-linha.ativa .nome { color: var(--ink); }
+  .led-linha .oque { color: var(--ink-faint); font-size: 12px; margin-left: auto; text-align: right; }
+
+  .contador { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); }
+  .contador .topo { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .contador .rot { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-faint); }
+  .contador .val { font-family: "Chakra Petch", monospace; font-size: 22px; font-weight: 700; }
+  .tentativas { display: flex; gap: 7px; margin-top: 10px; }
+  .tent {
+    flex: 1; height: 7px; border-radius: 4px; background: var(--panel-2);
+    border: 1px solid var(--line); transition: background .3s, box-shadow .3s;
+  }
+  .tent.usada { background: var(--lock); border-color: var(--lock); box-shadow: 0 0 9px rgba(245,165,36,.45); }
+  .tent.fatal { background: var(--alarm); border-color: var(--alarm); box-shadow: 0 0 9px rgba(240,84,74,.5); }
+
+  /* ------------------------------------------------------------ narração */
+
+  .narracao {
+    margin-top: 20px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--live);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    min-height: 92px;
+  }
+  .narracao .quem {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--live); margin: 0 0 7px;
+  }
+  .narracao p { margin: 0; font-size: 15px; }
+  .narracao p + p { margin-top: 9px; color: var(--ink-dim); font-size: 13.5px; }
+  .narracao .mono { color: var(--ink); background: var(--panel-2); padding: 1px 6px; border-radius: 4px; font-size: 13px; }
+  .narracao.alerta { border-left-color: var(--alarm); }
+  .narracao.alerta .quem { color: var(--alarm); }
+  .narracao.sucesso { border-left-color: var(--lock); }
+  .narracao.sucesso .quem { color: var(--lock); }
+
+  /* ------------------------------------------------------------- roteiro */
+
+  .roteiros { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; align-items: center; }
+  .roteiros .rot-label { font-size: 12.5px; color: var(--ink-faint); margin-right: 2px; }
+  .btn {
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 8px 16px;
+    color: var(--ink-dim);
+    font-family: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    transition: border-color .15s, color .15s, background .15s;
+  }
+  .btn:hover { border-color: var(--live); color: var(--ink); }
+  .btn[disabled] { opacity: .4; cursor: default; }
+  .btn.principal { border-color: var(--wire); color: var(--ink); }
+
+  /* -------------------------------------------------------- lógica viva */
+
+  .logica { margin-top: 20px; }
+  .equacoes { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px; }
+  .eq {
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12.5px;
+    transition: border-color .25s, background .25s;
+  }
+  .eq .linha { display: flex; align-items: baseline; gap: 8px; }
+  .eq .saida { font-weight: 600; color: var(--ink-dim); transition: color .25s; }
+  .eq .expr { color: var(--ink-faint); flex: 1; }
+  .eq .res {
+    font-weight: 600; font-size: 15px; color: var(--idle);
+    transition: color .25s, text-shadow .25s;
+  }
+  .eq .glosa { font-family: "IBM Plex Sans", sans-serif; font-size: 11.5px; color: var(--ink-faint); margin-top: 5px; display: block; }
+  .eq.on { border-color: var(--wire); background: #14291d; }
+  .eq.on .saida { color: var(--live); }
+  .eq.on .res { color: var(--live); text-shadow: 0 0 10px rgba(56,224,123,.5); }
+
+  /* -------------------------------------------------------- a corrente */
+
+  section.bloco { margin-top: 56px; }
+  section.bloco > h2 {
+    font-size: clamp(22px, 3vw, 28px);
+    font-weight: 700;
+    margin: 0 0 8px;
+  }
+  section.bloco > .intro {
+    color: var(--ink-dim);
+    max-width: 66ch;
+    margin: 0 0 24px;
+  }
+
+  .corrente { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+  .elo {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px 16px 18px;
+    position: relative;
+    transition: border-color .3s, transform .3s;
+  }
+  .elo .n {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px; color: var(--ink-faint); letter-spacing: .1em;
+  }
+  .elo h3 { font-size: 16px; margin: 6px 0 7px; font-weight: 700; }
+  .elo p { margin: 0; font-size: 13px; color: var(--ink-dim); }
+  .elo .dado {
+    margin-top: 11px; padding-top: 11px; border-top: 1px solid var(--line);
+    font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--ink-faint);
+  }
+  .elo.aceso { border-color: var(--live); transform: translateY(-3px); }
+  .elo.aceso .dado { color: var(--live); }
+
+  /* -------------------------------------------------------------- notas */
+
+  .notas { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+  .nota {
+    border-left: 2px solid var(--wire);
+    padding: 2px 0 2px 16px;
+  }
+  .nota h3 { font-size: 15px; margin: 0 0 6px; font-weight: 600; }
+  .nota p { margin: 0; font-size: 13.5px; color: var(--ink-dim); }
+  .nota p + p { margin-top: 8px; }
+  .nota .mono { color: var(--ink); font-size: 12.5px; }
+
+  footer {
+    margin-top: 64px; padding-top: 24px;
+    border-top: 1px solid var(--line);
+    color: var(--ink-faint); font-size: 13px;
+    display: flex; gap: 18px; flex-wrap: wrap; justify-content: space-between;
+  }
+  footer a { color: var(--ink-dim); }
+
+  :focus-visible { outline: 2px solid var(--live); outline-offset: 2px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">ExpoTech 2026.2 · UniFECAF · Engenharia da Computação</p>
+    <h1>LOCKWISE</h1>
+    <p class="lede">
+      Uma fechadura eletrônica feita de portas lógicas. Este é o <strong>circuito de verdade</strong>
+      rodando no seu navegador — as mesmas equações do arquivo em Logisim. Clique nos pinos e veja
+      o circuito pensar.
+    </p>
+  </header>
+
+  <div class="bancada">
+
+    <div class="modulo">
+      <h2>Painel de entrada</h2>
+      <p class="sub">A senha tem 4 bits. Clique para ligar e desligar cada um.</p>
+
+      <div class="bits" id="bits">
+        <button class="bit" data-pino="s3" aria-pressed="false">
+          <span class="valor">0</span><span class="nome">S3</span>
+        </button>
+        <button class="bit" data-pino="s2" aria-pressed="false">
+          <span class="valor">0</span><span class="nome">S2</span>
+        </button>
+        <button class="bit" data-pino="s1" aria-pressed="false">
+          <span class="valor">0</span><span class="nome">S1</span>
+        </button>
+        <button class="bit" data-pino="s0" aria-pressed="false">
+          <span class="valor">0</span><span class="nome">S0</span>
+        </button>
+      </div>
+
+      <div class="senha-eco">
+        <span>você digitou</span>
+        <span class="mono" id="senha-digitada">0000</span>
+        <span>· a fechadura espera</span>
+        <span class="mono">1011</span>
+      </div>
+
+      <div class="chaves">
+        <button class="chave" data-pino="confirma" aria-pressed="false">
+          <span class="led-mini"></span>
+          <span class="rotulo">CONFIRMA</span>
+          <span class="desc">"é essa a senha"</span>
+        </button>
+        <button class="chave" data-pino="timeout" aria-pressed="false">
+          <span class="led-mini"></span>
+          <span class="rotulo">TIMEOUT</span>
+          <span class="desc">o tempo da trava acabou</span>
+        </button>
+        <button class="chave" data-pino="reset" aria-pressed="false">
+          <span class="led-mini"></span>
+          <span class="rotulo">RESET</span>
+          <span class="desc">destrava, só o administrador</span>
+        </button>
+      </div>
+
+      <button class="clk" id="clk">
+        ⏻ PULSAR O CLOCK
+        <span class="hint">nada muda até você fazer isso — é o coração do circuito</span>
+      </button>
+
+      <div class="roteiros">
+        <span class="rot-label">ou assista:</span>
+        <button class="btn principal" data-roteiro="liberar">Acesso liberado</button>
+        <button class="btn" data-roteiro="bloquear">Três erros e bloqueio</button>
+        <button class="btn" data-roteiro="zerar">Recomeçar</button>
+      </div>
+    </div>
+
+    <div class="modulo">
+      <h2>A fechadura</h2>
+      <p class="sub">O que o circuito decidiu, neste instante.</p>
+
+      <div class="porta-area">
+        <div class="porta" id="porta">
+          <div class="vao"></div>
+          <div class="folha"><span class="macaneta"></span></div>
+        </div>
+
+        <div class="estado-atual">
+          <p class="estado-nome" id="estado-nome">AGUARDANDO</p>
+          <p class="estado-bits">Q1 Q0 = <b id="estado-bits">00</b></p>
+
+          <div class="leds" id="leds">
+            <div class="led-linha" data-led="senha_ok">
+              <span class="led"></span><span class="nome">SENHA_OK</span>
+              <span class="oque">a senha confere</span>
+            </div>
+            <div class="led-linha" data-led="aguardando">
+              <span class="led"></span><span class="nome">AGUARDANDO</span>
+              <span class="oque">em repouso</span>
+            </div>
+            <div class="led-linha" data-led="verificando">
+              <span class="led"></span><span class="nome">VERIFICANDO</span>
+              <span class="oque">comparando</span>
+            </div>
+            <div class="led-linha" data-led="trava_aberta">
+              <span class="led amb"></span><span class="nome">TRAVA_ABERTA</span>
+              <span class="oque">solenoide acionado</span>
+            </div>
+            <div class="led-linha" data-led="bloqueado">
+              <span class="led red"></span><span class="nome">BLOQUEADO</span>
+              <span class="oque">travado</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="contador">
+        <div class="topo">
+          <span class="rot">Tentativas erradas</span>
+          <span class="val mono" id="contador-val">00</span>
+        </div>
+        <div class="tentativas" id="tentativas">
+          <span class="tent"></span><span class="tent"></span><span class="tent"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="narracao" id="narracao">
+    <p class="quem">O que está acontecendo</p>
+    <p id="narra-1">A fechadura está em repouso. Digite a senha nos quatro bits e ligue o CONFIRMA.</p>
+    <p id="narra-2">Dica: a senha gravada no circuito é <span class="mono">1011</span> — ligue S3, S1 e S0.</p>
+  </div>
+
+  <section class="bloco logica">
+    <h2>Por dentro: a lógica acendendo</h2>
+    <p class="intro">
+      Estas são as equações reais do circuito, lidas do arquivo em Logisim. Elas acendem quando
+      valem 1. Mexa nos pinos acima e observe quais reagem.
+    </p>
+    <div class="equacoes" id="equacoes">
+      <div class="eq" data-sinal="p1">
+        <div class="linha"><span class="saida">P1</span><span class="expr">= S3 · S̄2</span><span class="res">0</span></div>
+        <span class="glosa">Os dois bits de cima estão certos?</span>
+      </div>
+      <div class="eq" data-sinal="p2">
+        <div class="linha"><span class="saida">P2</span><span class="expr">= S1 · S0</span><span class="res">0</span></div>
+        <span class="glosa">E os dois de baixo?</span>
+      </div>
+      <div class="eq" data-sinal="igual">
+        <div class="linha"><span class="saida">IGUAL</span><span class="expr">= P1 · P2</span><span class="res">0</span></div>
+        <span class="glosa">Se os dois pares conferem, a senha é 1011.</span>
+      </div>
+      <div class="eq" data-sinal="erro">
+        <div class="linha"><span class="saida">ERRO</span><span class="expr">= VER · ĪGUAL</span><span class="res">0</span></div>
+        <span class="glosa">Errou — mas só conta se estiver verificando.</span>
+      </div>
+      <div class="eq" data-sinal="e">
+        <div class="linha"><span class="saida">E</span><span class="expr">= C1 · (C0 + ERRO)</span><span class="res">0</span></div>
+        <span class="glosa">Chegou no limite. Note que ele antecipa o terceiro erro.</span>
+      </div>
+      <div class="eq" data-sinal="clr">
+        <div class="linha"><span class="saida">CLR</span><span class="expr">= LIB + RESET</span><span class="res">0</span></div>
+        <span class="glosa">Zera o contador: entrou, ou o administrador destravou.</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="bloco">
+    <h2>Para onde vai o que acontece aqui</h2>
+    <p class="intro">
+      Cada vez que a trava abre, nasce um evento. Ele atravessa cinco disciplinas e termina
+      decidindo quantos vigilantes um prédio precisa em cada turno.
+    </p>
+    <div class="corrente" id="corrente">
+      <div class="elo" data-elo="circuito">
+        <span class="n">01</span>
+        <h3>Circuito</h3>
+        <p>A máquina de estados decide liberar ou bloquear.</p>
+        <p class="dado">portas lógicas + flip-flops</p>
+      </div>
+      <div class="elo" data-elo="fisica">
+        <span class="n">02</span>
+        <h3>Física</h3>
+        <p>Um transistor aciona a trava de 12 V. A porta lógica sozinha não daria conta.</p>
+        <p class="dado">3,53 W × 5,16 s = 18 200 mJ</p>
+      </div>
+      <div class="elo" data-elo="gateway">
+        <span class="n">03</span>
+        <h3>Gateway</h3>
+        <p>A mesma máquina de estados em Python envia o evento pela internet.</p>
+        <p class="dado">POST /acessos → 201</p>
+      </div>
+      <div class="elo" data-elo="nuvem">
+        <span class="n">04</span>
+        <h3>Nuvem</h3>
+        <p>A API guarda o evento num banco de dados gerenciado.</p>
+        <p class="dado">FastAPI + PostgreSQL</p>
+      </div>
+      <div class="elo" data-elo="otimizacao">
+        <span class="n">05</span>
+        <h3>Otimização</h3>
+        <p>O histórico vira a escala de vigilância de menor custo.</p>
+        <p class="dado">26,6% mais barata</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="bloco">
+    <h2>Três coisas que este circuito faz e não são óbvias</h2>
+    <div class="notas">
+      <div class="nota">
+        <h3>O bloqueio chega na terceira, não na quarta</h3>
+        <p>
+          O contador só assume o valor novo <em>depois</em> do pulso de clock. Se o sinal de limite
+          olhasse para o contador, ele veria <span class="mono">10</span> no terceiro erro e deixaria
+          passar mais uma tentativa.
+        </p>
+        <p>
+          Por isso <span class="mono">E = C1·(C0 + ERRO)</span> e não <span class="mono">C1·C0</span>:
+          ele antecipa o erro que está acontecendo agora.
+        </p>
+      </div>
+      <div class="nota">
+        <h3>O contador não volta para zero sozinho</h3>
+        <p>
+          Um contador de 2 bits, depois de <span class="mono">11</span>, voltaria a
+          <span class="mono">00</span> — e o bloqueio se desfaria sozinho.
+        </p>
+        <p>
+          A habilitação carrega <span class="mono">¬(C1·C0)</span>: o contador cheio corta a própria
+          contagem. Ele satura em vez de transbordar.
+        </p>
+      </div>
+      <div class="nota">
+        <h3>Nada acontece entre dois pulsos de clock</h3>
+        <p>
+          Ligar um pino não muda estado nenhum. O circuito só olha para as entradas no instante da
+          borda de subida do clock.
+        </p>
+        <p>
+          É o que torna o comportamento previsível: ruído elétrico e trepidação de botão se apagam
+          muito antes do próximo pulso.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>LOCKWISE · ExpoTech 2026.2 · UniFECAF</span>
+    <span>Simulação fiel ao arquivo <span class="mono">lockwise_completo.circ</span></span>
+  </footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ------------------------------------------------------------------
+  // A lógica do circuito, porta por porta, como está em lockwise_completo.circ.
+  // Nada aqui é interpretação: cada linha é uma porta do arquivo.
+  // ------------------------------------------------------------------
+
+  function combinacional(p, r) {
+    const s2n = !p.s2;
+    const p1 = p.s3 && s2n;
+    const p2 = p.s1 && p.s0;
+    const igual = p1 && p2;
+    const ign = !igual;
+
+    const aguardando  = !r.q1 && !r.q0;
+    const verificando = !r.q1 &&  r.q0;
+    const liberado    =  r.q1 && !r.q0;
+    const bloqueado   =  r.q1 &&  r.q0;
+
+    const erro = verificando && ign;
+    const ce = r.c0 || erro;
+    const e  = r.c1 && ce;
+
+    const tn = !p.timeout;
+    const rn = !p.reset;
+    const ie = igual || e;
+    const ne = ign && e;
+
+    const a1 = !r.q1 &&  r.q0 && ie;
+    const a2 =  r.q1 && !r.q0 && tn;
+    const a3 =  r.q1 &&  r.q0 && rn;
+    const b1 = !r.q1 && !r.q0 && p.confirma;
+    const b2 = !r.q1 &&  r.q0 && ne;
+    const d1 = a1 || a2 || a3;
+    const d0 = b1 || b2 || a3;
+
+    const ecnt = r.c1 && r.c0;
+    const ebar = !ecnt;
+    const clr  = liberado || p.reset;
+    const clrn = !clr;
+    const en   = erro && ebar;
+    const x0 = r.c0 !== en;
+    const g  = r.c0 && en;
+    const x1 = r.c1 !== g;
+    const dc0 = x0 && clrn;
+    const dc1 = x1 && clrn;
+
+    return { p1, p2, igual, aguardando, verificando, liberado, bloqueado,
+             erro, e, clr, en, d1, d0, dc1, dc0 };
+  }
+
+  function borda(p, r) {
+    const s = combinacional(p, r);
+    return { q1: s.d1, q0: s.d0, c1: s.dc1, c0: s.dc0 };
+  }
+
+  const SENHA = 0b1011;
+  const NOMES = ["AGUARDANDO", "VERIFICANDO", "LIBERADO", "BLOQUEADO"];
+  const CORES = { AGUARDANDO: "var(--ink-dim)", VERIFICANDO: "var(--live)",
+                  LIBERADO: "var(--lock)", BLOQUEADO: "var(--alarm)" };
+
+  let pinos = { s3:false, s2:false, s1:false, s0:false, confirma:false, timeout:false, reset:false };
+  let reg   = { q1:false, q0:false, c1:false, c0:false };
+  let rodando = false;
+
+  // --------------------------------------------------------------- DOM
+
+  const el = (id) => document.getElementById(id);
+  const porta = el("porta");
+  const narracao = el("narracao");
+
+  function senhaAtual() {
+    return (pinos.s3 ? 8 : 0) + (pinos.s2 ? 4 : 0) + (pinos.s1 ? 2 : 0) + (pinos.s0 ? 1 : 0);
+  }
+  function senhaTexto() {
+    return [pinos.s3, pinos.s2, pinos.s1, pinos.s0].map(b => b ? "1" : "0").join("");
+  }
+  function estadoIndice() { return (reg.q1 ? 2 : 0) + (reg.q0 ? 1 : 0); }
+  function contadorValor() { return (reg.c1 ? 2 : 0) + (reg.c0 ? 1 : 0); }
+
+  function narrar(titulo, linha1, linha2, tom) {
+    narracao.className = "narracao" + (tom ? " " + tom : "");
+    narracao.querySelector(".quem").textContent = titulo;
+    el("narra-1").innerHTML = linha1;
+    el("narra-2").innerHTML = linha2 || "";
+  }
+
+  // ------------------------------------------------------------ desenho
+
+  function desenhar() {
+    const s = combinacional(pinos, reg);
+    const estado = NOMES[estadoIndice()];
+
+    document.querySelectorAll(".bit").forEach(b => {
+      const ligado = pinos[b.dataset.pino];
+      b.setAttribute("aria-pressed", String(ligado));
+      b.querySelector(".valor").textContent = ligado ? "1" : "0";
+    });
+    document.querySelectorAll(".chave").forEach(c => {
+      c.setAttribute("aria-pressed", String(pinos[c.dataset.pino]));
+    });
+
+    el("senha-digitada").textContent = senhaTexto();
+
+    const nomeEl = el("estado-nome");
+    nomeEl.textContent = estado;
+    nomeEl.style.color = CORES[estado];
+    el("estado-bits").textContent = (reg.q1 ? "1" : "0") + (reg.q0 ? "1" : "0");
+
+    const acesos = {
+      senha_ok: s.igual, aguardando: s.aguardando, verificando: s.verificando,
+      trava_aberta: s.liberado, bloqueado: s.bloqueado
+    };
+    document.querySelectorAll(".led-linha").forEach(linha => {
+      const on = acesos[linha.dataset.led];
+      linha.classList.toggle("ativa", on);
+      linha.querySelector(".led").classList.toggle("on", on);
+    });
+
+    porta.classList.toggle("aberta", s.liberado);
+
+    const cnt = contadorValor();
+    el("contador-val").textContent = (reg.c1 ? "1" : "0") + (reg.c0 ? "1" : "0");
+    document.querySelectorAll(".tent").forEach((t, i) => {
+      t.classList.toggle("usada", i < cnt && cnt < 3);
+      t.classList.toggle("fatal", cnt === 3);
+    });
+
+    const sinais = { p1: s.p1, p2: s.p2, igual: s.igual, erro: s.erro, e: s.e, clr: s.clr };
+    document.querySelectorAll(".eq").forEach(eq => {
+      const v = sinais[eq.dataset.sinal];
+      eq.classList.toggle("on", v);
+      eq.querySelector(".res").textContent = v ? "1" : "0";
+    });
+  }
+
+  // --------------------------------------------------- narração por gesto
+
+  function narrarPino(pino) {
+    const s = combinacional(pinos, reg);
+    const estado = NOMES[estadoIndice()];
+
+    if (["s3","s2","s1","s0"].includes(pino)) {
+      const digitada = senhaTexto();
+      if (s.igual) {
+        narrar("Comparador", "A senha confere. O LED <span class=\"mono\">SENHA_OK</span> acendeu.",
+          "Mas a trava ainda não abriu: o circuito só decide no pulso do clock. Ligue o CONFIRMA e pulse.");
+      } else {
+        const falta = [];
+        if (!s.p1) falta.push("os dois bits de cima (S3 ligado, S2 desligado)");
+        if (!s.p2) falta.push("os dois de baixo (S1 e S0 ligados)");
+        narrar("Comparador",
+          "Você digitou <span class=\"mono\">" + digitada + "</span>. O circuito compara com <span class=\"mono\">1011</span> e não bate.",
+          "Falta: " + falta.join(" e ") + ".");
+      }
+      return;
+    }
+
+    if (pino === "confirma") {
+      if (pinos.confirma) {
+        narrar("Entrada", "CONFIRMA ligado — é como apertar o botão de entrar.",
+          estado === "AGUARDANDO"
+            ? "Agora pulse o clock: a fechadura vai para VERIFICANDO."
+            : "Mas a fechadura está em " + estado + ", e aqui o CONFIRMA não tem efeito nenhum.");
+      } else {
+        narrar("Entrada", "CONFIRMA desligado.",
+          estado === "VERIFICANDO" ? "Pulse o clock para ver o veredito." : "");
+      }
+      return;
+    }
+
+    if (pino === "timeout") {
+      narrar("Temporizador",
+        pinos.timeout ? "TIMEOUT ligado — no circuito real, é um temporizador avisando que os 5,16 segundos acabaram."
+                      : "TIMEOUT desligado.",
+        estado === "LIBERADO" && pinos.timeout
+          ? "Pulse o clock e a trava fecha."
+          : "Só tem efeito quando a trava está aberta.");
+      return;
+    }
+
+    if (pino === "reset") {
+      narrar("Administrador",
+        pinos.reset ? "RESET ligado — é a chave do administrador."
+                    : "RESET desligado.",
+        estado === "BLOQUEADO" && pinos.reset
+          ? "Pulse o clock para destravar o sistema."
+          : "É a única forma de sair do estado BLOQUEADO.");
+    }
+  }
+
+  function narrarTransicao(antes, depois, cntAntes, cntDepois) {
+    const s = combinacional(pinos, reg);
+
+    if (antes === depois) {
+      if (antes === "BLOQUEADO") {
+        narrar("Bloqueado",
+          "Nada acontece. A fechadura está bloqueada e ignora qualquer senha — inclusive a correta.",
+          "Só o RESET do administrador destrava.", "alerta");
+      } else if (antes === "LIBERADO") {
+        narrar("Trava aberta", "A trava continua aberta.",
+          "No circuito real, um temporizador fecha sozinho depois de 5,16 segundos.", "sucesso");
+      } else {
+        narrar("Clock", "O clock pulsou, mas nada mudou de estado.",
+          antes === "AGUARDANDO"
+            ? "A fechadura espera o CONFIRMA. Sem ele, cada pulso a deixa onde está."
+            : "");
+      }
+      return;
+    }
+
+    if (depois === "VERIFICANDO") {
+      narrar("Verificando", "A fechadura recebeu o comando e está comparando a senha.",
+        "Pulse o clock de novo para ver o resultado. Desligar o CONFIRMA antes é o gesto normal.");
+    } else if (depois === "LIBERADO") {
+      narrar("Acesso liberado",
+        "A senha conferiu. O transistor acionou o solenoide e a trava abriu.",
+        "Este é o momento em que nasce um evento: <span class=\"mono\">18 200 mJ</span> de energia, que vai para a nuvem e um dia vira escala de vigilância.",
+        "sucesso");
+      acenderCorrente();
+    } else if (depois === "BLOQUEADO") {
+      narrar("Bloqueado",
+        "Terceira tentativa errada. O contador chegou em <span class=\"mono\">11</span> e o sistema travou.",
+        "Repare que o bloqueio veio na <em>terceira</em>, e não na quarta — o sinal de limite antecipa o erro que está acontecendo agora.",
+        "alerta");
+      porta.classList.add("travada");
+      setTimeout(() => porta.classList.remove("travada"), 500);
+    } else if (depois === "AGUARDANDO") {
+      if (antes === "VERIFICANDO") {
+        const n = cntDepois;
+        narrar("Senha recusada",
+          "A senha não conferiu. Voltamos ao repouso, e o contador de erros subiu para <span class=\"mono\">" + n + "</span>.",
+          n === 2 ? "Mais um erro e o sistema bloqueia." : "São três erros até o bloqueio.",
+          "alerta");
+      } else if (antes === "LIBERADO") {
+        narrar("Trava fechada", "O temporizador expirou e a trava fechou.",
+          "O contador de erros também zerou — entrar com sucesso limpa o histórico de tentativas.");
+      } else {
+        narrar("Destravado", "O administrador destravou o sistema.",
+          "O contador voltou a zero e a fechadura aceita tentativas de novo.");
+      }
+    }
+  }
+
+  function acenderCorrente() {
+    const elos = Array.from(document.querySelectorAll(".elo"));
+    elos.forEach(e => e.classList.remove("aceso"));
+    elos.forEach((e, i) => {
+      setTimeout(() => {
+        e.classList.add("aceso");
+        setTimeout(() => e.classList.remove("aceso"), 1400);
+      }, i * 190);
+    });
+  }
+
+  // ------------------------------------------------------------- eventos
+
+  function alternar(pino) {
+    if (rodando) return;
+    pinos[pino] = !pinos[pino];
+    desenhar();
+    narrarPino(pino);
+  }
+
+  function pulsar() {
+    if (rodando) return;
+    const antes = NOMES[estadoIndice()];
+    const cntAntes = contadorValor();
+    reg = borda(pinos, reg);
+    const depois = NOMES[estadoIndice()];
+    const cntDepois = contadorValor();
+
+    const botao = el("clk");
+    botao.classList.remove("pulsando");
+    void botao.offsetWidth;
+    botao.classList.add("pulsando");
+
+    desenhar();
+    narrarTransicao(antes, depois, cntAntes, cntDepois);
+  }
+
+  document.querySelectorAll(".bit, .chave").forEach(b => {
+    b.addEventListener("click", () => alternar(b.dataset.pino));
+  });
+  el("clk").addEventListener("click", pulsar);
+
+  // ------------------------------------------------------------ roteiros
+
+  function aplicarSenha(valor) {
+    pinos.s3 = !!(valor & 8); pinos.s2 = !!(valor & 4);
+    pinos.s1 = !!(valor & 2); pinos.s0 = !!(valor & 1);
+  }
+
+  const ROTEIROS = {
+    liberar: [
+      ["senha", 0b1011, "Digitando a senha correta: 1011."],
+      ["pino", "confirma", true, "Ligando o CONFIRMA."],
+      ["clock", null, null, null],
+      ["pino", "confirma", false, "Soltando o CONFIRMA."],
+      ["clock", null, null, null],
+      ["pino", "timeout", true, "O temporizador avisa que o tempo acabou."],
+      ["clock", null, null, null],
+      ["pino", "timeout", false, null]
+    ],
+    bloquear: [
+      ["senha", 0b0000, "Primeira tentativa, senha errada."],
+      ["pino", "confirma", true, null], ["clock", null, null, null],
+      ["pino", "confirma", false, null], ["clock", null, null, null],
+      ["senha", 0b1111, "Segunda tentativa, outra senha errada."],
+      ["pino", "confirma", true, null], ["clock", null, null, null],
+      ["pino", "confirma", false, null], ["clock", null, null, null],
+      ["senha", 0b0011, "Terceira tentativa."],
+      ["pino", "confirma", true, null], ["clock", null, null, null],
+      ["pino", "confirma", false, null], ["clock", null, null, null],
+      ["senha", 0b1011, "Agora a senha certa — vamos ver se adianta."],
+      ["pino", "confirma", true, null], ["clock", null, null, null],
+      ["pino", "confirma", false, null], ["clock", null, null, null]
+    ]
+  };
+
+  function rodarRoteiro(nome) {
+    if (rodando) return;
+    const passos = ROTEIROS[nome];
+    if (!passos) { zerar(); return; }
+
+    rodando = true;
+    document.querySelectorAll(".btn").forEach(b => b.disabled = true);
+
+    pinos = { s3:false, s2:false, s1:false, s0:false, confirma:false, timeout:false, reset:false };
+    reg = { q1:false, q0:false, c1:false, c0:false };
+    desenhar();
+
+    let i = 0;
+    function proximo() {
+      if (i >= passos.length) {
+        rodando = false;
+        document.querySelectorAll(".btn").forEach(b => b.disabled = false);
+        return;
+      }
+      const [tipo, a, b, texto] = passos[i++];
+      if (tipo === "senha") {
+        aplicarSenha(a);
+        desenhar();
+        if (texto) narrar("Roteiro", texto, "Senha nos pinos: <span class=\"mono\">" + senhaTexto() + "</span>.");
+      } else if (tipo === "pino") {
+        pinos[a] = b;
+        desenhar();
+        if (texto) narrar("Roteiro", texto, "");
+      } else {
+        pulsarInterno();
+      }
+      setTimeout(proximo, tipo === "clock" ? 1500 : 900);
+    }
+    setTimeout(proximo, 350);
+  }
+
+  function pulsarInterno() {
+    const antes = NOMES[estadoIndice()];
+    const cntAntes = contadorValor();
+    reg = borda(pinos, reg);
+    const depois = NOMES[estadoIndice()];
+
+    const botao = el("clk");
+    botao.classList.remove("pulsando");
+    void botao.offsetWidth;
+    botao.classList.add("pulsando");
+
+    desenhar();
+    narrarTransicao(antes, depois, cntAntes, contadorValor());
+  }
+
+  function zerar() {
+    pinos = { s3:false, s2:false, s1:false, s0:false, confirma:false, timeout:false, reset:false };
+    reg = { q1:false, q0:false, c1:false, c0:false };
+    desenhar();
+    narrar("O que está acontecendo",
+      "A fechadura está em repouso. Digite a senha nos quatro bits e ligue o CONFIRMA.",
+      "Dica: a senha gravada no circuito é <span class=\"mono\">1011</span> — ligue S3, S1 e S0.");
+  }
+
+  document.querySelectorAll("[data-roteiro]").forEach(b => {
+    b.addEventListener("click", () => rodarRoteiro(b.dataset.roteiro));
+  });
+
+  desenhar();
+})();
+</script>
