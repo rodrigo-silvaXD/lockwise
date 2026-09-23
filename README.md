@@ -48,15 +48,16 @@ lockwise/
 │   ├── lockwise_completo.circ     circuito principal
 │   └── README.md                  como abrir e operar
 ├── docs/
-│   ├── eletronica.md              projeto do circuito
 │   ├── fisica.md                  memorial de cálculos
 │   ├── arquitetura.md             C4 níveis 1–4, GoF e SOLID com arquivo:linha
-│   ├── otimizacao.md              modelo matemático
-│   ├── adr/                       registros de decisão (por quê de cada escolha)
-│   └── evidencias/                14 figuras da simulação
+│   ├── deploy.md                  como a API vai para o ar, e o roteiro do dia
+│   ├── eletronica.md              tabela-verdade, Karnaugh e transição de estados
+│   │                              (a escrever — Fase H)
+│   ├── adr/                       28 registros de decisão: o porquê de cada escolha
+│   └── evidencias/                14 figuras da simulação + relatório da otimização
 ├── gateway/                       gêmeo digital do circuito + POST para a API
 ├── backend/                       API FastAPI: State, Strategy, Observer + Postgres
-├── otimizacao/                    modelo PuLP: escala de vigilância de menor custo
+├── otimizacao/                    modelo PuLP e o memorial do modelo (README.md)
 ├── .github/workflows/             testes e deploy
 └── render.yaml                    infraestrutura do Render, versionada
 ```
