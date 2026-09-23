@@ -311,17 +311,16 @@ python -m lockwise_otimizacao.cli resolver --dias 7 --saida relatorio.txt
 
 **Pendente**: semear o histórico no banco de produção (precisa da chave da API).
 
-### Fase H — Documentação e vídeo (≈3 dias)
-Relatório técnico, vídeo pitch de até 3 minutos, README finalizado.
+### Fase H — Documentação e vídeo · PARCIAL (23/09/2026)
 
-Estrutura sugerida da seção de eletrônica:
-- 3.1 Visão geral → Fig. 01, 02
-- 3.2 Comparador → tabela-verdade, Karnaugh, expressão simplificada, Fig. 03, 04
-- 3.3 Máquina de estados → tabela de transição, equações D1/D0, Fig. 05–08
-- 3.4 Contador → equações, Fig. 09–13
-- 3.5 Verificação temporal → Fig. 14
+Concluído:
+- **`docs/eletronica.md`** — tabela-verdade do comparador (mintermo único m11, irredutível), mapa de Karnaugh, tabela de transição condensada em 9 linhas **verificada contra as 256 combinações do circuito** (zero contraexemplos), comportamento do contador, caminho crítico de 7 níveis, e as duas perguntas prováveis da sabatina com resposta generalizada. Todas as tabelas extraídas do `.circ` pelo leitor de netlist.
+- **`docs/relatorio.md`** — relatório técnico amarrando as cinco disciplinas, com seção de limitações declaradas (analógica de papel, histórico sintético, senha única, ponte operada por pessoa).
+- **`docs/video-pitch.md`** — roteiro dos 3 minutos com tempos, texto falado, checklist de gravação e divisão de falas por integrante.
 
-Regra: teoria antes, evidência depois.
+Pendente da Fase H:
+- Gravar o vídeo (precisa da equipe definida e de um ensaio cronometrado)
+- Preencher a tabela de Equipe no README e a divisão de falas do vídeo
 
 ### Fase I — Ensaio da sabatina (≈1 semana)
 Cada integrante sendo arguido pelos outros. É a fase mais ignorada e a que o regulamento trata com mais dureza: respostas vagas eliminam a elegibilidade do **grupo inteiro**.
