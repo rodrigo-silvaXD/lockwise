@@ -51,6 +51,7 @@ lockwise/
 │   ├── fisica.md                  memorial de cálculos
 │   ├── arquitetura.md             C4 níveis 1–4, GoF e SOLID com arquivo:linha
 │   ├── deploy.md                  como a API vai para o ar e o que fazer quando falha
+│   ├── relatorio.md              relatório técnico: as cinco disciplinas amarradas
 │   ├── eletronica.md             tabela-verdade, Karnaugh e transição de estados
 │   ├── adr/                       28 registros de decisão: o porquê de cada escolha
 │   └── evidencias/                14 figuras da simulação + relatório da otimização
@@ -201,6 +202,20 @@ Selecione a ferramenta de mão (Poke Tool) e clique nos pinos. A máquina de est
 Com senha incorreta, repita três vezes: CONFIRMA liga, pulse o CLK, CONFIRMA desliga, pulse o CLK. O contador evolui `00` → `01` → `10` e, na terceira tentativa, BLOQUEADO acende com o contador em `11`.
 
 Para desbloquear: ligue RESET e pulse o CLK.
+
+---
+
+## Documentação
+
+| Documento | O que traz |
+|---|---|
+| [Relatório técnico](docs/relatorio.md) | as cinco disciplinas amarradas, com as limitações declaradas |
+| [Eletrônica](docs/eletronica.md) | tabela-verdade, Karnaugh, transição de estados, caminho crítico |
+| [Física](docs/fisica.md) | memorial de cálculos: sinal, corrente, potência, magnetismo |
+| [Arquitetura](docs/arquitetura.md) | C4 níveis 1–4, padrões GoF e SOLID com arquivo:linha |
+| [Otimização](otimizacao/README.md) | formulação do modelo e o resultado |
+| [Deploy](docs/deploy.md) | como a API vai para o ar e o que fazer quando algo falha |
+| [Decisões (ADR)](docs/adr/) | 28 registros: o porquê de cada escolha |
 
 ---
 
