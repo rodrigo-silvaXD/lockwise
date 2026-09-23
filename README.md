@@ -51,8 +51,7 @@ lockwise/
 │   ├── fisica.md                  memorial de cálculos
 │   ├── arquitetura.md             C4 níveis 1–4, GoF e SOLID com arquivo:linha
 │   ├── deploy.md                  como a API vai para o ar, e o roteiro do dia
-│   ├── eletronica.md              tabela-verdade, Karnaugh e transição de estados
-│   │                              (a escrever — Fase H)
+│   ├── eletronica.md             tabela-verdade, Karnaugh e transição de estados
 │   ├── adr/                       28 registros de decisão: o porquê de cada escolha
 │   └── evidencias/                14 figuras da simulação + relatório da otimização
 ├── gateway/                       gêmeo digital do circuito + POST para a API
