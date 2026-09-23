@@ -21,9 +21,13 @@ Abra `index.html` no navegador. Não precisa de servidor, não tem dependência,
 - **Painel de entrada** — os quatro bits da senha, CONFIRMA, TIMEOUT, RESET e o pulso de clock
 - **A fechadura** — porta que abre, os sete LEDs do circuito e o contador de tentativas
 - **Narração** — uma frase em português explicando o que cada clique fez e o que fazer em seguida
+- **O caminho do sinal** — diagrama do circuito onde o pulso percorre os fios de verdade: entradas → comparador → máquina de estados → saída. Quando a senha não confere, o pulso **para no comparador**, uma marca vermelha aparece, e o sinal desvia para o contador de erros. É o comportamento real: `IGUAL = 0` não chega na entrada D do flip-flop.
 - **Lógica acendendo** — as equações reais do circuito, acesas quando valem 1
 - **Roteiros** — "acesso liberado" e "três erros e bloqueio" rodam sozinhos, passo a passo
+- **No mundo real** — o que cada parte seria numa montagem física, com os números de `docs/fisica.md`
 - **A corrente** — os cinco elos do projeto, que se acendem em sequência quando a trava abre
+
+Uma escolha de temporização que vale notar: o estado só muda **depois** que o pulso termina de percorrer os fios, não no instante do clique. É mais lento que o necessário, e é de propósito — deixa visível que o circuito tem um caminho a percorrer antes de decidir.
 
 ## Se as equações do circuito mudarem
 
