@@ -20,6 +20,24 @@ def test_leitura_e_aberta(api):
         assert api.get(rota).status_code == 200, rota
 
 
+def test_qualquer_uma_das_chaves_configuradas_e_aceita():
+    """Uma chave por origem: revogar a do simulador nao derruba o gateway."""
+    api = montar(api_key="do-gateway,do-wokwi")
+    for chave in ("do-gateway", "do-wokwi"):
+        r = api.post("/acessos", json=acesso("LIBERADO"), headers={"X-API-Key": chave})
+        assert r.status_code == 201, chave
+    assert api.post("/acessos", json=acesso("LIBERADO"),
+                    headers={"X-API-Key": "revogada"}).status_code == 401
+
+
+def test_revogar_uma_chave_nao_afeta_as_outras():
+    sem_wokwi = montar(api_key="do-gateway")
+    assert sem_wokwi.post("/acessos", json=acesso("LIBERADO"),
+                          headers={"X-API-Key": "do-wokwi"}).status_code == 401
+    assert sem_wokwi.post("/acessos", json=acesso("LIBERADO"),
+                          headers={"X-API-Key": "do-gateway"}).status_code == 201
+
+
 def test_sem_chave_configurada_a_escrita_falha_fechada_com_503():
     """503, não 401: o gateway trata 5xx como temporário e guarda o evento na fila."""
     api = montar(api_key=None)

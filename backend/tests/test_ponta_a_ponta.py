@@ -44,7 +44,7 @@ def api_no_ar(tmp_path_factory):
     if not ROTEIRO.exists():
         pytest.skip(f"gateway não encontrado em {GATEWAY}")
     banco = tmp_path_factory.mktemp("e2e") / "lockwise.db"
-    config = Configuracao(database_url=f"sqlite:///{banco.as_posix()}", api_key=CHAVE, politica="limite")
+    config = Configuracao(database_url=f"sqlite:///{banco.as_posix()}", api_keys=(CHAVE,), politica="limite")
     app = criar_app(config, engine=criar_engine(config.database_url))
 
     porto = _porto_livre()
