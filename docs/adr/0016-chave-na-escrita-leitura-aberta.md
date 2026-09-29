@@ -28,5 +28,3 @@ HTTP Basic: funciona, mas o gateway teria usuário e senha para uma coisa só. `
 Os dados de acesso — horários de entrada de um morador fictício — são legíveis por quem tiver a URL. Para o projeto acadêmico, com um usuário inventado e a URL conhecida só pela equipe e pelo avaliador, é aceitável. Se isso virasse produto, a leitura precisaria de autenticação, e essa ADR seria substituída.
 
 A chave do gateway e a chave da API são a mesma string, configurada dos dois lados por variável de ambiente. Não está em nenhum arquivo versionado; `.env.example` mostra o nome, não o valor.
-
-Atualização de 29/09: a variável passou a aceitar várias chaves separadas por vírgula, para que uma origem que exponha a sua — um projeto público de simulador — possa ser revogada sozinha ([ADR 0029](0029-varias-chaves-de-api.md)). O resto desta decisão continua valendo.

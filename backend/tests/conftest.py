@@ -19,8 +19,7 @@ logging.getLogger("lockwise").setLevel(logging.WARNING)
 
 
 def montar(politica: str = "nenhuma", api_key: str | None = CHAVE, **extras) -> TestClient:
-    chaves = tuple(k for k in (api_key.split(",") if api_key else []) if k)
-    config = Configuracao(database_url="sqlite://", api_keys=chaves, politica=politica, **extras)
+    config = Configuracao(database_url="sqlite://", api_key=api_key, politica=politica, **extras)
     app = criar_app(config, engine=criar_engine(config.database_url))
     return TestClient(app)
 
