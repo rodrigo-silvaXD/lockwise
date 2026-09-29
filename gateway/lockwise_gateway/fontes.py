@@ -1,8 +1,8 @@
 """De onde vêm os comandos que acionam os pinos.
 
-Hoje, do teclado (demo) ou de um arquivo de roteiro (testes e ensaio).
-Se a equipe montar o estágio de potência de `docs/fisica.md` com um ESP32
-lendo os pinos de estado, uma fonte `Serial` entra aqui sem tocar no resto.
+Do teclado, na demonstração, ou de um arquivo de roteiro, nos testes e no
+ensaio. As duas implementam o mesmo `FonteDeComandos`, então o interpretador
+não sabe de qual está lendo.
 """
 
 from __future__ import annotations
