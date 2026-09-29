@@ -106,7 +106,7 @@ Tudo por variável de ambiente; nada no código. Copie `.env.example`.
 | Variável | Padrão | Uso |
 |---|---|---|
 | `DATABASE_URL` | `sqlite:///./lockwise.db` | Render entrega `postgres://…`; é normalizada para `postgresql+psycopg://` |
-| `LOCKWISE_API_KEY` | — | obrigatória para escrever |
+| `LOCKWISE_API_KEY` | — | obrigatória para escrever; aceita várias separadas por vírgula, uma por origem ([ADR 0029](../docs/adr/0029-varias-chaves-de-api.md)) |
 | `LOCKWISE_POLITICA` | `limite` | `limite` · `horario` · `composta` · `nenhuma` |
 | `LOCKWISE_LIMITE_TENTATIVAS` | `2` | política `limite` |
 | `LOCKWISE_JANELA` | `06:00-23:00` | política `horario`; pode cruzar a meia-noite |

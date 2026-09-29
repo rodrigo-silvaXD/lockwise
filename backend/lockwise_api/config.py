@@ -80,7 +80,10 @@ def _mascarar(texto: str, visivel: int = 12) -> str:
 @dataclass(frozen=True)
 class Configuracao:
     database_url: str = "sqlite:///./lockwise.db"
-    api_key: str | None = None
+    # Uma ou mais chaves aceitas na escrita. Mais de uma existe para que uma
+    # fonte que exponha a chave — um projeto publico de simulador, por exemplo —
+    # use a sua propria, revogavel sem derrubar as outras (ADR 0029).
+    api_keys: tuple[str, ...] = ()
     politica: str = "limite"
     limite_tentativas: int = 2
     janela: tuple[time, time] = (time(6, 0), time(23, 0))
@@ -91,13 +94,20 @@ class Configuracao:
     # confirmar que o deploy trocou mesmo o que esta rodando (ver ADR 0022).
     commit: str = "desconhecido"
 
+    @property
+    def api_key(self) -> str | None:
+        """A primeira chave. Mantido para quem so precisa saber se ha alguma."""
+        return self.api_keys[0] if self.api_keys else None
+
     @classmethod
     def do_ambiente(cls, env: dict[str, str] | None = None) -> Configuracao:
         e = os.environ if env is None else env
         janela = e.get("LOCKWISE_JANELA", "06:00-23:00").split("-")
         return cls(
             database_url=normalizar_url_banco(e.get("DATABASE_URL", cls.database_url)),
-            api_key=e.get("LOCKWISE_API_KEY") or None,
+            api_keys=tuple(
+                k.strip() for k in e.get("LOCKWISE_API_KEY", "").split(",") if k.strip()
+            ),
             politica=e.get("LOCKWISE_POLITICA", cls.politica),
             limite_tentativas=int(e.get("LOCKWISE_LIMITE_TENTATIVAS", cls.limite_tentativas)),
             janela=(_hora(janela[0]), _hora(janela[1])),

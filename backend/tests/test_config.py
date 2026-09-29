@@ -64,7 +64,7 @@ def test_sqlite_passa_intacto():
 def test_padroes_sem_nenhuma_variavel():
     c = Configuracao.do_ambiente({})
     assert c.database_url == "sqlite:///./lockwise.db"
-    assert c.api_key is None and c.politica == "limite"
+    assert c.api_keys == () and c.api_key is None and c.politica == "limite"
     assert c.janela == (time(6, 0), time(23, 0)) and c.fuso == "America/Sao_Paulo"
     assert c.webhook_url is None and c.cors_origins == ("*",)
 
@@ -81,11 +81,24 @@ def test_le_o_ambiente_como_o_render_entrega():
         "LOCKWISE_CORS_ORIGINS": "https://painel.exemplo, https://outro.exemplo",
     })
     assert c.database_url == ESPERADO
-    assert c.api_key == "chave" and c.politica == "composta" and c.limite_tentativas == 1
+    assert c.api_keys == ("chave",) and c.api_key == "chave"
+    assert c.politica == "composta" and c.limite_tentativas == 1
     assert c.janela == (time(22, 0), time(6, 0)) and c.fuso == "UTC"
     assert c.cors_origins == ("https://painel.exemplo", "https://outro.exemplo")
 
 
 def test_variaveis_vazias_contam_como_ausentes():
     c = Configuracao.do_ambiente({"LOCKWISE_API_KEY": "", "LOCKWISE_WEBHOOK_URL": ""})
-    assert c.api_key is None and c.webhook_url is None
+    assert c.api_keys == () and c.api_key is None and c.webhook_url is None
+
+
+def test_varias_chaves_separadas_por_virgula():
+    """Uma chave por origem: o gateway tem a sua, o simulador publico tem outra."""
+    c = Configuracao.do_ambiente({"LOCKWISE_API_KEY": "do-gateway, do-wokwi ,do-painel"})
+    assert c.api_keys == ("do-gateway", "do-wokwi", "do-painel")
+    assert c.api_key == "do-gateway"  # a primeira e a principal
+
+
+def test_espacos_e_virgulas_sobrando_sao_ignorados():
+    c = Configuracao.do_ambiente({"LOCKWISE_API_KEY": " , uma-chave , , "})
+    assert c.api_keys == ("uma-chave",)
