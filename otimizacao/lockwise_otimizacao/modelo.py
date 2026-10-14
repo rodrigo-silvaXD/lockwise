@@ -48,22 +48,34 @@ class SemSolucao(Exception):
 def _solver():
     """O CBC, pelo caminho que existir nesta instalação.
 
-    O PuLP 4.0 remove `PULP_CBC_CMD` em favor de `COIN_CMD`, que depende do
-    binário do CBC instalado à parte (`pip install pulp[cbc]`). Onde ele
-    existir, usamos; onde não, caímos no CBC embutido, que é o caso do
-    Windows hoje. Assim o módulo funciona nas duas versões sem edição.
+    O nome do solver mudou entre versões do PuLP: a 4 removeu `PULP_CBC_CMD`
+    em favor de `COIN_CMD`. O `pyproject.toml` fixa a faixa que sabemos boa,
+    e esta função procura os dois nomes para o módulo não quebrar se alguém
+    instalar fora dela.
+
+    Cada candidato é consultado com `getattr`, nunca por acesso direto: um
+    atributo que deixou de existir levanta `AttributeError` em vez de ser
+    pulado, e foi exatamente assim que a versão anterior desta função quebrou
+    o pipeline quando o PuLP 4 saiu.
     """
-    coin = getattr(pulp, "COIN_CMD", None)
-    if coin is not None:
+    for nome in ("COIN_CMD", "PULP_CBC_CMD"):
+        fabrica = getattr(pulp, nome, None)
+        if fabrica is None:
+            continue
         try:
-            candidato = coin(msg=False)
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", DeprecationWarning)
+                candidato = fabrica(msg=False)
             if candidato.available():
                 return candidato
         except Exception:  # noqa: BLE001 — binário ausente ou incompatível
-            pass
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", DeprecationWarning)
-        return pulp.PULP_CBC_CMD(msg=False)
+            continue
+
+    raise SemSolucao(
+        "nenhum solver CBC disponível nesta instalação do PuLP "
+        f"({getattr(pulp, '__version__', 'versão desconhecida')}). "
+        "Instale a faixa suportada: pip install -e \".[dev]\" na pasta otimizacao."
+    )
 
 
 @dataclass(frozen=True)
