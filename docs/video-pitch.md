@@ -129,9 +129,13 @@ Três minutos é pouco. A escolha aqui é **mostrar o sistema funcionando** em v
 
 O regulamento avalia domínio individual. Vale cada integrante narrar o bloco da sua responsabilidade — e isso também ajuda no ensaio da sabatina, que cobra exatamente isso.
 
+São três integrantes e quatro blocos, então um narra dois. Decidam juntos
+quem fica com qual — e lembrem que essa divisão não vale na sabatina: lá
+cada um responde sobre qualquer parte.
+
 | Bloco | Quem narra |
 |---|---|
-| Problema e circuito | *(preencher)* |
-| Bloqueio e física | *(preencher)* |
-| Gateway e nuvem | *(preencher)* |
-| Otimização e fecho | *(preencher)* |
+| Problema e circuito | *(definir)* |
+| Bloqueio e física | *(definir)* |
+| Gateway e nuvem | *(definir)* |
+| Otimização e fecho | *(definir)* |

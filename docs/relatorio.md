@@ -4,6 +4,8 @@
 
 ExpoTech 2026.2 — Missão 2050 · Categoria INTERFACE · Engenharia da Computação · UniFECAF
 
+**Equipe:** Rodrigo Gonçalves da Silva (RA 98550) · Carlos Henrique Barreto (RA 113749) · Fabrício Conceição Silva (RA 114204)
+
 ---
 
 ## Resumo
