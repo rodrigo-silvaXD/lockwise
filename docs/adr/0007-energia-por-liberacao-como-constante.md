@@ -11,7 +11,7 @@ O documento de contexto trazia "≈ 18,4 J" como estimativa, sem cálculo.
 
 ## Decisão
 
-Cada acesso com resultado LIBERADO carrega `energia_mj = 18200`. Os demais (NEGADO, BLOQUEADO) carregam zero, porque a trava não é acionada.
+Fizemos cada acesso com resultado LIBERADO carregar `energia_mj = 18200`. Os demais (NEGADO, BLOQUEADO) carregam zero, porque a trava não é acionada.
 
 O valor vem do memorial de física: a fonte de 12 V entrega 292,5 mA à bobina (com 0,3 V perdidos no transistor saturado) e a fonte de 5 V entrega 4,3 mA à base; somados, 3,53 W. A trava fica aberta pelo tempo do NE555, 5,16 s. O produto é 18,2 J. Os 4,3 mJ de energia magnética da bobina e o LED de TRAVA_ABERTA cabem no arredondamento.
 

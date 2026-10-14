@@ -5,11 +5,11 @@ Situação: aceita para a aplicação (API no ar desde 22/09/2026); a parte de b
 
 ## Contexto
 
-O requisito de cloud pede deploy real em nuvem pública, banco de dados gerenciado, variáveis de ambiente seguras e pipeline de CI/CD. O roteiro cita AWS, GCP e Azure em camada gratuita, mas "camada gratuita" nesses três exige cartão de crédito no cadastro e uma configuração inicial (IAM, VPC, grupos de segurança) que consome dias. A equipe não tem cartão corporativo e tem oito semanas para cinco disciplinas.
+O requisito de cloud pede deploy real em nuvem pública, banco de dados gerenciado, variáveis de ambiente seguras e pipeline de CI/CD. O roteiro cita AWS, GCP e Azure em camada gratuita, mas "camada gratuita" nesses três exige cartão de crédito no cadastro e uma configuração inicial (IAM, VPC, grupos de segurança) que consome dias. Não temos cartão corporativo, e são oito semanas para cinco disciplinas.
 
 ## Decisão (proposta)
 
-Render: um web service Python conectado ao repositório do GitHub, com deploy automático a cada push na `main`, e um Postgres gerenciado no plano gratuito. Segredos (chave da API, URL do banco) ficam no painel do Render, nunca no repositório.
+Escolhemos o Render: um web service Python conectado ao repositório do GitHub, com deploy automático a cada push na `main`, e um Postgres gerenciado no plano gratuito. Segredos (chave da API, URL do banco) ficam no painel do Render, nunca no repositório.
 
 O GitHub Actions roda os testes a cada push; o deploy só acontece se os testes passarem.
 

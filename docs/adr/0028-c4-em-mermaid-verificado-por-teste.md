@@ -11,7 +11,7 @@ Dois problemas com isso. O primeiro é que a imagem se descola do código no pri
 
 ## Decisão
 
-Os diagramas são **Mermaid em Markdown**, versionados junto do código. O GitHub renderiza direto, e uma mudança de arquitetura aparece no diff como qualquer outra linha.
+Fizemos os diagramas em **Mermaid**, dentro do Markdown e versionados junto do código. O GitHub renderiza direto, e uma mudança de arquitetura aparece no diff como qualquer outra linha.
 
 Quatro níveis: contexto, contêiner, componente e — só para o padrão State, que é a mesma máquina de estados que aparece três vezes no projeto — código. Mais um diagrama de sequência de um `POST /acessos` que dispara a política de supervisão.
 
@@ -23,7 +23,7 @@ E o que sustenta tudo isso: `backend/tests/test_arquitetura.py` lê a árvore si
 
 PlantUML com a biblioteca oficial de C4: produz diagramas mais fiéis à notação, com legenda e estilos prontos. Exige um servidor de renderização ou um passo de build para virar imagem, e o GitHub não renderiza `.puml` sozinho. Mermaid perde em fidelidade à notação e ganha em ficar visível onde as pessoas leem.
 
-Ferramenta gráfica (draw.io, Excalidraw, Figma) exportando PNG: melhor acabamento, e é a opção que mais rápido apodrece. Descartada pelo motivo do contexto.
+Ferramenta gráfica (draw.io, Excalidraw, Figma) exportando PNG: melhor acabamento, e é a opção que mais rápido apodrece. Descartamos pelo motivo do contexto.
 
 UML clássico em vez de C4: o roteiro aceita os dois. C4 tem a vantagem de partir do contexto e ir fechando o zoom, o que casa com um sistema que atravessa hardware, máquina local e nuvem — um diagrama de classes sozinho não mostraria que existe um circuito do outro lado.
 

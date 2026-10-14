@@ -11,7 +11,7 @@ Os timestamps são guardados em UTC (ADR 0019). A conversão precisa acontecer n
 
 ## Decisão
 
-`GET /acessos/demanda-horaria` devolve 24 faixas, sempre presentes (a otimização quer um vetor completo, com zeros onde não há demanda), em hora local do fuso configurado em `LOCKWISE_FUSO`, padrão `America/Sao_Paulo`. Cada faixa traz acessos, liberados, negados, bloqueados e a soma de `energia_mj`.
+Fizemos `GET /acessos/demanda-horaria` devolver 24 faixas, sempre presentes (a otimização quer um vetor completo, com zeros onde não há demanda), em hora local do fuso configurado em `LOCKWISE_FUSO`, padrão `America/Sao_Paulo`. Cada faixa traz acessos, liberados, negados, bloqueados e a soma de `energia_mj`.
 
 A agregação é feita em Python: o repositório devolve os acessos do período e o serviço os distribui nas faixas usando `zoneinfo`.
 

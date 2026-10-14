@@ -9,7 +9,7 @@ O plano inicial do gateway previa `requests` para o HTTP. Na hora de começar, a
 
 ## Decisão
 
-O gateway usa só a biblioteca padrão: `urllib` para HTTP, `json`, `threading`, `argparse`, `dataclasses`. A única dependência é `pytest`, e só para os testes. Exige Python 3.11 ou mais novo.
+Deixamos o gateway apenas com a biblioteca padrão: `urllib` para HTTP, `json`, `threading`, `argparse`, `dataclasses`. A única dependência é `pytest`, e só para os testes. Exige Python 3.11 ou mais novo.
 
 ## Alternativas que consideramos
 

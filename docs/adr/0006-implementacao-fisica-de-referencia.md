@@ -11,7 +11,7 @@ Um LED com resistor em série é o cálculo óbvio, mas sozinho não sustenta um
 
 ## Decisão
 
-Documentar uma implementação física de referência — o que seria montado em bancada se o circuito lógico saísse do simulador — e justificar cada componente que a lógica sozinha não explica:
+Documentamos uma implementação física de referência — o que seria montado em bancada se o circuito lógico saísse do simulador — e justificamos cada componente que a lógica sozinha não explica:
 
 - Família 74HC a 5 V para as portas e flip-flops, com resistores de pull-down de 10 kΩ nas entradas (a entrada CMOS é um capacitor; flutuante, assume qualquer valor).
 - Filtro RC de 10 ms mais um Schmitt-trigger 74HC14 só no clock, porque é a única entrada sensível à borda (ADR 0005).
@@ -32,8 +32,8 @@ Um 555 no gateway em vez de hardware para o TIMEOUT: o gateway tem a opção `--
 
 A seção de física tem eletrostática (entrada CMOS, RC, desacoplamento), eletrodinâmica (LED, transistor, regulador, orçamento de potência) e magnetismo (força do solenoide, transitório L/R, pico reverso e diodo de roda livre). Cobre os três eixos que o roteiro cita.
 
-A lista de componentes permite montar de fato o estágio de potência para a demonstração, se a equipe quiser algo além da simulação. Não é obrigatório, mas responderia bem ao risco de "protótipo fictício".
+A lista de componentes permite montar de fato o estágio de potência para a demonstração, se quisermos algo além da simulação. Não é obrigatório, mas responderia bem ao risco de "protótipo fictício".
 
-Uma premissa fica declarada: a indutância da bobina, 100 mH, é ordem de grandeza de trava solenoide de 12 V, não valor de folha de dados. Afeta só o transitório (2,5 ms) e a energia magnética (4,3 mJ). Se a equipe escolher um modelo específico de trava, esse número deve ser trocado.
+Uma premissa fica declarada: a indutância da bobina, 100 mH, é ordem de grandeza de trava solenoide de 12 V, não valor de folha de dados. Afeta só o transitório (2,5 ms) e a energia magnética (4,3 mJ). Se escolhermos um modelo específico de trava, esse número deve ser trocado.
 
 O número de energia por liberação, que atravessa o resto do projeto, nasce aqui (ADR 0007).

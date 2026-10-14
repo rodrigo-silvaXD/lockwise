@@ -11,7 +11,7 @@ A resposta intuitiva é rejeitar com 422: o evento viola as regras. Mas o gatewa
 
 ## Decisão
 
-O evento é aceito (201) e guardado como qualquer outro. A projeção, ao encontrá-lo, mantém o estado que tinha e anota um aviso, que aparece em `GET /fechadura` no campo `avisos`. O histórico fica íntegro; a inconsistência fica visível.
+Aceitamos o evento (201) e guardamos como qualquer outro. A projeção, ao encontrá-lo, mantém o estado que tinha e anota um aviso, que aparece em `GET /fechadura` no campo `avisos`. O histórico fica íntegro; a inconsistência fica visível.
 
 A validação de contrato continua estrita: campo faltando, `resultado` fora do enum, `tentativa` fora de 1–3, `usuario_id` inexistente — tudo isso é 422, porque aí o problema é o payload, não a sequência.
 

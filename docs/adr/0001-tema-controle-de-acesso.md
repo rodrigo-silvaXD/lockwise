@@ -7,11 +7,11 @@ Situação: aceita
 
 O roteiro da categoria INTERFACE sugere três temas dentro de "Smart Home 2050": estação de monitoramento ambiental com otimização do intervalo de leitura, sistema de controle de acesso com backend em nuvem e otimização de escala de segurança, e painel de energia residencial com circuito de leitura de consumo. A inscrição fechou em 11/09 e, a partir daí, tema e equipe não mudam mais.
 
-O requisito de eletrônica aceita circuito simulado. Isso pesou na escolha, porque a equipe não tinha bancada nem componentes garantidos para o dia da avaliação.
+O requisito de eletrônica aceita circuito simulado. Isso pesou na escolha, porque não tínhamos bancada nem componentes garantidos para o dia da avaliação.
 
 ## Decisão
 
-Controle de acesso.
+Escolhemos o controle de acesso.
 
 Dos três, é o único que é inteiramente digital. Senha, comparação, máquina de estados, contador de tentativas: tudo isso se descreve com portas lógicas e flip-flops e se simula por completo no Logisim. Os outros dois temas partem de uma grandeza analógica (temperatura, corrente elétrica) que precisa de um sensor real ou de um simulador analógico. Sem isso, o "sensor" vira um número digitado, e a demonstração ao vivo fica com cara de protótipo fictício, que o regulamento pune com zero no quesito de funcionalidade.
 

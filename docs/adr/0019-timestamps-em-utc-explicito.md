@@ -11,7 +11,7 @@ Um teste que comparava o momento enviado com o recebido pegou isso. No Postgres,
 
 ## Decisão
 
-Toda datetime que entra na API é normalizada para UTC na validação: se vier com fuso, é convertida; se vier sem, é tratada como UTC. Toda datetime que sai passa por um validador de saída que garante o fuso UTC. O resultado é que as respostas sempre terminam em `Z`, em qualquer banco.
+Normalizamos para UTC, já na validação, toda datetime que entra na API: se vier com fuso, é convertida; se vier sem, é tratada como UTC. Toda datetime que sai passa por um validador de saída que garante o fuso UTC. O resultado é que as respostas sempre terminam em `Z`, em qualquer banco.
 
 Internamente, o domínio usa uma função `utc()` para o mesmo fim, de modo que a projeção de estado e as políticas nunca comparam um datetime com fuso contra um sem (o que em Python levanta exceção).
 

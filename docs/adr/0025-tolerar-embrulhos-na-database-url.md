@@ -18,7 +18,7 @@ O erro que isso produzia não ajudava: um traceback de dentro do SQLAlchemy, sem
 
 ## Decisão
 
-`normalizar_url_banco` passa a limpar o embrulho antes de olhar o prefixo: remove um `psql ` inicial, remove um `DATABASE_URL=` inicial, remove aspas simples ou duplas em volta, e apara espaços e quebras de linha. Só então faz a troca de `postgres://` ou `postgresql://` para `postgresql+psycopg://`.
+Fizemos `normalizar_url_banco` limpar o embrulho antes de olhar o prefixo: remove um `psql ` inicial, remove um `DATABASE_URL=` inicial, remove aspas simples ou duplas em volta, e apara espaços e quebras de linha. Só então faz a troca de `postgres://` ou `postgresql://` para `postgresql+psycopg://`.
 
 Se, depois disso, o texto não tiver `://`, o arranque falha com uma exceção própria que nomeia a variável, mostra o formato esperado, mostra os primeiros caracteres do que foi recebido — mascarando o resto, para não imprimir senha no log — e diz onde copiar a string certa.
 

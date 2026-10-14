@@ -5,13 +5,13 @@ Situação: aceita
 
 ## Contexto
 
-O roteiro pede backend em Python ou Java, com banco gerenciado na nuvem. A equipe programa em Python. O backend tem seis rotas, precisa validar o contrato do gateway (ADR 0011), e a documentação da API precisa existir sem que alguém a escreva à mão.
+O roteiro pede backend em Python ou Java, com banco gerenciado na nuvem. Programamos em Python. O backend tem seis rotas, precisa validar o contrato do gateway (ADR 0011), e a documentação da API precisa existir sem que alguém a escreva à mão.
 
-Ninguém da equipe tem Postgres instalado na máquina, e não queríamos que isso fosse pré-requisito para rodar os testes.
+Nenhum de nós tem Postgres instalado na máquina, e não queríamos que isso fosse pré-requisito para rodar os testes.
 
 ## Decisão
 
-FastAPI com Pydantic para as rotas e validação, SQLAlchemy 2 para o banco. Em desenvolvimento e nos testes, SQLite — em memória nos testes, em arquivo no uso local. Em produção, o Postgres gerenciado do Render. O mesmo código roda nos dois; a diferença é a `DATABASE_URL`.
+Adotamos FastAPI com Pydantic para as rotas e validação, e SQLAlchemy 2 para o banco. Em desenvolvimento e nos testes, SQLite — em memória nos testes, em arquivo no uso local. Em produção, o Postgres gerenciado do Render. O mesmo código roda nos dois; a diferença é a `DATABASE_URL`.
 
 As tabelas são criadas com `create_all` no arranque, e a semente do morador é inserida se não existir. Sem Alembic por enquanto.
 

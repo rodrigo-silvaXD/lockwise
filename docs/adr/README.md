@@ -2,6 +2,8 @@
 
 Cada arquivo desta pasta registra uma decisão que moldou o LOCKWISE: o que estava em jogo, o que escolhemos, o que descartamos e o que isso nos custa. Servem para que qualquer pessoa, da equipe ou de fora, encontre o porquê de cada escolha sem depender da memória de quem decidiu.
 
+Escrevemos na primeira pessoa do plural: quem decidiu foi a equipe, e o texto diz isso. "Escolhemos o Render", não "o Render foi escolhido": toda decisão tem dono.
+
 Regras que seguimos:
 
 - Uma decisão por arquivo, numerado na ordem em que foi tomada.
@@ -55,7 +57,8 @@ Situação: proposta | aceita | substituída pela NNNN
 O problema, as restrições, o que estava em jogo. Fatos, não opinião.
 
 ## Decisão
-O que escolhemos, em uma ou duas frases. Depois o raciocínio.
+O que escolhemos, em uma ou duas frases, com a equipe como sujeito:
+"Adotamos X", "Fizemos Y", "Desligamos Z". Depois o raciocínio.
 
 ## Alternativas que consideramos
 Cada uma com o motivo de ter sido descartada.

@@ -11,7 +11,7 @@ O retry do gateway (ADR 0012) cobre falhas curtas: três tentativas com esperas 
 
 ## Decisão
 
-O gateway ganhou um comando `acordar`, que chama `GET /health` a cada dois segundos até a API responder ou até esgotar o tempo (sessenta segundos por padrão). Quando o gateway inicia apontando para uma API — e não no modo eco —, ele faz isso automaticamente e avisa na tela: "acordando a API... no ar". Só depois processa a fila pendente e entrega o terminal ao operador.
+Demos ao gateway um comando `acordar`, que chama `GET /health` a cada dois segundos até a API responder ou até esgotar o tempo (sessenta segundos por padrão). Quando o gateway inicia apontando para uma API — e não no modo eco —, ele faz isso automaticamente e avisa na tela: "acordando a API... no ar". Só depois processa a fila pendente e entrega o terminal ao operador.
 
 O `--espera-acordar 0` desliga o comportamento, para quem estiver testando contra uma API local que já está de pé.
 

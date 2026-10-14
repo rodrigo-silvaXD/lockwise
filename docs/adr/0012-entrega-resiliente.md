@@ -9,7 +9,7 @@ A demonstração acontece numa sala de aula, com o Wi-Fi que houver, contra uma 
 
 ## Decisão
 
-Quando um POST falha por erro de conexão ou resposta 5xx, o gateway tenta de novo três vezes, esperando 0,5 s, 1 s e 2 s. Se ainda assim falhar, o evento vai para um arquivo JSON Lines em disco e o operador vê "enfileirado" na tela. Na próxima vez que o gateway iniciar, ou quando o operador digitar `fila`, os eventos pendentes são reenviados. O `momento` de cada evento é o original — o instante em que a trava abriu —, não o instante do reenvio.
+Programamos o gateway para, quando um POST falha por erro de conexão ou resposta 5xx, tentar de novo três vezes, esperando 0,5 s, 1 s e 2 s. Se ainda assim falhar, o evento vai para um arquivo JSON Lines em disco e o operador vê "enfileirado" na tela. Na próxima vez que o gateway iniciar, ou quando o operador digitar `fila`, os eventos pendentes são reenviados. O `momento` de cada evento é o original — o instante em que a trava abriu —, não o instante do reenvio.
 
 Respostas 4xx não são repetidas nem enfileiradas. Um 4xx significa que o gateway e a API discordam sobre o contrato; repetir não resolve, e enfileirar só adiaria o mesmo erro. O operador vê "rejeitado" e o código, e alguém precisa olhar.
 
