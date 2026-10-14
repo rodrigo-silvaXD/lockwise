@@ -9,7 +9,11 @@ description = "Modelo de cobertura para a escala de vigilancia do LOCKWISE"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "pulp>=2.8",
+    # Teto no 4 de proposito. O PuLP 4 removeu PULP_CBC_CMD, passou a exigir o
+    # extra [cbc] para ter solver, e importa numpy sem declarar a dependencia.
+    # Nada no modelo precisa do que a 4 trouxe, e uma release nova as vesperas
+    # da avaliacao e risco sem contrapartida (ADR 0029).
+    "pulp>=2.8,<4",
     # zoneinfo nao acompanha base de fusos no Windows
     "tzdata; sys_platform == 'win32'",
 ]
