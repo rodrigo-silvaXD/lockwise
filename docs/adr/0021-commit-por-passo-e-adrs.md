@@ -11,7 +11,7 @@ O regulamento pesa 20% em "documentação e GitHub" e avisa que o repositório p
 
 ## Decisão
 
-Todo bloco de trabalho concluído vira um commit com mensagem que diz o que mudou e por quê, e é enviado ao GitHub na hora. Não existe trabalho "só local" no fim de uma sessão.
+Combinamos que todo bloco de trabalho concluído vira um commit com mensagem que diz o que mudou e por quê, e é enviado ao GitHub na hora. Não existe trabalho "só local" no fim de uma sessão.
 
 Toda decisão que molda a arquitetura — escolha de ferramenta, de padrão, de contrato, de comportamento em caso de erro — vira um registro em `docs/adr/`, numerado, com contexto, decisão, alternativas descartadas e consequências, incluindo as negativas. A ADR é escrita quando a decisão é tomada, no mesmo commit do código que ela justifica. Uma ADR aceita não é reescrita: se a decisão mudar, nasce outra que substitui a anterior, e a anterior recebe a marca de substituída.
 

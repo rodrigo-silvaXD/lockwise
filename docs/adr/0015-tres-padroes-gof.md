@@ -11,13 +11,13 @@ O backend recebe eventos, guarda e responde consultas. O que nele varia, e porta
 
 ## Decisão
 
-Três padrões, escolhidos pelo trabalho que fazem.
+Usamos três padrões, escolhidos pelo trabalho que fazem.
 
 State (`dominio/estados.py`). A nuvem não vê os pinos do circuito; vê a sequência de eventos que o gateway enviou. Para responder "a fechadura está aberta agora?", precisa reconstruir o estado a partir dessa sequência. Cada classe de estado (Aguardando, Liberado, Bloqueado) sabe o que cada evento significa para ela e para onde leva. É a mesma máquina de estados do circuito e do gateway, pela terceira vez, com um trabalho diferente: projeção. Duas adaptações deliberadas: não há VERIFICANDO, porque a nuvem só recebe o resultado da verificação; e LIBERADO expira sozinho após 5,16 s, porque o gateway não envia TIMEOUT e a nuvem conhece o temporizador (ADR 0006).
 
 Strategy (`dominio/politicas.py`). O hardware decide bloquear após três erros; isso não se muda por software. O que a nuvem decide é quando avisar alguém, e essa decisão depende do contexto de uso: uma casa quer saber de tentativas suspeitas antes do bloqueio; um condomínio quer saber de acesso fora do horário. A política é um objeto trocado por variável de ambiente — `limite`, `horario`, `composta`, `nenhuma` — e o serviço que registra acessos não sabe qual está em uso.
 
-Observer (`dominio/notificacao.py`). Quando um alerta nasce, alguém precisa saber. Hoje é o log; opcionalmente um webhook do Discord da equipe. Quem cria o alerta não conhece os interessados; eles se inscrevem. Um observador que falha (webhook fora do ar) é isolado e registrado, nunca derruba o registro do acesso.
+Observer (`dominio/notificacao.py`). Quando um alerta nasce, alguém precisa saber. Hoje é o log; opcionalmente um webhook do nosso Discord. Quem cria o alerta não conhece os interessados; eles se inscrevem. Um observador que falha (webhook fora do ar) é isolado e registrado, nunca derruba o registro do acesso.
 
 ## Alternativas que consideramos
 

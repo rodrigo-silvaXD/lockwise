@@ -11,7 +11,7 @@ Havia três caminhos: operar o circuito e o gateway diariamente até novembro ac
 
 ## Decisão
 
-Gerar histórico sintético, com duas regras que separam isso de inventar números.
+Geramos histórico sintético, com duas regras que separam isso de inventar números.
 
 A primeira: os eventos nascem da **máquina de estados do gateway**, importada do módulo vizinho. O gerador aciona os mesmos pinos — liga CONFIRMA, pulsa o clock, desliga, pulsa de novo — e os eventos saem da mesma função que os produz na operação real. Por isso o campo `tentativa` conta certo, o `energia_mj` traz os 18 200 mJ só nas liberações, o bloqueio acontece no terceiro erro e o desbloqueio administrativo aparece depois dele. Nada disso precisou ser reproduzido à mão, porque quem produz é o circuito replicado.
 

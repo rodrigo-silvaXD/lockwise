@@ -13,9 +13,9 @@ A segunda: um contador binário de dois bits, ao receber um erro estando em `11`
 
 ## Decisão
 
-O sinal de bloqueio antecipa o limiar: `E = C1·(C0 + ERRO)`. Com o contador em `10` e um erro acontecendo agora, `E` vale 1 nesta mesma borda, e a máquina vai para BLOQUEADO junto com o contador indo para `11`. A fig. 11 mostra exatamente isso.
+Fizemos o sinal de bloqueio antecipar o limiar: `E = C1·(C0 + ERRO)`. Com o contador em `10` e um erro acontecendo agora, `E` vale 1 nesta mesma borda, e a máquina vai para BLOQUEADO junto com o contador indo para `11`. A fig. 11 mostra exatamente isso.
 
-O contador satura: `EN = ERRO·¬(C1·C0)`. Quando os dois bits estão em 1, a habilitação de contagem é cortada, e nenhum erro adicional o faz transbordar.
+E fizemos o contador saturar: `EN = ERRO·¬(C1·C0)`. Quando os dois bits estão em 1, a habilitação de contagem é cortada, e nenhum erro adicional o faz transbordar.
 
 ## Alternativas que consideramos
 

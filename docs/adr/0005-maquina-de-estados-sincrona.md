@@ -9,13 +9,13 @@ A fechadura poderia reagir na hora: CONFIRMA ligado, senha comparada, trava aber
 
 ## Decisão
 
-Todas as transições acontecem na borda de subida de CLK. As entradas (senha, CONFIRMA, TIMEOUT, RESET) são apenas amostradas nessa borda; entre uma borda e outra, podem mudar à vontade sem efeito.
+Projetamos a máquina para que todas as transições aconteçam na borda de subida de CLK. As entradas (senha, CONFIRMA, TIMEOUT, RESET) são apenas amostradas nessa borda; entre uma borda e outra, podem mudar à vontade sem efeito.
 
 O motivo principal é previsibilidade. Num circuito assíncrono, a ordem em que os sinais se propagam pelas portas determina o resultado, e um pulso espúrio de nanossegundos numa entrada (um glitch de lógica combinacional, o ricochete de uma chave) pode avançar a máquina ou o contador. No projeto síncrono, nada disso importa: só o que está estável no instante da borda é lido.
 
 ## Alternativas que consideramos
 
-Projeto assíncrono: menos um pino, demonstração mais fluida. Descartado porque o contador de tentativas seria a primeira vítima — cada ricochete mecânico do CONFIRMA contaria como uma tentativa, e o bloqueio viria sem motivo.
+Projeto assíncrono: menos um pino, demonstração mais fluida. Descartamos porque o contador de tentativas seria a primeira vítima — cada ricochete mecânico do CONFIRMA contaria como uma tentativa, e o bloqueio viria sem motivo.
 
 Clock automático (componente Clock do Logisim a alguns hertz): a máquina avançaria sozinha e o operador não teria controle do passo a passo. Para a demonstração e para as capturas de evidência, o clock manual é melhor: cada borda é um gesto deliberado, e cada figura mostra um estado estável.
 

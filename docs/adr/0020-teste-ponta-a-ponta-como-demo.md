@@ -11,7 +11,7 @@ Os testes unitários do gateway e do backend usam clientes HTTP falsos. Provam q
 
 ## Decisão
 
-Um teste no backend, `tests/test_ponta_a_ponta.py`, sobe a API real com uvicorn num porto livre e SQLite em arquivo, importa o gateway real de `../gateway`, executa o roteiro de ensaio da demonstração (`roteiros/demo.txt`) contra a API pela rede, e depois verifica pelas rotas de leitura que tudo o que o circuito faria está no banco: quatro acessos com os resultados e tentativas certos, três alertas (dois do gateway e um da política de supervisão, ligado ao acesso que o gerou), a energia da física na faixa horária certa, e a fechadura de volta a AGUARDANDO depois do desbloqueio.
+Escrevemos um teste no backend, `tests/test_ponta_a_ponta.py`, que sobe a API real com uvicorn num porto livre e SQLite em arquivo, importa o gateway real de `../gateway`, executa o roteiro de ensaio da demonstração (`roteiros/demo.txt`) contra a API pela rede, e depois verifica pelas rotas de leitura que tudo o que o circuito faria está no banco: quatro acessos com os resultados e tentativas certos, três alertas (dois do gateway e um da política de supervisão, ligado ao acesso que o gerou), a energia da física na faixa horária certa, e a fechadura de volta a AGUARDANDO depois do desbloqueio.
 
 ## Alternativas que consideramos
 
