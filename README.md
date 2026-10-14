@@ -238,11 +238,15 @@ Cada decisão que moldou o projeto — do tema à política de autenticação �
 
 ## Equipe
 
-| Integrante | Responsabilidade |
+| Integrante | RA |
 |---|---|
-| *(preencher)* | *(preencher)* |
+| Rodrigo Gonçalves da Silva | 98550 |
+| Carlos Henrique Barreto | 113749 |
+| Fabrício Conceição Silva | 114204 |
 
-Conforme o regulamento da ExpoTech, todos os integrantes devem ser capazes de explicar qualquer parte do projeto.
+Engenharia da Computação · UniFECAF · Campus Conceito
+
+Conforme o regulamento da ExpoTech, a nota é individual e qualquer integrante pode ser questionado sobre qualquer parte do projeto. Por isso não dividimos o trabalho em áreas estanques: cada um conduziu partes diferentes, mas as decisões estão registradas em [`docs/adr/`](docs/adr/) para que todos possam defendê-las.
 
 ---
 
