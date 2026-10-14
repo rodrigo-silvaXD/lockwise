@@ -108,3 +108,40 @@ def test_comparacao_reporta_economia_mensal():
     c = comparar(demanda(PERFIL))
     assert c.economia_mensal == pytest.approx(c.economia * 30)
     assert c.vigilantes_a_menos == c.ingenua.total_vigilantes - c.otimizada.total_vigilantes
+
+
+# ----------------------------------------------- escolha do solver
+
+
+@pytest.mark.parametrize("ausente", ["COIN_CMD", "PULP_CBC_CMD"])
+def test_nome_de_solver_que_sumiu_nao_derruba_o_modulo(monkeypatch, ausente):
+    """O nome do solver muda entre versoes do PuLP, e sumir nao pode ser erro bruto.
+
+    A versao 4 removeu PULP_CBC_CMD. A primeira versao desta logica acessava
+    esse nome direto no fallback: quando ele sumiu, o modulo levantou
+    AttributeError e derrubou o pipeline inteiro — um erro que nao dizia nada
+    sobre o que fazer.
+
+    O contrato agora e: ou o modelo resolve com o solver que restou, ou falha
+    com SemSolucao explicando como instalar. Nunca AttributeError.
+    """
+    import pulp
+
+    monkeypatch.delattr(pulp, ausente, raising=False)
+    try:
+        escala = otimizar(demanda(PERFIL))
+    except SemSolucao as e:
+        assert "solver" in str(e).lower()
+    else:
+        assert escala.cobre_tudo()
+
+
+def test_erro_claro_quando_nao_ha_solver_nenhum(monkeypatch):
+    """Sem solver, a mensagem precisa dizer o que instalar."""
+    import pulp
+
+    for nome in ("COIN_CMD", "PULP_CBC_CMD"):
+        monkeypatch.delattr(pulp, nome, raising=False)
+
+    with pytest.raises(SemSolucao, match="nenhum solver CBC"):
+        otimizar(demanda(PERFIL))
