@@ -11,7 +11,7 @@ Ao mesmo tempo, o regulamento dá 35% da nota para "funcionar ao vivo" e avisa q
 
 ## Decisão
 
-O gateway é a mesma máquina de estados do circuito, escrita em Python. O operador aciona os mesmos pinos nos dois lados — no Logisim com a Poke Tool, no gateway com comandos que têm o mesmo nome — e o gateway, ao transitar de estado, envia o evento para a nuvem.
+Escrevemos o gateway como a mesma máquina de estados do circuito, em Python. O operador aciona os mesmos pinos nos dois lados — no Logisim com a Poke Tool, no gateway com comandos que têm o mesmo nome — e o gateway, ao transitar de estado, envia o evento para a nuvem.
 
 O que faz isso não ser "duas telas separadas" é a prova de equivalência (ADR 0009): antes de começar a demonstração, mostra-se o teste verde que diz que o Python e o circuito são a mesma máquina em todos os estados possíveis. A partir daí, o que o gateway envia é o que o circuito decidiu.
 
@@ -31,6 +31,6 @@ ESP32 lendo os pinos de estado do circuito montado fisicamente e escrevendo na s
 
 A demonstração tem duas janelas que o operador precisa manter em sincronia. Um erro de digitação num lado e não no outro é possível; o comando `estado` mostra o que o gateway acha que está acontecendo, para conferir contra o Logisim.
 
-O gateway é testável sem Logisim, roda em CI, e tem um roteiro de ensaio (`roteiros/demo.txt`) que a equipe pode repetir quantas vezes quiser.
+O gateway é testável sem Logisim, roda em CI, e tem um roteiro de ensaio (`roteiros/demo.txt`) que podemos repetir quantas vezes quisermos.
 
 O gateway é também a segunda encarnação da máquina de estados; o backend será a terceira (ADR 0015). Três implementações da mesma FSM é uma redundância deliberada: cada uma tem um trabalho diferente, e a equivalência entre a primeira e a segunda é provada.

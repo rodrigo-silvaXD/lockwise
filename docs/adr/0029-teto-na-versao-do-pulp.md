@@ -19,7 +19,7 @@ O efeito foi pior do que um teste vermelho. O pipeline barra o deploy, então a 
 
 ## Decisão
 
-`pulp>=2.8,<4`.
+Fixamos `pulp>=2.8,<4`.
 
 Nada no modelo precisa do que a versão 4 trouxe. O que ela trouxe de concreto, para este projeto, foi uma dependência não declarada e um solver que exige configuração extra — a quatro semanas da avaliação.
 

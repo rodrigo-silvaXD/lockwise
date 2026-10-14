@@ -9,7 +9,7 @@ Definir o que o gateway envia para a nuvem, quando, e com quais campos. Isso é 
 
 ## Decisão
 
-Um evento nasce apenas quando a máquina de estados muda de estado. Nunca por leitura periódica.
+Definimos que um evento nasce apenas quando a máquina de estados muda de estado. Nunca por leitura periódica.
 
 | Transição | O que vai para a nuvem |
 |---|---|

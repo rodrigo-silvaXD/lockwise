@@ -20,19 +20,19 @@ Três saídas apareceram: apagar o banco antigo, dividir o banco antigo entre os
 
 ## Decisão
 
-O banco vai para a Neon; a aplicação continua no Render.
+Levamos o banco para a Neon; a aplicação continua no Render.
 
-A Neon é Postgres gerenciado, com plano gratuito, e a equipe já a usa em outro projeto — não é uma ferramenta nova para aprender na véspera. O requisito de cloud pede "banco de dados gerenciado", sem exigir que seja do mesmo provedor da aplicação; separar aplicação e banco é, aliás, o arranjo comum em produção.
+A Neon é Postgres gerenciado, com plano gratuito, e já a usamos em outro projeto — não é uma ferramenta nova para aprender na véspera. O requisito de cloud pede "banco de dados gerenciado", sem exigir que seja do mesmo provedor da aplicação; separar aplicação e banco é, aliás, o arranjo comum em produção.
 
 No `render.yaml`, o bloco `databases` deixou de existir e a `DATABASE_URL` virou uma variável com `sync: false`: o valor é colado uma vez no painel do Render e o blueprint não o sobrescreve nos deploys seguintes.
 
 ## Alternativas que consideramos
 
-Apagar o Postgres gratuito antigo do Render: resolveria em dois cliques e manteria tudo num provedor só. Descartado porque apagar é irreversível e o banco pertence a outro projeto do autor; não vale arriscar dados alheios ao LOCKWISE para economizar uma configuração.
+Apagar o Postgres gratuito antigo do Render: resolveria em dois cliques e manteria tudo num provedor só. Descartamos porque apagar é irreversível e o banco pertence a outro projeto nosso; não vale arriscar dados alheios ao LOCKWISE para economizar uma configuração.
 
 Reusar o banco do outro projeto, com as tabelas do LOCKWISE convivendo com as dele: funcionaria — os nomes `usuario`, `acesso` e `alerta` provavelmente não colidem —, mas mistura dois sistemas no mesmo banco, e um `create_all` distraído em qualquer um dos dois passa a ser um risco para o outro.
 
-Supabase ou Aiven: também dão Postgres gratuito, mas seriam um provedor a mais para a equipe conhecer. A Neon já está na casa.
+Supabase ou Aiven: também dão Postgres gratuito, mas seriam um provedor a mais para conhecermos. A Neon já está na casa.
 
 ## Consequências
 

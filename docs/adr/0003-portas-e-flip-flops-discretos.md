@@ -11,7 +11,7 @@ Mas a avaliação é individual e o regulamento é explícito: qualquer integran
 
 ## Decisão
 
-Tudo em portas lógicas e flip-flops D.
+Montamos tudo em portas lógicas e flip-flops D.
 
 O contador de tentativas são dois flip-flops D com a lógica de incremento em XOR e AND, e a saturação em uma porta. O comparador são três ANDs em dois estágios (P1 = S3·S̄2, P2 = S1·S0, IGUAL = P1·P2), em vez de um AND de quatro entradas, para reduzir o fan-in e deixar cada etapa explicável. A máquina de estados são dois flip-flops D com as equações de D1 e D0 escritas porta a porta.
 
@@ -19,7 +19,7 @@ As conexões entre blocos usam túneis nomeados em vez de fios longos. Cada sina
 
 ## Alternativas que consideramos
 
-Componentes prontos do Logisim: rápidos, mas opacos na sabatina. Descartado pelo motivo acima.
+Componentes prontos do Logisim: rápidos, mas opacos na sabatina. Descartamos pelo motivo acima.
 
 Fiação explícita entre blocos: mais fiel a um esquemático tradicional, mas o circuito tem mais de 130 conexões e os cruzamentos tornariam o diagrama ilegível nas capturas de evidência.
 

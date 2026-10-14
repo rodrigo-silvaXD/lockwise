@@ -7,13 +7,13 @@ Situação: aceita
 
 O Render, quando conectado a um repositório, tem uma opção de deploy automático a cada commit na branch principal. É o caminho mais fácil: dois cliques e todo push vai para o ar.
 
-O problema é que "todo push" inclui o push com o teste quebrado. Numa equipe de quatro pessoas mexendo em cinco disciplinas nas semanas que antecedem a avaliação, é questão de tempo até alguém enviar código que não passa. Se isso derrubar a API, e derrubar na véspera, perdemos o quesito que vale 35%.
+O problema é que "todo push" inclui o push com o teste quebrado. Com quatro pessoas mexendo em cinco disciplinas nas semanas que antecedem a avaliação, é questão de tempo até alguém enviar código que não passa. Se isso derrubar a API, e derrubar na véspera, perdemos o quesito que vale 35%.
 
 O requisito de cloud também pede pipeline de CI/CD, e "o Render faz deploy sozinho" é uma resposta pobre para "me mostre seu pipeline".
 
 ## Decisão
 
-O `autoDeployTrigger` fica desligado no `render.yaml`. Quem manda deployar é o GitHub Actions, depois que os testes passam.
+Desligamos o `autoDeployTrigger` no `render.yaml`. Quem manda deployar é o GitHub Actions, depois que os testes passam.
 
 São dois workflows. O primeiro (`ci.yml`) roda as duas suítes em jobs separados a cada push e pull request: o gateway, que inclui a prova de equivalência contra o arquivo `.circ`, e o backend, que inclui a demo ponta a ponta. O segundo (`deploy.yml`) é disparado pela conclusão do primeiro, verifica que ele terminou em sucesso, chama o deploy hook do Render e depois fica consultando `/health` até a API responder com status ok — por até dez minutos, porque o plano gratuito hiberna e o build leva alguns minutos.
 
@@ -21,11 +21,11 @@ Se os segredos não estiverem configurados, o workflow de deploy avisa e termina
 
 ## Alternativas que consideramos
 
-Deploy automático do Render a cada commit: simples, mas publica código quebrado. Descartado pelo motivo acima.
+Deploy automático do Render a cada commit: simples, mas publica código quebrado. Descartamos pelo motivo acima.
 
 Deploy só por gatilho manual: seguro, mas depende de alguém lembrar. E na véspera da avaliação, "alguém lembrar" não é um plano.
 
-Render Preview Environments por pull request: bom em projeto de produção, mas cada ambiente consome recursos do plano gratuito, e não temos fluxo de PR na equipe.
+Render Preview Environments por pull request: bom em projeto de produção, mas cada ambiente consome recursos do plano gratuito, e não temos fluxo de PR.
 
 Uma action oficial do Render em vez de `curl` no deploy hook: a action existe, mas exige uma chave de API com permissão ampla. O deploy hook é uma URL secreta que só sabe fazer uma coisa — disparar um deploy daquele serviço. Menos permissão, menos dependência.
 

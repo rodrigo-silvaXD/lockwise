@@ -9,7 +9,7 @@ Um gêmeo digital (ADR 0008) só vale se for de fato a mesma máquina que o circ
 
 ## Decisão
 
-Três camadas, construídas nesta ordem.
+Construímos três camadas, nesta ordem.
 
 Primeiro, dois modelos em Python. `circuito.py` transcreve as equações da netlist, porta a porta, com a coordenada de cada porta no comentário; não sabe o que é senha ou tentativa. `estados.py` e `maquina.py` implementam a mesma máquina com o padrão State, em termos semânticos. Um teste varre os 16 estados possíveis dos quatro flip-flops contra as 128 combinações dos sete pinos de entrada e exige que os dois modelos produzam o mesmo próximo estado — 2048 casos, todo o espaço. Outro teste exige as mesmas saídas. Um terceiro reproduz as sequências das figuras de evidência e confere estado e contador a cada borda.
 

@@ -11,7 +11,7 @@ Ao começar a implementar, percebemos que essa formulação não tem o que otimi
 
 ## Decisão
 
-Turnos de 8 h começando a cada 4 h. São seis turnos — 00–08, 04–12, 08–16, 12–20, 16–00, 20–04 — e cada hora do dia é coberta por exatamente dois deles.
+Adotamos turnos de 8 h começando a cada 4 h. São seis turnos — 00–08, 04–12, 08–16, 12–20, 16–00, 20–04 — e cada hora do dia é coberta por exatamente dois deles.
 
 Com a sobreposição, escalar alguém no turno 12–20 ajuda tanto a tarde quanto o início da noite, e a mesma hora pode ser atendida por combinações diferentes de turnos. A escolha passa a ser combinatória, que é o que caracteriza um problema de cobertura.
 
