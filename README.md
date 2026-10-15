@@ -33,9 +33,9 @@ O projeto atravessa cinco camadas, e o mesmo dado — o evento de acesso — per
 | Eletrônica digital | Concluída |
 | Física aplicada | Concluída |
 | Gateway | Concluído |
-| Backend e banco | Concluído (local; deploy na Fase F) |
+| Backend e banco | Concluído |
 | Arquitetura e padrões | Concluída |
-| Nuvem e CI/CD | API no ar; falta ligar o deploy automático |
+| Nuvem e CI/CD | Concluída |
 | Pesquisa operacional | Concluída |
 
 ---

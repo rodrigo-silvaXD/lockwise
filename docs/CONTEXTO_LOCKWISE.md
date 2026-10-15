@@ -172,7 +172,7 @@ lockwise/
 └── .github/workflows/             A FAZER
 ```
 
-Pendência no README: preencher a tabela de Equipe.
+A tabela de Equipe do README está preenchida: Rodrigo Gonçalves da Silva (98550), Carlos Henrique Barreto (113749) e Fabrício Conceição Silva (114204).
 
 ---
 
@@ -182,8 +182,8 @@ Pendência no README: preencher a tabela de Equipe.
 |---|---|---|
 | 1 | Eletrônica digital e analógica: circuito funcional simulado, sensor ou atuador, lógica digital | **Cumprido** (entregue acima do mínimo: combinacional *e* sequencial) |
 | 2 | Física: justificativa do comportamento físico com cálculos documentados | **Cumprido** (`docs/fisica.md`) |
-| 3 | Arquitetura: C4 ou UML, ≥2 padrões GoF, SOLID no backend | **Código cumprido** (3 padrões + SOLID em `backend/`); C4 pendente (Fase E) |
-| 4 | Cloud: deploy real, banco gerenciado, variáveis seguras, CI/CD | **Cumprido**: API em https://lockwise-api.onrender.com, Postgres na Neon, segredos no painel, CI verde (falta ligar o deploy automático) |
+| 3 | Arquitetura: C4 ou UML, ≥2 padrões GoF, SOLID no backend | **Cumprido**: 3 padrões + SOLID em `backend/`, C4 níveis 1–4 em `docs/arquitetura.md` |
+| 4 | Cloud: deploy real, banco gerenciado, variáveis seguras, CI/CD | **Cumprido**: API em https://lockwise-api.onrender.com, Postgres na Neon, segredos no painel, CI verde e deploy automático funcionando desde 22/09 |
 | 5 | Operations Research: problema de otimização modelado e resolvido | **Cumprido** (`otimizacao/`, PuLP + CBC, 26,6% de economia) |
 
 ---
@@ -223,6 +223,12 @@ Restam cerca de **8 semanas** até a avaliação.
 ---
 
 ## 10. O que falta fazer
+
+> Estado em 15/10/2026: as fases A a G estão concluídas e os cinco requisitos do
+> roteiro cumpridos. O simulador está em https://rodrigo-silvaxd.github.io/lockwise/
+> e a API em https://lockwise-api.onrender.com, com deploy automático. Restam a
+> Fase H (gravar o vídeo) e a Fase I (ensaio da sabatina), mais a troca da chave
+> da API que foi exposta.
 
 ### Fase A — Física ✅ CONCLUÍDA (16/09/2026)
 Memorial em `docs/fisica.md`, organizado por grandeza (sinal, corrente/tensão, potência, magnetismo) e cobrindo os três eixos do roteiro — eletrostática, eletrodinâmica, magnetismo. Valores de projeto:
@@ -270,7 +276,7 @@ Rotas: `POST/GET /acessos`, `GET /acessos/demanda-horaria`, `POST/GET /alertas`,
 
 Rodar: `LOCKWISE_API_KEY=dev .venv/Scripts/python -m uvicorn lockwise_api.asgi:app --reload` e o gateway com `--api-url http://127.0.0.1:8000`.
 
-**Pendente da Fase D em produção**: criar o Postgres no Render (Fase F) e apontar `DATABASE_URL`. Nenhuma migração é necessária — `create_all` cria tudo no primeiro arranque.
+Resolvido na Fase F: o Postgres ficou na Neon, não no Render (ADR 0024), e a `DATABASE_URL` está no painel. Nenhuma migração foi necessária — `create_all` criou tudo no primeiro arranque.
 
 ### Fase E — Arquitetura ✅ CONCLUÍDA (22/09/2026)
 `docs/arquitetura.md`, C4 em Mermaid versionado (renderiza no GitHub, muda por PR).
@@ -309,7 +315,7 @@ python -m lockwise_otimizacao.cli semear --dias 7 --chave <chave>
 python -m lockwise_otimizacao.cli resolver --dias 7 --saida relatorio.txt
 ```
 
-**Pendente**: semear o histórico no banco de produção (precisa da chave da API).
+Histórico semeado no banco de produção em 22/09: 998 eventos entregues, zero falhas. O relatório da execução está em `docs/evidencias/relatorio_otimizacao.txt`.
 
 ### Fase H — Documentação e vídeo · PARCIAL (23/09/2026)
 
@@ -319,8 +325,7 @@ Concluído:
 - **`docs/video-pitch.md`** — roteiro dos 3 minutos com tempos, texto falado, checklist de gravação e divisão de falas por integrante.
 
 Pendente da Fase H:
-- Gravar o vídeo (precisa da equipe definida e de um ensaio cronometrado)
-- Preencher a tabela de Equipe no README e a divisão de falas do vídeo
+- Gravar o vídeo (falta decidir quem narra cada bloco e ensaiar cronometrado)
 
 ### Fase I — Ensaio da sabatina (≈1 semana)
 Cada integrante sendo arguido pelos outros. É a fase mais ignorada e a que o regulamento trata com mais dureza: respostas vagas eliminam a elegibilidade do **grupo inteiro**.
