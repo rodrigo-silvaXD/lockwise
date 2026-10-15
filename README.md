@@ -134,7 +134,12 @@ O Logisim simula a lógica; o memorial [`docs/fisica.md`](docs/fisica.md) descre
 
 ## No ar
 
-A API está publicada em **https://lockwise-api.onrender.com** ([Swagger](https://lockwise-api.onrender.com/docs)), com Postgres gerenciado na Neon. Aplicação no Render, banco na Neon, testes no GitHub Actions — o porquê de cada escolha está em [`docs/adr/`](docs/adr/), e o passo a passo em [`docs/deploy.md`](docs/deploy.md).
+| | |
+|---|---|
+| Simulador do circuito | https://rodrigo-silvaxd.github.io/lockwise/ |
+| API | https://lockwise-api.onrender.com · [Swagger](https://lockwise-api.onrender.com/docs) |
+
+A API está publicada no Render, com Postgres gerenciado na Neon. Aplicação no Render, banco na Neon, testes no GitHub Actions — o porquê de cada escolha está em [`docs/adr/`](docs/adr/), e o passo a passo em [`docs/deploy.md`](docs/deploy.md).
 
 ```bash
 curl https://lockwise-api.onrender.com/health
@@ -209,7 +214,7 @@ Para desbloquear: ligue RESET e pulse o CLK.
 
 ## Experimente o circuito
 
-Antes de qualquer coisa: [**abra o simulador**](site/index.html) e clique nos pinos. É o circuito de verdade — as mesmas equações do arquivo em Logisim — rodando no navegador, com uma frase explicando o que cada clique fez.
+Antes de qualquer coisa: [**abra o simulador**](https://rodrigo-silvaxd.github.io/lockwise/) e clique nos pinos. É o circuito de verdade — as mesmas equações do arquivo em Logisim — rodando no navegador, com uma frase explicando o que cada clique fez.
 
 Ligue S3, S1 e S0 (a senha é `1011`), ligue CONFIRMA e pulse o clock duas vezes. A trava abre.
 
