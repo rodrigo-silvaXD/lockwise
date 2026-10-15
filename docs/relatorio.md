@@ -311,3 +311,4 @@ O que consideramos o diferencial técnico não é nenhuma das cinco partes isola
 
 **Repositório:** <https://github.com/rodrigo-silvaXD/lockwise>
 **API:** <https://lockwise-api.onrender.com>
+**Simulador do circuito:** <https://rodrigo-silvaxd.github.io/lockwise/>

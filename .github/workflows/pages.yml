@@ -1,0 +1,48 @@
+# Publica o simulador em GitHub Pages.
+#
+# Sem isto, o link do README aponta para o arquivo .html dentro do repositorio,
+# e quem clica ve o codigo-fonte em vez da pagina funcionando — o oposto do que
+# um simulador interativo precisa.
+
+name: pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "site/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Uma publicacao por vez, e sem cancelar a que ja esta no ar.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    name: publicar o simulador
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: conferir que o simulador existe
+        # Falhar aqui com mensagem e melhor do que publicar uma pagina vazia.
+        run: test -f site/index.html || { echo "::error::site/index.html nao encontrado"; exit 1; }
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - id: deploy
+        uses: actions/deploy-pages@v4

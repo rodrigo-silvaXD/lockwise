@@ -14,7 +14,9 @@ A fidelidade foi verificada contra `gateway/referencia/sequencias.json` — as m
 
 ## Como abrir
 
-Abra `index.html` no navegador. Não precisa de servidor, não tem dependência, não faz requisição nenhuma.
+No ar em **https://rodrigo-silvaxd.github.io/lockwise/**, publicado pelo GitHub Pages a cada mudança em `site/`.
+
+Localmente, abra `index.html` no navegador. Não precisa de servidor, não tem dependência, não faz requisição nenhuma.
 
 ## O que tem na página
 
