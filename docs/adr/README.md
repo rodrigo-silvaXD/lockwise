@@ -44,6 +44,7 @@ Regras que seguimos:
 | [0027](0027-historico-sintetico-pela-api-real.md) | Histórico sintético pela máquina de estados e pela API real | otimização | aceita |
 | [0028](0028-c4-em-mermaid-verificado-por-teste.md) | C4 em Mermaid versionado, camadas verificadas por teste | arquitetura | aceita |
 | [0029](0029-teto-na-versao-do-pulp.md) | Teto na versão maior do PuLP | otimização | aceita |
+| [0030](0030-placa-em-webgl-em-vez-de-tinkercad.md) | A placa de portas em WebGL, não no Tinkercad | eletrônica | aceita |
 
 ## Modelo para uma ADR nova
 
@@ -66,4 +67,3 @@ Cada uma com o motivo de ter sido descartada.
 ## Consequências
 O que ganhamos e o que passamos a carregar. As negativas também.
 ```
-| [0030](0030-placa-em-webgl-em-vez-de-tinkercad.md) | A placa de portas em WebGL, não no Tinkercad | eletrônica | aceita |
