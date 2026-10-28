@@ -54,6 +54,27 @@
   .lede { font-size: clamp(16px, 2vw, 19px); color: var(--ink-dim); max-width: 62ch; margin: 0; }
   .lede strong { color: var(--ink); font-weight: 600; }
 
+  /* atalho para a placa em 3D */
+  .atalho {
+    display: inline-flex; align-items: center; gap: 10px;
+    margin-top: 20px; padding: 11px 16px;
+    background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+    text-decoration: none; color: var(--ink);
+    transition: border-color .25s var(--suave), background .25s var(--suave), transform .25s var(--suave);
+  }
+  .atalho:hover { border-color: var(--live); background: var(--panel-2); transform: translateY(-1px); }
+  .atalho:focus-visible { outline: 2px solid var(--live); outline-offset: 2px; }
+  .atalho-rot {
+    font-family: "IBM Plex Mono", monospace; font-size: 10.5px;
+    letter-spacing: .14em; text-transform: uppercase; color: var(--live);
+  }
+  .atalho-txt { font-size: 14px; color: var(--ink-dim); }
+  .atalho-seta { color: var(--ink-faint); transition: transform .25s var(--suave); }
+  .atalho:hover .atalho-seta { transform: translateX(3px); }
+  @media (max-width: 560px) {
+    .atalho { flex-wrap: wrap; gap: 4px 10px; }
+  }
+
   /* ------------------------------------------------------------- painel */
 
   .bancada {
@@ -421,6 +442,11 @@
       rodando no seu navegador — as mesmas equações do arquivo em Logisim. Clique nos pinos e
       acompanhe o sinal percorrer o circuito.
     </p>
+    <a class="atalho" href="circuito-3d.html">
+      <span class="atalho-rot">Ver em 3D</span>
+      <span class="atalho-txt">a placa de portas, peça por peça</span>
+      <span class="atalho-seta" aria-hidden="true">&rarr;</span>
+    </a>
   </header>
 
   <div class="bancada">
