@@ -66,3 +66,4 @@ Cada uma com o motivo de ter sido descartada.
 ## Consequências
 O que ganhamos e o que passamos a carregar. As negativas também.
 ```
+| [0030](0030-placa-em-webgl-em-vez-de-tinkercad.md) | A placa de portas em WebGL, não no Tinkercad | eletrônica | aceita |
