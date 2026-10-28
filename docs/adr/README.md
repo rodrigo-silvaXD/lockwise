@@ -45,6 +45,7 @@ Regras que seguimos:
 | [0028](0028-c4-em-mermaid-verificado-por-teste.md) | C4 em Mermaid versionado, camadas verificadas por teste | arquitetura | aceita |
 | [0029](0029-teto-na-versao-do-pulp.md) | Teto na versão maior do PuLP | otimização | aceita |
 | [0030](0030-placa-em-webgl-em-vez-de-tinkercad.md) | A placa de portas em WebGL, não no Tinkercad | eletrônica | aceita |
+| [0031](0031-video-sem-rosto-com-dois-narradores.md) | Vídeo pitch sem rosto, narrado por dois integrantes | entrega | aceita |
 
 ## Modelo para uma ADR nova
 

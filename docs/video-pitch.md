@@ -4,26 +4,50 @@ Três minutos, exigidos pelo regulamento geral da ExpoTech (não pelo roteiro da
 
 Três minutos é pouco. A escolha aqui é **mostrar o sistema funcionando** em vez de narrar o que ele faz: quem assiste precisa ver o dado nascer no circuito e chegar na nuvem. Slides explicativos consomem tempo e não provam nada.
 
+## Formato
+
+**Captura de tela com narração em voz. Ninguém aparece.** Sem webcam, sem
+câmera, sem foto da equipe — a tela é a única imagem do vídeo inteiro. Isso
+combina com a escolha acima: os três minutos ficam todos para o sistema.
+
+**Narram o Carlos e o Fabrício.** O Rodrigo não participa da gravação. Isso
+não tem efeito na nota individual: o regulamento avalia domínio individual na
+sabatina, em sala, não no vídeo. Mas tem um efeito prático — como nenhum
+rosto aparece, **cada um se identifica pela voz na primeira fala**, senão
+quem assiste não sabe quem é quem.
+
+A equipe inteira, com os três nomes e RAs, aparece escrita na tela do fecho.
+
 ---
 
 ## Estrutura
 
-| Tempo | Bloco | O que aparece na tela |
-|---|---|---|
-| 0:00–0:20 | O problema | Fala, sobre a tela do circuito parado |
-| 0:20–0:40 | O circuito | Logisim, senha correta, trava abre |
-| 0:40–1:10 | O bloqueio | Três erros, contador subindo, BLOQUEADO |
-| 1:10–1:50 | A ponte | Gateway ao lado, POSTs saindo, 201 |
-| 1:50–2:20 | A nuvem | Navegador: `/fechadura`, `/acessos`, banco |
-| 2:20–2:50 | A otimização | Relatório com os 26,6% |
-| 2:50–3:00 | Fecho | Equipe e o repositório |
+| Tempo | Bloco | Narra | O que aparece na tela |
+|---|---|---|---|
+| 0:00–0:20 | O problema | Carlos | Fala, sobre a tela do circuito parado |
+| 0:20–0:40 | O circuito | Carlos | Logisim, senha correta, trava abre |
+| 0:40–1:10 | O bloqueio | Carlos | Três erros, contador subindo, BLOQUEADO |
+| 1:10–1:50 | A ponte | Fabrício | Gateway ao lado, POSTs saindo, 201 |
+| 1:50–2:20 | A nuvem | Fabrício | Navegador: `/fechadura`, `/acessos`, banco |
+| 2:20–2:50 | A otimização | Fabrício | Relatório com os 26,6% |
+| 2:50–3:00 | Fecho | Carlos | Equipe e o repositório |
+
+A divisão segue o assunto, não o cronômetro: o **Carlos** fica com o hardware
+— o circuito, o bloqueio e a física que os sustenta — e o **Fabrício** com o
+software e a matemática — a ponte, a nuvem e a otimização. Dá 80 segundos de
+fala para um e 100 para o outro, e cada um narra o que estudou mais a fundo.
+
+Essa divisão vale **só para o vídeo**. Na sabatina cada um responde sobre
+qualquer parte; ver `docs/sabatina.md`.
 
 ---
 
 ## Texto
 
-### 0:00–0:20 · O problema
+### 0:00–0:20 · O problema — **Carlos**
 
+> Aqui é o Carlos, do projeto LOCKWISE.
+>
 > Uma fechadura eletrônica precisa decidir sozinha quem entra. Mas a decisão dela, sozinha, não vale muito: quem administra um prédio quer saber **quando** as pessoas entram, **quantas** tentativas falharam, e **quantos vigilantes** precisa ter em cada turno.
 >
 > O LOCKWISE liga essas duas pontas. Um circuito digital decide o acesso, e o mesmo evento atravessa até virar uma escala de trabalho.
@@ -56,8 +80,10 @@ Três minutos é pouco. A escolha aqui é **mostrar o sistema funcionando** em v
 
 ---
 
-### 1:10–1:50 · A ponte
+### 1:10–1:50 · A ponte — **Fabrício**
 
+> Aqui é o Fabrício.
+>
 > O Logisim não fala com a internet. Então o gateway é a mesma máquina de estados escrita em Python — e a equivalência não é promessa, é teste.
 
 *Tela: rodar `pytest tests/test_netlist.py`, mostrar verde.*
@@ -96,9 +122,11 @@ Três minutos é pouco. A escolha aqui é **mostrar o sistema funcionando** em v
 
 ---
 
-### 2:50–3:00 · Fecho
+### 2:50–3:00 · Fecho — **Carlos**
 
-*Tela: página do repositório no GitHub.*
+*Tela: página do repositório no GitHub, com os três nomes e RAs sobrepostos —
+Rodrigo Gonçalves da Silva (98550), Carlos Henrique Barreto (113749),
+Fabrício Conceição Silva (114204).*
 
 > Circuito, física, arquitetura, nuvem e otimização. Um evento atravessando as cinco.
 >
@@ -127,15 +155,32 @@ Três minutos é pouco. A escolha aqui é **mostrar o sistema funcionando** em v
 
 ## Divisão de falas
 
-O regulamento avalia domínio individual. Vale cada integrante narrar o bloco da sua responsabilidade — e isso também ajuda no ensaio da sabatina, que cobra exatamente isso.
+| Blocos | Quem narra | Tempo |
+|---|---|:--:|
+| O problema · O circuito · O bloqueio · Fecho | **Carlos** | 80 s |
+| A ponte · A nuvem · A otimização | **Fabrício** | 100 s |
 
-São três integrantes e quatro blocos, então um narra dois. Decidam juntos
-quem fica com qual — e lembrem que essa divisão não vale na sabatina: lá
-cada um responde sobre qualquer parte.
+O Rodrigo não narra. Os três nomes aparecem na tela do fecho.
 
-| Bloco | Quem narra |
-|---|---|
-| Problema e circuito | *(definir)* |
-| Bloqueio e física | *(definir)* |
-| Gateway e nuvem | *(definir)* |
-| Otimização e fecho | *(definir)* |
+## Gravar sem aparecer
+
+Como ninguém aparece, tudo depende do que se lê na tela e do que se ouve.
+
+**Captura.** Gravar a tela em 1920×1080, 30 fps. No Windows serve a Game Bar
+(`Win+G`) ou o OBS, que é melhor porque permite marcar a região e trocar de
+cena sem cortar. **Desligar qualquer sobreposição de webcam** — é o erro mais
+fácil de cometer e o único que invalida a escolha de formato.
+
+**Antes de gravar a tela:** fechar notificações (modo foco), limpar a barra de
+tarefas, sair de contas pessoais visíveis no navegador, e aumentar a fonte do
+terminal e do editor. O que não se lê no celular não existe.
+
+**Voz.** Gravar numa sala sem eco, com o microfone perto. Se as duas falas
+forem gravadas em lugares diferentes, deixar o volume parecido — corte com
+mudança brusca de som chama mais atenção que corte de imagem.
+
+**Montagem.** Cada um grava seus blocos separado e junta depois. A troca de
+narrador cai sempre numa troca de tela (0:00→1:10 Carlos, 1:10→2:50 Fabrício,
+2:50 Carlos), então a emenda fica escondida.
+
+**Nomear o arquivo:** `lockwise-pitch.mp4`, até 3:00 cravados.
