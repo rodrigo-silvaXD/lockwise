@@ -38,6 +38,10 @@ jobs:
         # Falhar aqui com mensagem e melhor do que publicar uma pagina vazia.
         run: test -f site/index.html || { echo "::error::site/index.html nao encontrado"; exit 1; }
 
+      - name: conferir que a placa em 3D existe
+        # As duas paginas se linkam; publicar uma sem a outra deixa um link morto.
+        run: test -f site/circuito-3d.html || { echo "::error::site/circuito-3d.html nao encontrado"; exit 1; }
+
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3

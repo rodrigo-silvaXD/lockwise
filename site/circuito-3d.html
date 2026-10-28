@@ -64,6 +64,27 @@
   }
   .sub { margin: 5px 0 0; color: var(--ink-dim); font-size: 13px; max-width: 54ch; }
 
+  /* volta para o simulador das camadas */
+  .atalho {
+    display: inline-flex; align-items: center; gap: 9px;
+    margin-top: 12px; padding: 8px 13px;
+    background: rgba(24,33,42,.9); border: 1px solid var(--line); border-radius: 8px;
+    text-decoration: none; color: var(--ink);
+    pointer-events: auto;   /* o header ignora o mouse, para a placa receber o arrasto */
+    backdrop-filter: blur(8px);
+    transition: border-color .25s var(--suave), transform .25s var(--suave);
+  }
+  .atalho:hover { border-color: var(--live); transform: translateY(-1px); }
+  .atalho:focus-visible { outline: 2px solid var(--live); outline-offset: 2px; }
+  .atalho-seta { color: var(--ink-faint); transition: transform .25s var(--suave); }
+  .atalho:hover .atalho-seta { transform: translateX(-3px); }
+  .atalho-rot {
+    font-family: "IBM Plex Mono", monospace; font-size: 10.5px;
+    letter-spacing: .14em; text-transform: uppercase; color: var(--live);
+  }
+  .atalho-txt { font-size: 13px; color: var(--ink-dim); }
+  @media (max-width: 560px) { .atalho-txt { display: none; } }
+
   /* ------------------------------------------------------------ bancada */
 
   #bancada {
@@ -164,7 +185,7 @@
   #ficha {
     position: fixed; z-index: 5;
     right: max(20px, env(safe-area-inset-right, 0px));
-    top: 104px;
+    top: 156px;   /* abaixo do cabeçalho, que agora tem o atalho */
     width: min(290px, calc(100vw - 40px));
     background: rgba(24,33,42,.95);
     border: 1px solid var(--line);
@@ -234,6 +255,11 @@
   <h1>A placa de portas lógicas</h1>
   <p class="sub">37 peças discretas &mdash; 33 portas e 4 flip-flops D. Nenhum microcontrolador:
     quem decide abrir é a própria lógica combinacional.</p>
+  <a class="atalho" href="https://rodrigo-silvaxd.github.io/lockwise/">
+    <span class="atalho-seta" aria-hidden="true">&larr;</span>
+    <span class="atalho-rot">Simulador</span>
+    <span class="atalho-txt">o evento atravessando as camadas</span>
+  </a>
 </header>
 
 <div id="bancada">
