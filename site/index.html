@@ -54,25 +54,26 @@
   .lede { font-size: clamp(16px, 2vw, 19px); color: var(--ink-dim); max-width: 62ch; margin: 0; }
   .lede strong { color: var(--ink); font-weight: 600; }
 
-  /* atalho para a placa em 3D */
-  .atalho {
-    display: inline-flex; align-items: center; gap: 10px;
-    margin-top: 20px; padding: 11px 16px;
+  /* as duas visões do projeto; a mesma peça existe em circuito-3d.html */
+  .visoes { display: flex; gap: 10px; margin-top: 22px; flex-wrap: wrap; }
+  .visao {
+    display: flex; flex-direction: column; gap: 2px;
+    padding: 11px 16px; min-width: 0;
     background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
     text-decoration: none; color: var(--ink);
     transition: border-color .25s var(--suave), background .25s var(--suave), transform .25s var(--suave);
   }
-  .atalho:hover { border-color: var(--live); background: var(--panel-2); transform: translateY(-1px); }
-  .atalho:focus-visible { outline: 2px solid var(--live); outline-offset: 2px; }
-  .atalho-rot {
-    font-family: "IBM Plex Mono", monospace; font-size: 10.5px;
-    letter-spacing: .14em; text-transform: uppercase; color: var(--live);
+  a.visao:hover { border-color: var(--live); background: var(--panel-2); transform: translateY(-1px); }
+  a.visao:focus-visible { outline: 2px solid var(--live); outline-offset: 2px; }
+  .visao.atual { border-color: var(--live); background: #16301f; }
+  .visao-n {
+    font-family: "Chakra Petch", "IBM Plex Sans", system-ui, sans-serif;
+    font-size: 14px; font-weight: 700; letter-spacing: .01em; color: var(--ink-dim);
   }
-  .atalho-txt { font-size: 14px; color: var(--ink-dim); }
-  .atalho-seta { color: var(--ink-faint); transition: transform .25s var(--suave); }
-  .atalho:hover .atalho-seta { transform: translateX(3px); }
-  @media (max-width: 560px) {
-    .atalho { flex-wrap: wrap; gap: 4px 10px; }
+  .visao.atual .visao-n { color: var(--live); }
+  .visao-d {
+    font-family: "IBM Plex Mono", monospace; font-size: 11px;
+    color: var(--ink-faint); letter-spacing: .02em;
   }
 
   /* ------------------------------------------------------------- painel */
@@ -442,11 +443,16 @@
       rodando no seu navegador — as mesmas equações do arquivo em Logisim. Clique nos pinos e
       acompanhe o sinal percorrer o circuito.
     </p>
-    <a class="atalho" href="circuito-3d.html">
-      <span class="atalho-rot">Ver em 3D</span>
-      <span class="atalho-txt">a placa de portas, peça por peça</span>
-      <span class="atalho-seta" aria-hidden="true">&rarr;</span>
-    </a>
+    <nav class="visoes" aria-label="Visões do projeto">
+      <span class="visao atual" aria-current="page">
+        <span class="visao-n">Simulador</span>
+        <span class="visao-d">o evento atravessando as camadas</span>
+      </span>
+      <a class="visao" href="circuito-3d.html">
+        <span class="visao-n">Placa 3D</span>
+        <span class="visao-d">as portas lógicas, peça por peça</span>
+      </a>
+    </nav>
   </header>
 
   <div class="bancada">
