@@ -1,0 +1,932 @@
+<title>Placa LOCKWISE</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  /* Bancada: a placa ocupa a tela inteira; os controles flutuam sobre ela.
+     Tokens herdados do simulador em site/index.html, para os dois lados do
+     projeto terem a mesma identidade. */
+  :root {
+    --ground: #10161a;
+    --panel: #18212a;
+    --panel-2: #1e2932;
+    --line: #2b3946;
+    --ink: #e8f0f4;
+    --ink-dim: #8aa0ad;
+    --ink-faint: #5d7280;
+    --live: #38e07b;
+    --idle: #1d5c39;
+    --lock: #f5a524;
+    --alarm: #f0544a;
+    --cobre: #c98a46;
+    --radius: 10px;
+    --suave: cubic-bezier(.4, 0, .2, 1);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { height: 100%; }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    margin: 0;
+    overflow: hidden;
+  }
+
+  .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+
+  #palco { position: fixed; inset: 0; }
+  #palco canvas { display: block; touch-action: none; }
+
+  /* ----------------------------------------------------------- cabeçalho */
+
+  header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 3;
+    padding-block: 18px 14px;
+    padding-left: max(20px, env(safe-area-inset-left, 0px));
+    padding-right: max(20px, env(safe-area-inset-right, 0px));
+    background: linear-gradient(to bottom, rgba(16,22,26,.92), rgba(16,22,26,0));
+    pointer-events: none;
+  }
+  .eyebrow {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--live); margin: 0 0 6px;
+  }
+  h1 {
+    font-family: "Chakra Petch", "IBM Plex Sans", system-ui, sans-serif;
+    font-size: clamp(20px, 3.4vw, 30px); font-weight: 700;
+    letter-spacing: -.01em; margin: 0; line-height: 1.1;
+  }
+  .sub { margin: 5px 0 0; color: var(--ink-dim); font-size: 13px; max-width: 54ch; }
+
+  /* ------------------------------------------------------------ bancada */
+
+  #bancada {
+    position: fixed; z-index: 4;
+    left: max(20px, env(safe-area-inset-left, 0px));
+    bottom: max(20px, env(safe-area-inset-bottom, 0px));
+    width: min(340px, calc(100vw - 40px));
+    background: rgba(24,33,42,.93);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px;
+    backdrop-filter: blur(10px);
+    max-height: calc(100% - 150px);
+    overflow-y: auto;
+  }
+
+  .rot {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--ink-faint); margin: 0 0 9px;
+  }
+
+  .estado-linha { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .estado-nome {
+    font-family: "Chakra Petch", monospace;
+    font-size: 21px; font-weight: 700; margin: 0; letter-spacing: .01em;
+    color: var(--live); transition: color .35s var(--suave);
+  }
+  .estado-nome.amb { color: var(--lock); }
+  .estado-nome.red { color: var(--alarm); }
+  .estado-bits { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--ink-faint); margin: 0; }
+  .estado-bits b { color: var(--ink-dim); font-weight: 600; }
+
+  .divisor { height: 1px; background: var(--line); margin: 14px 0; }
+
+  /* chaves de senha */
+  .senha { display: flex; gap: 7px; }
+  .bit {
+    flex: 1; min-width: 0;
+    font-family: "IBM Plex Mono", monospace; font-size: 15px; font-weight: 600;
+    padding: 9px 0; border-radius: 7px; cursor: pointer;
+    background: var(--panel-2); color: var(--ink-faint);
+    border: 1px solid var(--line);
+    transition: all .22s var(--suave);
+  }
+  .bit span { display: block; font-size: 9px; letter-spacing: .1em; color: var(--ink-faint); margin-top: 1px; }
+  .bit[aria-pressed="true"] { background: #16301f; border-color: var(--live); color: var(--live); }
+  .bit[aria-pressed="true"] span { color: var(--idle); }
+
+  .pinos { display: flex; gap: 7px; margin-top: 9px; }
+  .pino {
+    flex: 1; min-width: 0;
+    font-family: "IBM Plex Mono", monospace; font-size: 10.5px; font-weight: 600;
+    letter-spacing: .06em;
+    padding: 8px 2px; border-radius: 7px; cursor: pointer;
+    background: var(--panel-2); color: var(--ink-faint);
+    border: 1px solid var(--line);
+    transition: all .22s var(--suave);
+  }
+  .pino[aria-pressed="true"] { background: #33260e; border-color: var(--lock); color: var(--lock); }
+
+  .acoes { display: flex; gap: 8px; margin-top: 12px; }
+  .clk {
+    flex: 1;
+    font-family: "Chakra Petch", monospace; font-size: 14px; font-weight: 700;
+    letter-spacing: .08em;
+    padding: 11px 0; border-radius: 8px; cursor: pointer;
+    background: var(--live); color: #0b1a11; border: 1px solid var(--live);
+    transition: transform .12s var(--suave), filter .2s var(--suave);
+  }
+  .clk:hover { filter: brightness(1.1); }
+  .clk:active { transform: scale(.97); }
+
+  .macros { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+  .macro {
+    font-family: "IBM Plex Mono", monospace; font-size: 11px;
+    padding: 7px 10px; border-radius: 7px; cursor: pointer;
+    background: transparent; color: var(--ink-dim);
+    border: 1px solid var(--line);
+    transition: all .2s var(--suave);
+  }
+  .macro:hover { border-color: var(--ink-faint); color: var(--ink); }
+  .macro:disabled { opacity: .4; cursor: default; }
+
+  .tentativas { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .tentativas .val { font-family: "Chakra Petch", monospace; font-size: 19px; font-weight: 700; }
+  .barra { display: flex; gap: 5px; margin-top: 7px; }
+  .barra i {
+    flex: 1; height: 4px; border-radius: 2px; background: var(--panel-2);
+    transition: background .3s var(--suave);
+  }
+  .barra i.on { background: var(--alarm); }
+
+  button:focus-visible, .bit:focus-visible { outline: 2px solid var(--live); outline-offset: 2px; }
+
+  /* --------------------------------------------------------- ficha porta */
+
+  #ficha {
+    position: fixed; z-index: 5;
+    right: max(20px, env(safe-area-inset-right, 0px));
+    top: 104px;
+    width: min(290px, calc(100vw - 40px));
+    background: rgba(24,33,42,.95);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 15px 16px;
+    backdrop-filter: blur(10px);
+  }
+  #ficha .tipo {
+    font-family: "IBM Plex Mono", monospace; font-size: 10px;
+    letter-spacing: .16em; text-transform: uppercase; color: var(--live); margin: 0 0 4px;
+  }
+  #ficha h2 {
+    font-family: "Chakra Petch", monospace; font-size: 18px; font-weight: 700;
+    margin: 0 0 9px; letter-spacing: .01em;
+  }
+  #ficha .eq {
+    font-family: "IBM Plex Mono", monospace; font-size: 12.5px;
+    background: var(--ground); border: 1px solid var(--line); border-radius: 7px;
+    padding: 9px 10px; margin: 0 0 9px; color: var(--ink);
+    overflow-x: auto; white-space: nowrap;
+  }
+  #ficha .nota { margin: 0 0 8px; font-size: 12.5px; color: var(--ink-dim); }
+  #ficha .meta {
+    font-family: "IBM Plex Mono", monospace; font-size: 10.5px;
+    color: var(--ink-faint); margin: 0; display: flex; justify-content: space-between; gap: 8px;
+  }
+  #ficha .nivel { font-weight: 600; }
+  #ficha .nivel.alto { color: var(--live); }
+
+  .dica {
+    position: fixed; z-index: 3;
+    right: max(20px, env(safe-area-inset-right, 0px));
+    bottom: max(20px, env(safe-area-inset-bottom, 0px));
+    font-family: "IBM Plex Mono", monospace; font-size: 10.5px;
+    color: var(--ink-faint); letter-spacing: .04em; margin: 0; text-align: right;
+    pointer-events: none;
+  }
+
+  #carregando {
+    position: fixed; inset: 0; z-index: 9;
+    display: grid; place-items: center;
+    background: var(--ground);
+    font-family: "IBM Plex Mono", monospace; font-size: 12px;
+    letter-spacing: .14em; text-transform: uppercase; color: var(--ink-faint);
+    transition: opacity .6s var(--suave);
+  }
+  #carregando.sai { opacity: 0; pointer-events: none; }
+
+  @media (max-width: 900px) {
+    #ficha { top: auto; bottom: max(20px, env(safe-area-inset-bottom, 0px)); }
+    #bancada { width: calc(100vw - 40px); max-height: 42%; }
+    .dica { display: none; }
+  }
+  @media (max-width: 900px) and (max-height: 760px) {
+    #ficha { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition-duration: .01ms !important; }
+  }
+</style>
+
+<div id="palco"></div>
+
+<header>
+  <p class="eyebrow">LOCKWISE &middot; camada de decisão</p>
+  <h1>A placa de portas lógicas</h1>
+  <p class="sub">37 peças discretas &mdash; 33 portas e 4 flip-flops D. Nenhum microcontrolador:
+    quem decide abrir é a própria lógica combinacional.</p>
+</header>
+
+<div id="bancada">
+  <p class="rot">Estado da máquina</p>
+  <div class="estado-linha">
+    <p class="estado-nome" id="estado-nome">AGUARDANDO</p>
+    <p class="estado-bits">Q1 Q0 = <b id="estado-bits">00</b></p>
+  </div>
+
+  <div class="divisor"></div>
+
+  <p class="rot">Senha nos pinos S3&ndash;S0 &middot; gravada 1011</p>
+  <div class="senha" id="senha"></div>
+
+  <div class="pinos" id="pinos"></div>
+
+  <div class="acoes">
+    <button class="clk" id="clk">PULSO DE CLK</button>
+  </div>
+
+  <div class="macros" id="macros">
+    <button class="macro" data-macro="certa">tentar 1011</button>
+    <button class="macro" data-macro="errada">tentar 0110</button>
+    <button class="macro" data-macro="fechar">fechar</button>
+    <button class="macro" data-macro="desbloquear">desbloquear</button>
+  </div>
+
+  <div class="divisor"></div>
+
+  <div class="tentativas">
+    <p class="rot" style="margin:0">Contador de erros</p>
+    <span class="val mono" id="contador-val">00</span>
+  </div>
+  <div class="barra" id="barra"><i></i><i></i><i></i></div>
+</div>
+
+<div id="ficha">
+  <p class="tipo" id="ficha-tipo">Porta AND</p>
+  <h2 id="ficha-nome">IGUAL</h2>
+  <p class="eq mono" id="ficha-eq">IGUAL = P1 · P2</p>
+  <p class="nota" id="ficha-nota">Clique em qualquer peça da placa para ler a equação dela.</p>
+  <p class="meta">
+    <span id="ficha-loc">Logisim @(700,770)</span>
+    <span class="nivel" id="ficha-nivel">nível 0</span>
+  </p>
+</div>
+
+<p class="dica">arraste para girar &middot; rolar para aproximar &middot; espaço = clk</p>
+
+<div id="carregando">montando a placa</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+/* ===================================================================
+   1. A LÓGICA
+   Porte direto de gateway/lockwise_gateway/circuito.py, que por sua vez
+   reproduz circuito/lockwise_completo.circ porta a porta. As coordenadas
+   @(x,y) em cada peça são as do Logisim, para qualquer divergência entre
+   esta tela e o arquivo original ser localizável.
+   =================================================================== */
+
+const pinos = { s3: true, s2: false, s1: true, s0: true,
+                confirma: false, timeout: false, reset: false };
+let reg = { q1: false, q0: false, c1: false, c0: false };
+
+function combinacional(p, r) {
+  const s2n  = !p.s2;
+  const p1   = p.s3 && s2n;
+  const p2   = p.s1 && p.s0;
+  const igual = p1 && p2;
+  const ign  = !igual;
+
+  const ag  = !r.q1 && !r.q0;
+  const ver = !r.q1 &&  r.q0;
+  const lib =  r.q1 && !r.q0;
+  const blq =  r.q1 &&  r.q0;
+
+  const erro = ver && ign;
+  const ce   = r.c0 || erro;
+  const e    = r.c1 && ce;
+
+  const tn = !p.timeout;
+  const rn = !p.reset;
+  const ie = igual || e;
+  const ne = ign && e;
+  const a1 = !r.q1 &&  r.q0 && ie;
+  const a2 =  r.q1 && !r.q0 && tn;
+  const a3 =  r.q1 &&  r.q0 && rn;
+  const b1 = !r.q1 && !r.q0 && p.confirma;
+  const b2 = !r.q1 &&  r.q0 && ne;
+  const d1 = a1 || a2 || a3;
+  const d0 = b1 || b2 || a3;
+
+  const ecnt = r.c1 && r.c0;
+  const ebar = !ecnt;
+  const clr  = lib || p.reset;
+  const clrn = !clr;
+  const en   = erro && ebar;
+  const x0   = r.c0 !== en;
+  const g    = r.c0 && en;
+  const x1   = r.c1 !== g;
+  const dc0  = x0 && clrn;
+  const dc1  = x1 && clrn;
+
+  return { s2n, p1, p2, igual, ign, ag, ver, lib, blq, erro, ce, e,
+           tn, rn, ie, ne, a1, a2, a3, b1, b2, d1, d0,
+           ecnt, ebar, clr, clrn, en, x0, g, x1, dc0, dc1,
+           PS3: p.s3, PS2: p.s2, PS1: p.s1, PS0: p.s0,
+           PCONF: p.confirma, PTO: p.timeout, PRST: p.reset,
+           FFQ1: r.q1, FFQ0: r.q0, FFC1: r.c1, FFC0: r.c0 };
+}
+
+function borda(p, r) {
+  const s = combinacional(p, r);
+  return { q1: s.d1, q0: s.d0, c1: s.dc1, c0: s.dc0 };
+}
+
+const ESTADOS = [
+  { nome: 'AGUARDANDO',  cor: 'live' },
+  { nome: 'VERIFICANDO', cor: 'live' },
+  { nome: 'LIBERADO',    cor: 'live' },
+  { nome: 'BLOQUEADO',   cor: 'red'  },
+];
+
+/* ===================================================================
+   2. AS PEÇAS
+   Cada entrada: id, tipo, rótulo do sinal, equação, loc no Logisim,
+   posição na placa [x, z] e de onde vêm suas entradas (para as trilhas).
+   =================================================================== */
+
+const PECAS = [
+  // --- pinos de entrada (posts na borda esquerda) ---
+  { id:'PS3',  t:'pino', n:'S3', eq:'bit 3 da senha digitada', nota:'Pino de entrada. A senha gravada no comparador é 1011.', loc:'pino', pos:[-30,-13] },
+  { id:'PS2',  t:'pino', n:'S2', eq:'bit 2 da senha digitada', nota:'Pino de entrada. Único bit que entra invertido no comparador.', loc:'pino', pos:[-30,-10] },
+  { id:'PS1',  t:'pino', n:'S1', eq:'bit 1 da senha digitada', nota:'Pino de entrada.', loc:'pino', pos:[-30,-7] },
+  { id:'PS0',  t:'pino', n:'S0', eq:'bit 0 da senha digitada', nota:'Pino de entrada.', loc:'pino', pos:[-30,-4] },
+  { id:'PCONF',t:'pino', n:'CONFIRMA', eq:'pedido de verificação', nota:'Tira a máquina de AGUARDANDO e a leva para VERIFICANDO.', loc:'pino', pos:[-30,4] },
+  { id:'PTO',  t:'pino', n:'TIMEOUT', eq:'fim do tempo de trava aberta', nota:'No hardware vem do NE555: fecha a trava sozinho depois do tempo dimensionado.', loc:'pino', pos:[-30,8] },
+  { id:'PRST', t:'pino', n:'RESET', eq:'desbloqueio administrativo', nota:'Única saída de BLOQUEADO. Também zera o contador de erros.', loc:'pino', pos:[-30,12] },
+
+  // --- comparador de senha ---
+  { id:'s2n',  t:'not', n:'S2N',  eq:'S2N = ¬S2', nota:'A senha gravada é 1011, então o bit 2 precisa estar em zero.', loc:'@(300,620)', pos:[-25,-10], de:['PS2'] },
+  { id:'p1',   t:'and', n:'P1',   eq:'P1 = S3 · ¬S2', nota:'Confere a metade alta da senha.', loc:'@(300,720)', pos:[-20,-12], de:['PS3','s2n'] },
+  { id:'p2',   t:'and', n:'P2',   eq:'P2 = S1 · S0', nota:'Confere a metade baixa da senha.', loc:'@(300,820)', pos:[-20,-5], de:['PS1','PS0'] },
+  { id:'igual',t:'and', n:'IGUAL',eq:'IGUAL = P1 · P2', nota:'Senha correta. Sai no pino SENHA_OK e é uma das portas que levam a LIBERADO.', loc:'@(700,770)', pos:[-15,-8.5], de:['p1','p2'] },
+  { id:'ign',  t:'not', n:'IN',   eq:'IN = ¬IGUAL', nota:'Senha errada. Alimenta o sinal ERRO e o caminho de bloqueio.', loc:'@(1000,770)', pos:[-10,-8.5], de:['igual'] },
+
+  // --- flip-flops da máquina de estados ---
+  { id:'FFQ1', t:'ff',  n:'FF Q1', eq:'Q1 ← D1 na borda de subida', nota:'Bit alto do estado. Com Q0 forma os quatro estados da fechadura.', loc:'@(1000,1620)', pos:[-24,4], de:['d1'] },
+  { id:'FFQ0', t:'ff',  n:'FF Q0', eq:'Q0 ← D0 na borda de subida', nota:'Bit baixo do estado.', loc:'@(1000,1820)', pos:[-24,9], de:['d0'] },
+
+  // --- decodificação do estado ---
+  { id:'ag',  t:'and', n:'AG',  eq:'AG = ¬Q1 · ¬Q0',  nota:'Estado 00, repouso. Sai no pino AGUARDANDO.', loc:'@(300,940)',  pos:[-17,2], de:['FFQ1','FFQ0'] },
+  { id:'ver', t:'and', n:'VER', eq:'VER = ¬Q1 · Q0',  nota:'Estado 01: a senha nos pinos está sendo comparada.', loc:'@(300,1040)', pos:[-17,6], de:['FFQ1','FFQ0'] },
+  { id:'lib', t:'and', n:'LIB', eq:'LIB = Q1 · ¬Q0',  nota:'Estado 10: trava acionada. Também zera o contador de erros via CLR.', loc:'@(300,1140)', pos:[-17,10], de:['FFQ1','FFQ0'] },
+  { id:'blq', t:'and', n:'BLQ', eq:'BLQ = Q1 · Q0',   nota:'Estado 11: sistema travado. Só RESET sai daqui.', loc:'@(300,1240)', pos:[-17,14], de:['FFQ1','FFQ0'] },
+
+  // --- limiar de bloqueio ---
+  { id:'erro', t:'and', n:'ERR', eq:'ERRO = VER · ¬IGUAL', nota:'Uma tentativa errada, no momento exato em que ela é julgada.', loc:'@(700,940)', pos:[-10,0], de:['ver','ign'] },
+  { id:'ce',   t:'or',  n:'CE',  eq:'CE = C0 + ERRO', nota:'Parte do limiar antecipado.', loc:'@(700,1040)', pos:[-5,0], de:['FFC0','erro'] },
+  { id:'e',    t:'and', n:'E',   eq:'E = C1 · (C0 + ERRO)', nota:'Limiar antecipado: com ERRO em 1, E vale C1. A terceira tentativa bloqueia na mesma borda, sem esperar o contador chegar a 11.', loc:'@(1050,1040)', pos:[0,0], de:['FFC1','ce'] },
+
+  // --- próximo estado ---
+  { id:'tn', t:'not', n:'TN', eq:'TN = ¬TIMEOUT', nota:'Enquanto não houve timeout, LIBERADO se mantém.', loc:'@(300,1340)', pos:[-25,17], de:['PTO'] },
+  { id:'rn', t:'not', n:'RN', eq:'RN = ¬RESET', nota:'Enquanto não há reset, BLOQUEADO se mantém.', loc:'@(300,1410)', pos:[-25,21], de:['PRST'] },
+  { id:'ie', t:'or',  n:'IE', eq:'IE = IGUAL + E', nota:'Sai de VERIFICANDO para cima: ou a senha estava certa, ou o limite foi atingido.', loc:'@(700,1360)', pos:[5,-4], de:['igual','e'] },
+  { id:'ne', t:'and', n:'NE', eq:'NE = ¬IGUAL · E', nota:'Senha errada com o limite atingido: o destino é BLOQUEADO.', loc:'@(700,1460)', pos:[5,4], de:['ign','e'] },
+
+  { id:'a1', t:'and3', n:'A1', eq:'A1 = ¬Q1 · Q0 · IE', nota:'De VERIFICANDO para LIBERADO ou BLOQUEADO.', loc:'@(300,1650)', pos:[11,-14], de:['FFQ1','FFQ0','ie'] },
+  { id:'a2', t:'and3', n:'A2', eq:'A2 = Q1 · ¬Q0 · TN', nota:'LIBERADO se mantém enquanto o temporizador não estourar.', loc:'@(300,1770)', pos:[11,-9], de:['FFQ1','FFQ0','tn'] },
+  { id:'a3', t:'and3', n:'A3', eq:'A3 = Q1 · Q0 · RN',  nota:'BLOQUEADO se mantém enquanto não houver RESET. Entra em D1 e em D0.', loc:'@(300,1890)', pos:[11,-4], de:['FFQ1','FFQ0','rn'] },
+  { id:'b1', t:'and3', n:'B1', eq:'B1 = ¬Q1 · ¬Q0 · CONFIRMA', nota:'De AGUARDANDO para VERIFICANDO.', loc:'@(300,2010)', pos:[11,2], de:['FFQ1','FFQ0','PCONF'] },
+  { id:'b2', t:'and3', n:'B2', eq:'B2 = ¬Q1 · Q0 · NE', nota:'De VERIFICANDO direto para BLOQUEADO.', loc:'@(300,2130)', pos:[11,7], de:['FFQ1','FFQ0','ne'] },
+
+  { id:'d1', t:'or3', n:'D1', eq:'D1 = A1 + A2 + A3', nota:'Entrada D do flip-flop alto. Volta para o começo da placa pelo barramento de realimentação.', loc:'@(700,1650)', pos:[18,-9], de:['a1','a2','a3'] },
+  { id:'d0', t:'or3', n:'D0', eq:'D0 = B1 + B2 + A3', nota:'Entrada D do flip-flop baixo.', loc:'@(700,2010)', pos:[18,3], de:['b1','b2','a3'] },
+
+  // --- contador de tentativas, com saturação ---
+  { id:'FFC1', t:'ff', n:'FF C1', eq:'C1 ← DC1 na borda de subida', nota:'Bit alto do contador de erros.', loc:'@(1000,2700)', pos:[-24,25], de:['dc1'] },
+  { id:'FFC0', t:'ff', n:'FF C0', eq:'C0 ← DC0 na borda de subida', nota:'Bit baixo do contador de erros.', loc:'@(1000,2900)', pos:[-24,31], de:['dc0'] },
+
+  { id:'ecnt', t:'and', n:'ECNT', eq:'ECNT = C1 · C0', nota:'Contador cheio, em 11.', loc:'@(300,2350)', pos:[-16,28], de:['FFC1','FFC0'] },
+  { id:'ebar', t:'not', n:'EBAR', eq:'EBAR = ¬(C1 · C0)', nota:'A saturação: sem isto o contador daria a volta de 11 para 00 e o bloqueio nunca prenderia.', loc:'@(300,2430)', pos:[-11,28], de:['ecnt'] },
+  { id:'clr',  t:'or',  n:'CLR',  eq:'CLR = LIB + RESET', nota:'Zera o contador quando a porta abre ou quando o administrador destrava.', loc:'@(300,2510)', pos:[-16,20], de:['lib','PRST'] },
+  { id:'clrn', t:'not', n:'CLRN', eq:'CLRN = ¬CLR', nota:'Entra nas duas entradas D do contador: com CLR em 1, ambas vão a zero.', loc:'@(700,2510)', pos:[-11,20], de:['clr'] },
+  { id:'en',   t:'and', n:'EN',   eq:'EN = ERRO · ¬(C1 · C0)', nota:'Incrementa o contador, mas só enquanto ele não estiver cheio.', loc:'@(300,2610)', pos:[-5,28], de:['erro','ebar'] },
+
+  { id:'x0', t:'xor', n:'X0', eq:'X0 = C0 ⊕ EN', nota:'Bit baixo do somador de 1.', loc:'@(300,2710)', pos:[1,32], de:['FFC0','en'] },
+  { id:'g',  t:'and', n:'G',  eq:'G = C0 · EN',  nota:'O vai-um do incremento.', loc:'@(300,2810)', pos:[1,26], de:['FFC0','en'] },
+  { id:'x1', t:'xor', n:'X1', eq:'X1 = C1 ⊕ G',  nota:'Bit alto do somador de 1.', loc:'@(300,2910)', pos:[7,23], de:['FFC1','g'] },
+  { id:'dc0',t:'and', n:'DC0',eq:'DC0 = X0 · CLRN', nota:'Entrada D do flip-flop C0.', loc:'@(700,2710)', pos:[13,32], de:['x0','clrn'] },
+  { id:'dc1',t:'and', n:'DC1',eq:'DC1 = X1 · CLRN', nota:'Entrada D do flip-flop C1.', loc:'@(700,2910)', pos:[13,24], de:['x1','clrn'] },
+];
+
+// Saídas: LEDs na borda direita.
+const SAIDAS = [
+  { sig:'ag',    n:'AGUARDANDO',   pos:[25,-10], cor:0x38e07b },
+  { sig:'ver',   n:'VERIFICANDO',  pos:[25,-5],  cor:0x38e07b },
+  { sig:'lib',   n:'TRAVA_ABERTA', pos:[25,0],   cor:0xf5a524 },
+  { sig:'blq',   n:'BLOQUEADO',    pos:[25,5],   cor:0xf0544a },
+  { sig:'igual', n:'SENHA_OK',     pos:[25,10],  cor:0x38e07b },
+];
+
+const ZONAS = [
+  { t:'COMPARADOR DE SENHA', x:-20, z:-17 },
+  { t:'DECODIFICAÇÃO DE ESTADO', x:-17, z:-0.5 },
+  { t:'PRÓXIMO ESTADO', x:9, z:-18 },
+  { t:'CONTADOR DE TENTATIVAS', x:-8, z:16.5 },
+];
+
+/* ===================================================================
+   3. A CENA
+   =================================================================== */
+
+const palco = document.getElementById('palco');
+const cena = new THREE.Scene();
+cena.background = new THREE.Color(0x10161a);
+cena.fog = new THREE.Fog(0x10161a, 70, 160);
+
+const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 500);
+camera.position.set(-6, 46, 52);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+palco.appendChild(renderer.domElement);
+
+const pmrem = new THREE.PMREMGenerator(renderer);
+cena.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+const controles = new OrbitControls(camera, renderer.domElement);
+controles.enableDamping = true;
+controles.dampingFactor = 0.055;
+controles.target.set(-4, 0, 7);
+controles.minDistance = 16;
+controles.maxDistance = 120;
+controles.maxPolarAngle = Math.PI * 0.49;
+
+cena.add(new THREE.HemisphereLight(0x9fc4d8, 0x0a1014, 1.1));
+const chave = new THREE.DirectionalLight(0xffffff, 1.5);
+chave.position.set(-22, 40, 24);
+cena.add(chave);
+const preenche = new THREE.DirectionalLight(0x6fd3a0, 0.45);
+preenche.position.set(26, 16, -22);
+cena.add(preenche);
+
+/* ---- a placa ---- */
+
+const LARG = 66, PROF = 58, CX = -3, CZ = 8;
+
+const placa = new THREE.Mesh(
+  new THREE.BoxGeometry(LARG, 1.1, PROF),
+  new THREE.MeshStandardMaterial({ color: 0x0f2a1e, roughness: 0.62, metalness: 0.08 })
+);
+placa.position.set(CX, -0.75, CZ);
+cena.add(placa);
+
+// borda de cobre, a serigrafia da placa
+const borda_ = new THREE.Mesh(
+  new THREE.BoxGeometry(LARG - 2.4, 0.08, PROF - 2.4),
+  new THREE.MeshStandardMaterial({ color: 0x1a4433, roughness: 0.5, metalness: 0.3 })
+);
+borda_.position.set(CX, -0.17, CZ);
+cena.add(borda_);
+
+const grade = new THREE.GridHelper(Math.max(LARG, PROF), 46, 0x1a4433, 0x163a2a);
+grade.position.set(CX, -0.14, CZ);
+grade.material.transparent = true;
+grade.material.opacity = 0.32;
+cena.add(grade);
+
+/* ---- texto em sprite (serigrafia e rótulos) ---- */
+
+function rotulo(texto, { tam = 44, cor = '#8aa0ad', peso = 600, esp = 0.1 } = {}) {
+  const c = document.createElement('canvas');
+  const ctx = c.getContext('2d');
+  const fonte = `${peso} ${tam}px "IBM Plex Mono", ui-monospace, monospace`;
+  ctx.font = fonte;
+  const letras = texto.split('');
+  const extra = tam * esp;
+  const larg = letras.reduce((s, ch) => s + ctx.measureText(ch).width + extra, 0);
+  c.width = Math.ceil(larg + 16);
+  c.height = Math.ceil(tam * 1.6);
+  const g = c.getContext('2d');
+  g.font = fonte;
+  g.fillStyle = cor;
+  g.textBaseline = 'middle';
+  let x = 8;
+  for (const ch of letras) { g.fillText(ch, x, c.height / 2); x += g.measureText(ch).width + extra; }
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 4;
+  const spr = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
+  spr.scale.set(c.width / c.height * (tam / 44) * 1.9, (tam / 44) * 1.9, 1);
+  return spr;
+}
+
+for (const z of ZONAS) {
+  const s = rotulo(z.t, { tam: 40, cor: '#2f6b4a', esp: 0.22 });
+  s.position.set(z.x, 0.35, z.z);
+  s.scale.multiplyScalar(0.88);
+  cena.add(s);
+}
+
+/* ---- silhuetas das portas ---- */
+
+function formaAnd() {
+  const f = new THREE.Shape();
+  f.moveTo(-1.1, -0.85); f.lineTo(0, -0.85);
+  f.absarc(0, 0, 0.85, -Math.PI / 2, Math.PI / 2, false);
+  f.lineTo(-1.1, 0.85); f.closePath();
+  return f;
+}
+function formaOr() {
+  const f = new THREE.Shape();
+  f.moveTo(-1.1, -0.85);
+  f.quadraticCurveTo(0.1, -0.8, 1.05, 0);
+  f.quadraticCurveTo(0.1, 0.8, -1.1, 0.85);
+  f.quadraticCurveTo(-0.45, 0, -1.1, -0.85);
+  return f;
+}
+function formaNot() {
+  const f = new THREE.Shape();
+  f.moveTo(-0.95, -0.85); f.lineTo(0.75, 0); f.lineTo(-0.95, 0.85); f.closePath();
+  return f;
+}
+function formaArco() {
+  const f = new THREE.Shape();
+  f.moveTo(-1.45, -0.85);
+  f.quadraticCurveTo(-0.8, 0, -1.45, 0.85);
+  f.quadraticCurveTo(-1.18, 0, -1.45, -0.85);
+  return f;
+}
+
+const EXTRUSAO = { depth: 0.9, bevelEnabled: true, bevelSize: 0.07, bevelThickness: 0.07, bevelSegments: 3, curveSegments: 20 };
+
+const geoms = {
+  and:  new THREE.ExtrudeGeometry(formaAnd(), EXTRUSAO),
+  and3: new THREE.ExtrudeGeometry(formaAnd(), { ...EXTRUSAO, depth: 1.1 }),
+  or:   new THREE.ExtrudeGeometry(formaOr(),  EXTRUSAO),
+  or3:  new THREE.ExtrudeGeometry(formaOr(),  { ...EXTRUSAO, depth: 1.1 }),
+  xor:  new THREE.ExtrudeGeometry(formaOr(),  EXTRUSAO),
+  not:  new THREE.ExtrudeGeometry(formaNot(), EXTRUSAO),
+  arco: new THREE.ExtrudeGeometry(formaArco(), EXTRUSAO),
+  ff:   new THREE.BoxGeometry(2.5, 1.0, 3.0),
+  pino: new THREE.CylinderGeometry(0.42, 0.52, 1.5, 20),
+};
+for (const k of ['and','and3','or','or3','xor','not','arco']) geoms[k].rotateX(-Math.PI / 2);
+
+const ROTULO_TIPO = { and:'Porta AND', and3:'Porta AND de 3 entradas', or:'Porta OR',
+  or3:'Porta OR de 3 entradas', xor:'Porta XOR', not:'Inversor', ff:'Flip-flop D', pino:'Pino de entrada' };
+
+const ESCALA = { and:1.5, and3:1.5, or:1.5, or3:1.5, xor:1.5, not:1.35, ff:1, pino:1 };
+
+const pecas = new Map();
+const clicaveis = [];
+
+for (const p of PECAS) {
+  const grupo = new THREE.Group();
+  const s = ESCALA[p.t] ?? 1;
+  grupo.position.set(p.pos[0], 0, p.pos[1]);
+
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0x27333d, roughness: 0.34, metalness: 0.5,
+    emissive: new THREE.Color(0x38e07b), emissiveIntensity: 0,
+  });
+
+  const corpo = new THREE.Mesh(geoms[p.t] ?? geoms.and, mat);
+  corpo.scale.setScalar(s);
+  if (p.t === 'ff') corpo.position.y = 0.5;
+  else if (p.t === 'pino') corpo.position.y = 0.75;
+  grupo.add(corpo);
+  clicaveis.push(corpo);
+  corpo.userData.peca = p;
+
+  if (p.t === 'xor') {
+    const arco = new THREE.Mesh(geoms.arco, mat);
+    arco.scale.setScalar(s);
+    grupo.add(arco);
+  }
+  if (p.t === 'not') { // a bolinha de inversão
+    const b = new THREE.Mesh(new THREE.SphereGeometry(0.26 * s, 16, 12), mat);
+    b.position.set(0.98 * s, 0.45, 0);
+    grupo.add(b);
+  }
+  if (p.t === 'ff') { // chanfro do clock
+    const ck = new THREE.Mesh(
+      new THREE.BoxGeometry(0.16, 0.12, 1.1),
+      new THREE.MeshStandardMaterial({ color: 0x5d7280, roughness: 0.5, metalness: 0.4 })
+    );
+    ck.position.set(-1.25, 1.0, 0);
+    grupo.add(ck);
+  }
+
+  const r = rotulo(p.n, { tam: 34, cor: '#8aa0ad', esp: 0.09 });
+  r.position.set(0, p.t === 'ff' ? 2.2 : 1.6, p.t === 'ff' ? 0 : 1.6);
+  r.scale.multiplyScalar(0.62);
+  grupo.add(r);
+
+  cena.add(grupo);
+  pecas.set(p.id, { def: p, grupo, mat, label: r });
+}
+
+/* ---- LEDs de saída ---- */
+
+const leds = [];
+for (const s of SAIDAS) {
+  const g = new THREE.Group();
+  g.position.set(s.pos[0], 0, s.pos[1]);
+
+  const base = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.75, 0.9, 0.35, 24),
+    new THREE.MeshStandardMaterial({ color: 0x1e2932, roughness: 0.5, metalness: 0.6 })
+  );
+  base.position.y = 0.18;
+  g.add(base);
+
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0x1a222a, roughness: 0.18, metalness: 0.1,
+    emissive: new THREE.Color(s.cor), emissiveIntensity: 0,
+    transparent: true, opacity: 0.92,
+  });
+  const domo = new THREE.Mesh(new THREE.SphereGeometry(0.62, 24, 18, 0, Math.PI * 2, 0, Math.PI / 2), mat);
+  domo.position.y = 0.35;
+  g.add(domo);
+
+  const luz = new THREE.PointLight(s.cor, 0, 9);
+  luz.position.y = 1.2;
+  g.add(luz);
+
+  const r = rotulo(s.n, { tam: 34, cor: '#5d7280', esp: 0.12 });
+  r.position.set(3.6, 1.0, 0);
+  r.scale.multiplyScalar(0.66);
+  g.add(r);
+
+  cena.add(g);
+  leds.push({ sig: s.sig, mat, luz });
+}
+
+/* ---- trilhas de cobre ---- */
+
+const matTrilha = [];
+
+function pontoSaida(id) {
+  const p = pecas.get(id);
+  const d = p.def;
+  const dx = d.t === 'ff' ? 1.4 : d.t === 'pino' ? 0.6 : 1.6;
+  return new THREE.Vector3(d.pos[0] + dx, 0.08, d.pos[1]);
+}
+function pontoEntrada(id, i, n) {
+  const d = pecas.get(id).def;
+  const dx = d.t === 'ff' ? 1.4 : 1.7;
+  const esp = d.t === 'ff' ? 0.9 : 0.55;
+  const off = n > 1 ? (i - (n - 1) / 2) * esp : 0;
+  return new THREE.Vector3(d.pos[0] - dx, 0.08, d.pos[1] + off);
+}
+
+let faixa = 0;
+for (const p of PECAS) {
+  if (!p.de) continue;
+  p.de.forEach((origem, i) => {
+    const a = pontoSaida(origem);
+    const b = pontoEntrada(p.id, i, p.de.length);
+    const y = 0.07 + (faixa++ % 7) * 0.035;      // faixas, para não se sobreporem
+    const meioX = (a.x + b.x) / 2 + ((faixa % 5) - 2) * 0.5;
+
+    let pts;
+    if (b.x > a.x + 1.2) {
+      pts = [ a, new THREE.Vector3(a.x + 0.9, y, a.z), new THREE.Vector3(meioX, y, a.z),
+              new THREE.Vector3(meioX, y, b.z), new THREE.Vector3(b.x - 0.9, y, b.z), b ];
+    } else {
+      // realimentação: volta por fora da placa
+      const volta = Math.max(a.z, b.z) + 4.2 + (faixa % 3) * 1.1;
+      pts = [ a, new THREE.Vector3(a.x + 2.2, y, a.z), new THREE.Vector3(a.x + 2.2, y, volta),
+              new THREE.Vector3(b.x - 2.6, y, volta), new THREE.Vector3(b.x - 2.6, y, b.z), b ];
+    }
+
+    const curva = new THREE.CatmullRomCurve3(pts, false, 'catmullrom', 0.04);
+    const mat = new THREE.MeshStandardMaterial({
+      color: 0x3d5a4b, roughness: 0.4, metalness: 0.75,
+      emissive: new THREE.Color(0x38e07b), emissiveIntensity: 0,
+    });
+    const tubo = new THREE.Mesh(new THREE.TubeGeometry(curva, 44, 0.085, 7, false), mat);
+    cena.add(tubo);
+    matTrilha.push({ mat, sig: origem });
+  });
+}
+
+/* ===================================================================
+   4. PINTAR O ESTADO LÓGICO NA PLACA
+   =================================================================== */
+
+const alvo = new Map();   // id -> intensidade desejada
+
+function pintar() {
+  const s = combinacional(pinos, reg);
+
+  for (const [id, p] of pecas) alvo.set(id, s[id] ? 1 : 0);
+  for (const t of matTrilha) t.mat.userData.alvo = s[t.sig] ? 1 : 0;
+  for (const l of leds) l.mat.userData.alvo = s[l.sig] ? 1 : 0;
+
+  // painel
+  const idx = (reg.q1 ? 2 : 0) + (reg.q0 ? 1 : 0);
+  const est = ESTADOS[idx];
+  const nome = document.getElementById('estado-nome');
+  nome.textContent = est.nome;
+  nome.className = 'estado-nome' + (est.cor === 'red' ? ' red' : idx === 2 ? ' amb' : '');
+  document.getElementById('estado-bits').textContent = `${+reg.q1}${+reg.q0}`;
+
+  const cont = (reg.c1 ? 2 : 0) + (reg.c0 ? 1 : 0);
+  document.getElementById('contador-val').textContent = `${+reg.c1}${+reg.c0}`;
+  document.querySelectorAll('#barra i').forEach((el, i) => el.classList.toggle('on', i < cont));
+
+  if (fichaAtual) mostrarFicha(fichaAtual);
+}
+
+/* ===================================================================
+   5. FICHA DA PEÇA
+   =================================================================== */
+
+let fichaAtual = PECAS.find(p => p.id === 'igual');
+
+function mostrarFicha(p) {
+  fichaAtual = p;
+  const s = combinacional(pinos, reg);
+  document.getElementById('ficha-tipo').textContent = ROTULO_TIPO[p.t] ?? 'Peça';
+  document.getElementById('ficha-nome').textContent = p.n;
+  document.getElementById('ficha-eq').textContent = p.eq;
+  document.getElementById('ficha-nota').textContent = p.nota;
+  document.getElementById('ficha-loc').textContent = p.loc === 'pino' ? 'pino de entrada' : `Logisim ${p.loc}`;
+  const alto = !!s[p.id];
+  const nv = document.getElementById('ficha-nivel');
+  nv.textContent = `nível ${alto ? 1 : 0}`;
+  nv.className = 'nivel' + (alto ? ' alto' : '');
+}
+
+const raio = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+let arrastou = false;
+
+renderer.domElement.addEventListener('pointerdown', () => { arrastou = false; });
+renderer.domElement.addEventListener('pointermove', () => { arrastou = true; });
+renderer.domElement.addEventListener('pointerup', (ev) => {
+  if (arrastou) return;
+  const r = renderer.domElement.getBoundingClientRect();
+  mouse.x = ((ev.clientX - r.left) / r.width) * 2 - 1;
+  mouse.y = -((ev.clientY - r.top) / r.height) * 2 + 1;
+  raio.setFromCamera(mouse, camera);
+  const hits = raio.intersectObjects(clicaveis, false);
+  if (hits.length) mostrarFicha(hits[0].object.userData.peca);
+});
+
+/* ===================================================================
+   6. CONTROLES
+   =================================================================== */
+
+const BITS = [['s3','S3'],['s2','S2'],['s1','S1'],['s0','S0']];
+const PINOS_UI = [['confirma','CONFIRMA'],['timeout','TIMEOUT'],['reset','RESET']];
+
+const elSenha = document.getElementById('senha');
+for (const [k, n] of BITS) {
+  const b = document.createElement('button');
+  b.className = 'bit';
+  b.id = `bit-${k}`;
+  b.innerHTML = `${+pinos[k]}<span>${n}</span>`;
+  b.setAttribute('aria-pressed', String(pinos[k]));
+  b.addEventListener('click', () => { pinos[k] = !pinos[k]; sincronizar(); });
+  elSenha.appendChild(b);
+}
+
+const elPinos = document.getElementById('pinos');
+for (const [k, n] of PINOS_UI) {
+  const b = document.createElement('button');
+  b.className = 'pino';
+  b.id = `pino-${k}`;
+  b.textContent = n;
+  b.setAttribute('aria-pressed', String(pinos[k]));
+  b.addEventListener('click', () => { pinos[k] = !pinos[k]; sincronizar(); });
+  elPinos.appendChild(b);
+}
+
+function sincronizar() {
+  for (const [k] of BITS) {
+    const b = document.getElementById(`bit-${k}`);
+    b.firstChild.textContent = String(+pinos[k]);
+    b.setAttribute('aria-pressed', String(pinos[k]));
+  }
+  for (const [k] of PINOS_UI) {
+    document.getElementById(`pino-${k}`).setAttribute('aria-pressed', String(pinos[k]));
+  }
+  pintar();
+}
+
+let ocupado = false;
+function clk() {
+  reg = borda(pinos, reg);
+  pintar();
+}
+document.getElementById('clk').addEventListener('click', clk);
+
+addEventListener('keydown', (e) => {
+  if (e.code === 'Space' && e.target === document.body) { e.preventDefault(); clk(); }
+});
+
+const espera = (ms) => new Promise(r => setTimeout(r, ms));
+
+const MACROS = {
+  certa:       [['senha', 0b1011], ['confirma', true], 'clk', ['confirma', false], 'clk'],
+  errada:      [['senha', 0b0110], ['confirma', true], 'clk', ['confirma', false], 'clk'],
+  fechar:      [['timeout', true], 'clk', ['timeout', false]],
+  desbloquear: [['reset', true], 'clk', ['reset', false]],
+};
+
+async function rodarMacro(nome) {
+  if (ocupado) return;
+  ocupado = true;
+  document.querySelectorAll('.macro').forEach(b => b.disabled = true);
+  for (const passo of MACROS[nome]) {
+    if (passo === 'clk') clk();
+    else if (passo[0] === 'senha') {
+      const v = passo[1];
+      pinos.s3 = !!(v & 8); pinos.s2 = !!(v & 4); pinos.s1 = !!(v & 2); pinos.s0 = !!(v & 1);
+      sincronizar();
+    } else { pinos[passo[0]] = passo[1]; sincronizar(); }
+    await espera(620);
+  }
+  document.querySelectorAll('.macro').forEach(b => b.disabled = false);
+  ocupado = false;
+}
+
+document.getElementById('macros').addEventListener('click', (e) => {
+  const b = e.target.closest('.macro');
+  if (b) rodarMacro(b.dataset.macro);
+});
+
+/* ===================================================================
+   7. LAÇO
+   =================================================================== */
+
+function medir() {
+  const w = palco.clientWidth, h = palco.clientHeight;
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  renderer.setSize(w, h);
+}
+addEventListener('resize', medir);
+medir();
+
+const suavizar = (atual, dest, k) => atual + (dest - atual) * k;
+
+function laco() {
+  requestAnimationFrame(laco);
+
+  for (const [id, p] of pecas) {
+    const d = alvo.get(id) ?? 0;
+    p.mat.emissiveIntensity = suavizar(p.mat.emissiveIntensity, d * 0.85, 0.12);
+    p.mat.color.setHex(p.mat.emissiveIntensity > 0.25 ? 0x2d4a3c : 0x27333d);
+  }
+  for (const t of matTrilha) {
+    const d = t.mat.userData.alvo ?? 0;
+    t.mat.emissiveIntensity = suavizar(t.mat.emissiveIntensity, d * 1.5, 0.14);
+  }
+  for (const l of leds) {
+    const d = l.mat.userData.alvo ?? 0;
+    l.mat.emissiveIntensity = suavizar(l.mat.emissiveIntensity, d * 2.6, 0.13);
+    l.luz.intensity = l.mat.emissiveIntensity * 2.2;
+  }
+
+  controles.update();
+  renderer.render(cena, camera);
+}
+
+pintar();
+mostrarFicha(fichaAtual);
+laco();
+
+requestAnimationFrame(() => {
+  const c = document.getElementById('carregando');
+  c.classList.add('sai');
+  setTimeout(() => c.remove(), 700);
+});
+</script>
