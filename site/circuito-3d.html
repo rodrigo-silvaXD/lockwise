@@ -533,25 +533,27 @@ cena.add(preenche);
 
 const LARG = 66, PROF = 58, CX = -3, CZ = 8;
 
+// O laminado fica bem escuro de propósito: o verde é a cor do sinal vivo, e
+// uma placa verde brilhante disputaria com ele. Aqui o verde só aparece no
+// que está conduzindo.
 const placa = new THREE.Mesh(
   new THREE.BoxGeometry(LARG, 1.1, PROF),
-  new THREE.MeshStandardMaterial({ color: 0x0f2a1e, roughness: 0.62, metalness: 0.08 })
+  new THREE.MeshStandardMaterial({ color: 0x0c1714, roughness: 0.78, metalness: 0.06 })
 );
 placa.position.set(CX, -0.75, CZ);
 cena.add(placa);
 
-// borda de cobre, a serigrafia da placa
 const borda_ = new THREE.Mesh(
   new THREE.BoxGeometry(LARG - 2.4, 0.08, PROF - 2.4),
-  new THREE.MeshStandardMaterial({ color: 0x1a4433, roughness: 0.5, metalness: 0.3 })
+  new THREE.MeshStandardMaterial({ color: 0x122420, roughness: 0.66, metalness: 0.22 })
 );
 borda_.position.set(CX, -0.17, CZ);
 cena.add(borda_);
 
-const grade = new THREE.GridHelper(Math.max(LARG, PROF), 46, 0x1a4433, 0x163a2a);
+const grade = new THREE.GridHelper(Math.max(LARG, PROF), 46, 0x1b3a30, 0x16302a);
 grade.position.set(CX, -0.14, CZ);
 grade.material.transparent = true;
-grade.material.opacity = 0.32;
+grade.material.opacity = 0.22;
 cena.add(grade);
 
 /* ---- texto em sprite (serigrafia e rótulos) ---- */
@@ -581,8 +583,8 @@ function rotulo(texto, { tam = 44, cor = '#8aa0ad', peso = 600, esp = 0.1 } = {}
 }
 
 for (const z of ZONAS) {
-  const s = rotulo(z.t, { tam: 40, cor: '#2f6b4a', esp: 0.22 });
-  s.position.set(z.x, 0.35, z.z);
+  const s = rotulo(z.t, { tam: 40, cor: '#4a8a6b', esp: 0.22 });
+  s.position.set(z.x, 0.9, z.z);
   s.scale.multiplyScalar(0.88);
   cena.add(s);
 }
@@ -955,12 +957,60 @@ function laco() {
     l.luz.intensity = l.mat.emissiveIntensity * 2.2;
   }
 
+  if (voo) {
+    controles.target.lerp(voo.alvo, 0.07);
+    camera.position.lerp(voo.cam, 0.07);
+    if (++voo.passos > 90) voo = null;
+  }
+
   controles.update();
   renderer.render(cena, camera);
 }
 
+/* ===================================================================
+   8. CHEGAR POR UMA ZONA
+   O diagrama do simulador aponta para cá com um #ancora. Cada bloco de lá
+   corresponde a uma região da placa; ao chegar, a câmera voa até ela e a
+   ficha já abre numa porta representativa daquela região.
+   =================================================================== */
+
+const FOCOS = {
+  entradas:      { alvo: new THREE.Vector3(-28, 0,  2), dist: 30, peca: 'PCONF' },
+  comparador:    { alvo: new THREE.Vector3(-18, 0, -8), dist: 28, peca: 'igual' },
+  decodificador: { alvo: new THREE.Vector3(-16, 0,  8), dist: 30, peca: 'ver'   },
+  estado:        { alvo: new THREE.Vector3(  7, 0, -3), dist: 40, peca: 'd1'    },
+  contador:      { alvo: new THREE.Vector3( -2, 0, 27), dist: 36, peca: 'en'    },
+};
+
+const semMovimento = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let voo = null;
+
+function focarZona(nome) {
+  const f = FOCOS[nome];
+  if (!f) return;
+  const cam = f.alvo.clone().add(new THREE.Vector3(-5, f.dist * 0.74, f.dist * 0.82));
+  const peca = PECAS.find(p => p.id === f.peca);
+  if (peca) mostrarFicha(peca);
+  if (semMovimento) {
+    controles.target.copy(f.alvo);
+    camera.position.copy(cam);
+    return;
+  }
+  voo = { alvo: f.alvo.clone(), cam, passos: 0 };
+}
+
+// Qualquer gesto do usuário cancela o voo: a câmera é dele a partir dali.
+controles.addEventListener('start', () => { voo = null; });
+
+function lerHash() {
+  const h = location.hash.replace('#', '').toLowerCase();
+  if (FOCOS[h]) focarZona(h);
+}
+addEventListener('hashchange', lerHash);
+
 pintar();
 mostrarFicha(fichaAtual);
+lerHash();
 laco();
 
 requestAnimationFrame(() => {
