@@ -197,7 +197,7 @@ def energia_em_texto(d: Demanda) -> str:
         "mudaria uma única decisão do modelo.",
         "",
         "Onde a energia serve de verdade: ela é a assinatura física de cada acesso",
-        "liberado (docs/fisica.md §6 — 12 V × 292,5 mA × 5,16 s = 18 200 mJ). É por",
+        "liberado (docs/fisica.md §6 — 3,53 W × 5,16 s = 18 200 mJ). É por",
         "ela que se confere se o histórico bate com o número de aberturas reais.",
     ])
 

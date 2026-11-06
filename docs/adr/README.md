@@ -44,7 +44,8 @@ Regras que seguimos:
 | [0027](0027-historico-sintetico-pela-api-real.md) | Histórico sintético pela máquina de estados e pela API real | otimização | aceita |
 | [0028](0028-c4-em-mermaid-verificado-por-teste.md) | C4 em Mermaid versionado, camadas verificadas por teste | arquitetura | aceita |
 | [0029](0029-teto-na-versao-do-pulp.md) | Teto na versão maior do PuLP | otimização | aceita |
-| [0030](0030-placa-em-webgl-em-vez-de-tinkercad.md) | A placa de portas em WebGL, não no Tinkercad | eletrônica | aceita |
+| [0030](0030-placa-em-webgl-em-vez-de-tinkercad.md) | A placa de portas em WebGL, não no Tinkercad | eletrônica | aceita; fatos corrigidos pela 0031 |
+| [0031](0031-correcao-dos-fatos-da-adr-0030.md) | Correção dos fatos da ADR 0030 | eletrônica | aceita |
 
 ## Modelo para uma ADR nova
 
