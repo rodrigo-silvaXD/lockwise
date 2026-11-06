@@ -59,15 +59,16 @@ Complemento, se perguntarem por que controle de acesso e não outro tema:
 
 ### Por que ele é útil?
 
-> Quem administra um prédio já tem fechadura e já tem registro de acesso. O
-> que normalmente não existe é o passo seguinte: transformar esse registro
-> em uma decisão de quanto pessoal escalar. No LOCKWISE o histórico que a
-> porta gera é a demanda do modelo de escala — o dado não morre no relatório.
+> Uma fechadura decide quem entra, mas quem administra um prédio também
+> precisa saber quantas pessoas escalar em cada turno. No LOCKWISE o
+> histórico que a porta gera é a demanda do modelo de escala, então o
+> registro de acesso vira uma decisão de pessoal.
 
 O número concreto, para não ficar abstrato:
 
-> No cenário que medimos, a escala ótima usa **9 vigilantes contra 12** da
-> escala ingênua: R$ 748,00 por dia a menos, 26,6%.
+> No cenário do projeto, com histórico sintético, a escala ótima usa
+> **9 vigilantes contra 12** da escala ingênua: R$ 748,00 por dia a menos,
+> 26,6%.
 
 ### Como ele se diferencia?
 
@@ -87,27 +88,28 @@ Aqui é onde se perde ponto por exagero. A resposta honesta tem duas partes.
 Se insistirem em "mas isso vende?":
 
 > É um projeto acadêmico, e não medimos mercado. O que afirmamos é técnico:
-> quatro garantias que a maioria dos projetos desta escala afirma sem provar,
-> aqui são verificadas por teste automatizado.
+> são quatro garantias conferidas de forma automática, por teste ou pelo
+> pipeline.
 
 ### Qual foi a parte mais difícil?
 
 Pergunta de aquecimento, mas revela quem construiu e quem assistiu. Cada um
 precisa de uma resposta própria e verdadeira. Exemplos que servem:
 
-> Fazer o bloqueio acontecer na terceira tentativa e não na quarta. A
-> primeira versão contava certo e bloqueava tarde, porque o flip-flop só
-> assume o valor novo depois da borda.
+> Fazer o bloqueio acontecer na terceira tentativa e não na quarta. O
+> flip-flop só assume o valor novo depois da borda, então o sinal de limiar
+> precisa ser calculado antes dela.
 
 > Descobrir que o deploy estava verde com a versão antiga no ar. O teste
 > checava `"status":"ok"`, que é verdade em qualquer versão.
 
 ### Quem fez o quê?
 
-> Construímos junto e revisamos junto. Para estudo, o Rodrigo concentrou o
-> circuito e a nuvem, o Carlos a física e a eletrônica, e o Fabrício o
-> gateway e a otimização. Mas qualquer um de nós responde sobre qualquer
-> parte — e é por isso que ensaiamos trocando.
+Esta resposta o grupo escreve junto, com a divisão real do trabalho. Cada um
+diz o que de fato fez e completa:
+
+> Mas qualquer um de nós responde sobre qualquer parte, e é por isso que
+> ensaiamos trocando.
 
 Nunca responder "essa parte não foi comigo". É a frase que derruba o grupo.
 
@@ -123,9 +125,8 @@ Nunca responder "essa parte não foi comigo". É a frase que derruba o grupo.
 
 ### Por que dois estágios em vez de um AND de quatro entradas?
 
-> Para reduzir fan-in. Um AND de 4 entradas é um componente pior de acionar
-> e de desenhar; dois de 2 entradas mais um de junção fazem o mesmo com
-> portas mais comuns.
+> Para reduzir o fan-in e evitar um AND de 4 entradas. Dois ANDs de 2
+> entradas e um terceiro que os junta fazem a mesma comparação.
 
 ### Quais são os estados e como são codificados?
 
@@ -180,28 +181,35 @@ A outra pergunta esperada.
 
 ### De onde vêm os 18 200 mJ de cada acesso?
 
-> De 12 volts × 292,5 miliamperes × 5,16 segundos. Não é um número
-> escolhido: cada um dos três fatores tem cálculo próprio no memorial de
-> física — a tensão da fonte, a corrente de acionamento do solenoide e o
-> tempo que a trava fica aberta.
+> De 3,53 watts durante 5,16 segundos. A potência soma a bobina,
+> 12 V × 292,5 mA = 3,51 W, e a base do transistor, 5 V × 4,3 mA = 0,02 W.
+> O tempo é o do NE555, T = RC·ln 3. O produto dá cerca de 18,2 J, e cada
+> fator tem cálculo próprio no memorial de física.
+
+Cuidado com a forma curta: 12 V × 292,5 mA × 5,16 s dá 18 112 mJ, porque
+deixa a base de fora.
 
 ### Por que não ligar a trava direto na saída da porta lógica?
 
-> Porque a saída lógica não entrega a corrente do solenoide, e porque a
-> carga é indutiva. Entre as duas coisas existe um estágio de potência com
-> transistor em saturação, dimensionado no memorial.
+> Porque a bobina exige 300 mA e a porta fornece 25 mA no máximo absoluto,
+> 12 vezes menos. E porque a trava é de 12 V e a lógica de 5 V: mesmo sem
+> queimar, a força cairia a 17% e a trava não abriria. Por isso há um
+> estágio de potência com um BC337 em saturação.
 
 ### Para que serve o diodo?
 
-> Para a corrente da bobina ter caminho quando o transistor corta. Sem ele,
-> o colapso do campo gera um pico de tensão reversa que destrói o
-> transistor. É diodo de roda livre, em antiparalelo com o solenoide.
+> Quando o transistor corta, a bobina gera uma tensão reversa para manter a
+> corrente. Sem o diodo, essa tensão chega a centenas de volts e destrói o
+> transistor, que suporta 45 V. O 1N4007, em antiparalelo com a bobina, dá
+> caminho à corrente e limita a tensão a 12,8 V.
 
 ### Como escolheram o resistor de base?
 
-> A partir da corrente de coletor necessária e do ganho mínimo do
-> transistor, com folga para garantir saturação e não região ativa — em
-> saturação a dissipação é baixa; na ativa, o transistor aquece.
+> Não pelo h_FE da folha de dados, que vale para a região ativa. Impusemos
+> um ganho forçado três vezes menor que o h_FE mínimo, para garantir
+> saturação, e calculamos R_B no pior caso de tensão de saída da porta. O
+> resultado de 1 kΩ dá de 3,7 a 4,3 mA, dentro do que a porta 74HC fornece
+> com nível garantido.
 
 ### O circuito está montado?
 
@@ -235,12 +243,11 @@ A pergunta mais perigosa deste eixo. A resposta é o diferencial do projeto.
 > registradores = 2048 casos, com zero divergências. A equivalência é
 > provada contra o arquivo do circuito, não afirmada.
 
-### Por que não usar um ESP32 lendo os pinos?
+### Por que não usar um microcontrolador lendo os pinos?
 
-> Porque o circuito não está montado — não há pino físico para ler. Com o
-> hardware montado, um ESP32 eliminaria o passo manual, e o gateway já tem a
-> abstração que receberia essa fonte. Chegamos a ter essa ponte no projeto e
-> a removemos quando ficou claro que ela não se sustentava sem a montagem.
+> A equipe decidiu não seguir com a simulação em microcontrolador. O
+> circuito não está montado, então não há pino físico para ler, e a ponte é
+> o gêmeo digital, com a equivalência provada por teste.
 
 ---
 
@@ -249,22 +256,26 @@ A pergunta mais perigosa deste eixo. A resposta é o diferencial do projeto.
 ### Onde a API roda e por quê?
 
 > FastAPI no Render, com Postgres gerenciado na Neon. Render porque faz
-> deploy direto do GitHub e oferece banco gerenciado no plano gratuito sem
-> cartão. AWS custaria dias de configuração de permissões antes da primeira
-> linha útil.
+> deploy direto do GitHub, sem cartão no plano gratuito. AWS custaria dias de
+> configuração de permissões antes da primeira linha útil. O banco foi para a
+> Neon porque o Render permite um único Postgres gratuito por conta, e a
+> conta já tinha um, de outro projeto.
 
 ### Como a API sabe o estado atual da fechadura?
 
 > Reconstruindo a partir dos eventos. É a mesma máquina de estados pela
 > terceira vez — no circuito ela decide o presente, no gateway ela
-> acompanha, e na API ela projeta o passado.
+> acompanha, e na API ela projeta o passado. Na nuvem não existe VERIFICANDO,
+> porque ela só recebe o resultado da verificação.
 
 ### Que padrões de projeto vocês usaram?
 
-> Três padrões GoF, e cada um resolve um problema concreto do sistema, não
-> foi aplicado para constar. O State é a tradução direta do hardware: o
-> circuito **é** uma máquina de estados, e cada estado virou uma classe que
-> sabe para onde ir na próxima borda.
+> Três padrões GoF, cada um com um trabalho real. **State**
+> (`dominio/estados.py`): a nuvem reconstrói o estado da fechadura a partir
+> dos eventos. **Strategy** (`dominio/politicas.py`): a política de quando
+> avisar alguém é trocada por variável de ambiente, sem mexer no serviço.
+> **Observer** (`dominio/notificacao.py`): quem cria o alerta não conhece os
+> interessados, e um observador que falha não derruba o registro do acesso.
 
 ### Como vocês garantem que a arquitetura em camadas foi respeitada?
 
@@ -291,7 +302,7 @@ Pergunta boa de responder bem — mostra maturidade.
 ### Por que tantas ADRs?
 
 > Porque numa sabatina a pergunta mais provável é "por que vocês fizeram
-> assim?". São 30 decisões registradas com o que estava em jogo, o que
+> assim?". São 32 decisões registradas com o que estava em jogo, o que
 > descartamos e o que a escolha nos custa.
 
 ---
@@ -352,24 +363,33 @@ Este é o risco nº 1 do projeto. A defesa não é verbal — é a demo encadead
 ao vivo. Se virar "Logisim numa tela e print da API na outra", a resposta
 não salva.
 
-### "A economia de R$ 84 480 por mês é crível?"
+### "A economia de R$ 22.440 por mês é crível?"
 
-A pergunta mais perigosa do projeto. Não defender esse número.
+A pergunta mais perigosa do projeto. Admitir o limite antes de defender o
+número.
 
-> Esse é o número extrapolado para 50 unidades, e é o mais frágil do
-> trabalho. Ele depende de K = 4, quinze minutos por acesso, que é uma
-> estimativa conservadora. O número que sustentamos é o medido numa
-> instalação: 9 vigilantes contra 12, R$ 748 por dia, 26,6%. A extrapolação
-> linear para 50 unidades ignora ganho de escala e é por isso que a tratamos
-> como ordem de grandeza, não como previsão.
+> Ela vale para o cenário do modelo e não é uma medição. A escala otimizada
+> custa R$ 2.068 por dia, com 9 vigilantes. A ingênua custa R$ 2.816, com 12.
+> A diferença é R$ 748 por dia, 26,6%, ou R$ 22.440 em 30 dias.
+>
+> O ponto fraco é o dimensionamento. K = 4, quinze minutos por acesso, é uma
+> estimativa nossa, e ela exige 4 vigilantes no pico para um condomínio de
+> cerca de 50 unidades, o que é alto. Com K = 6, a escala cai para 6
+> vigilantes e R$ 1.386 por dia.
+>
+> O custo de R$ 220 por turno também é uma ordem de grandeza. A referência
+> pública do CadTerc equivale a cerca de R$ 376 por 8 horas. Trocar esse
+> valor muda os reais, mas não muda a escala nem o percentual.
+
+Cuidado com os R$ 84.480: esse valor é o custo mensal da escala ingênua
+(R$ 2.816 × 30), não a economia.
 
 ### "Por que o circuito não está montado?"
 
-> Porque o roteiro aceita circuito simulado e preferimos investir o tempo na
-> cadeia completa. O estágio de potência está dimensionado com cálculo
-> térmico; montá-lo custa cerca de R$ 30 em componentes, e é o caminho mais
-> direto para fechar essa lacuna. Não é uma parte que não sabemos fazer — é
-> uma que escolhemos não fazer.
+> O roteiro aceita circuito simulado, e isso está declarado no memorial e no
+> relatório. O estágio de potência está dimensionado, com cálculo térmico e
+> de saturação. Montá-lo custaria cerca de R$ 30 em componentes e é o caminho
+> mais direto para fechar essa lacuna.
 
 ### "Vocês usaram IA para fazer isso?"
 
@@ -399,10 +419,10 @@ equação e a coordenada de cada uma, e serve de material de estudo.
 
 ### "Se eu tirar a internet, o que acontece?"
 
-> A fechadura continua decidindo: a decisão de acesso é combinacional, não
-> depende da nuvem. O gateway tem fila offline e reenvia quando a API
-> volta. O que se perde é o registro em tempo real, não o controle de
-> acesso.
+> A fechadura continua decidindo, porque quem decide é o circuito, com o
+> comparador e a máquina de estados, não a nuvem. O gateway tem fila offline
+> e reenvia quando a API volta. O que se perde é o registro em tempo real,
+> não o controle de acesso.
 
 ---
 

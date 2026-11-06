@@ -35,7 +35,7 @@ A equipe inteira, com os três nomes e RAs, aparece escrita na tela do fecho.
 A divisão segue o assunto, não o cronômetro: o **Carlos** fica com o hardware
 — o circuito, o bloqueio e a física que os sustenta — e o **Fabrício** com o
 software e a matemática — a ponte, a nuvem e a otimização. Dá 80 segundos de
-fala para um e 100 para o outro, e cada um narra o que estudou mais a fundo.
+fala para um e 100 para o outro.
 
 Essa divisão vale **só para o vídeo**. Na sabatina cada um responde sobre
 qualquer parte; ver `docs/sabatina.md`.
@@ -106,7 +106,7 @@ qualquer parte; ver `docs/sabatina.md`.
 
 *Tela: `/acessos` mostrando o registro recém-criado, com o `energia_mj`.*
 
-> E cada liberação carrega dezoito mil e duzentos milijoules. Esse número não é enfeite: é doze volts vezes duzentos e noventa e dois miliamperes vezes cinco vírgula dezesseis segundos — cada fator calculado no memorial de física.
+> E cada liberação carrega dezoito mil e duzentos milijoules. Esse número não é enfeite: são três vírgula cinquenta e três watts, da bobina e da base do transistor, durante cinco vírgula dezesseis segundos — cada fator calculado no memorial de física.
 
 ---
 

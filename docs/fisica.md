@@ -483,7 +483,7 @@ Os 4,3 mJ de energia magnética da bobina (seção 4.6) e os 68 mW do LED `TRAVA
 
 **Onde esse número vai.** O gateway envia, a cada evento com resultado `LIBERADO`, o campo `energia_mj = 18200`. Eventos `NEGADO` e `BLOQUEADO` não acionam a trava e registram `energia_mj = 0`. O backend persiste o valor na tabela `acesso`, e o módulo de otimização pode somá-lo por faixa horária para compor o custo energético da operação junto ao custo de vigilância.
 
-A frase para a sabatina: *"a energia registrada em cada acesso não é um número inventado — é 12 volts vezes 292 miliamperes vezes 5,16 segundos, e cada um desses três fatores tem um cálculo neste memorial."*
+A frase para a sabatina: *"a energia registrada em cada acesso não é um número inventado — são 3,53 watts, da bobina e da base do transistor, durante 5,16 segundos, e cada um desses fatores tem um cálculo neste memorial."*
 
 ---
 

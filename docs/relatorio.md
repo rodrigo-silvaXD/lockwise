@@ -285,7 +285,7 @@ Registradas por honestidade, e porque um avaliador as encontraria de qualquer fo
 
 ## 8. Conclusão
 
-Os cinco requisitos do roteiro estão atendidos, e o que os liga é a rastreabilidade de um único dado: os 18 200 mJ que aparecem no banco de dados são doze volts vezes 292,5 miliamperes vezes 5,16 segundos, e cada um desses três fatores tem um cálculo no memorial de física. A demanda que o modelo de otimização consome é o histórico que o circuito gerou.
+Os cinco requisitos do roteiro estão atendidos, e o que os liga é a rastreabilidade de um único dado: os 18 200 mJ que aparecem no banco de dados são 3,53 watts, da bobina e da base do transistor, durante 5,16 segundos, e cada um desses fatores tem um cálculo no memorial de física. A demanda que o modelo de otimização consome é o histórico que o circuito gerou.
 
 O que consideramos o diferencial técnico não é nenhuma das cinco partes isoladas, e sim o que as conecta com garantias verificáveis: a equivalência entre o hardware simulado e o software é provada contra o arquivo do circuito, não afirmada; a arquitetura documentada é imposta por teste, não descrita; o ótimo da otimização é conferido por força bruta, não aceito do solver; e o deploy é verificado pela SHA do commit que chegou ao ar.
 

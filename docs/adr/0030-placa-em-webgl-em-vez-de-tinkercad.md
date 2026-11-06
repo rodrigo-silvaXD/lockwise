@@ -1,7 +1,7 @@
 # ADR 0030 — A placa em WebGL, não no Tinkercad
 
 Data: 2026-10-28
-Situação: aceita
+Situação: aceita; os fatos sobre o Tinkercad e a contagem de peças foram corrigidos pela [ADR 0032](0032-correcao-dos-fatos-da-adr-0030.md)
 
 ## Contexto
 

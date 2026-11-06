@@ -65,7 +65,8 @@ GitHub Actions com CI que barra o deploy e confere a SHA do commit em `/health`.
   §1.1 e no `relatorio.md` §7. O roteiro aceita circuito simulado.
 - O Logisim **não se comunica** com nada. Nunca se comunicou. O gateway é um
   gêmeo digital, e a equivalência é provada por teste, não por cabo.
-- A economia da otimização dá R$ 84 480/mês para 50 unidades — irreal, porque
+- A escala ingênua custa R$ 84 480/mês e a economia é R$ 22 440/mês, para cerca
+  de 50 unidades — dimensionamento irreal, porque
   K=4 (15 min por acesso) é conservador demais. Duas saídas oferecidas e não
   decididas: recalibrar K para ~8, ou reposicionar o cenário para uma
   instalação maior.
