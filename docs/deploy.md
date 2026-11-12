@@ -7,7 +7,8 @@ push na main
     │
     ▼
 GitHub Actions — testes            gateway: 107 testes (inclui a prova contra o .circ)
-    │                              backend: 69 testes (inclui a demo ponta a ponta)
+    │                              backend: 102 testes (inclui a demo ponta a ponta)
+    │                              otimização: 32 testes (inclui o ótimo por força bruta)
     │ só se passar
     ▼
 GitHub Actions — deploy            chama o deploy hook do Render

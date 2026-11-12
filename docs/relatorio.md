@@ -26,7 +26,7 @@ O projeto atravessa cinco disciplinas, e o que as une não é o tema: é **um ú
 [OTIMIZAÇÃO]    escala de vigilância: 26,6% mais barata que a ingênua
 ```
 
-Resultados verificáveis: **238 testes automatizados**, pipeline de CI/CD verde, API pública em <https://lockwise-api.onrender.com>, e 28 registros de decisão documentando o porquê de cada escolha.
+Resultados verificáveis: **241 testes automatizados**, pipeline de CI/CD verde, API pública em <https://lockwise-api.onrender.com>, e 31 registros de decisão documentando o porquê de cada escolha.
 
 ---
 
@@ -252,8 +252,8 @@ Um teste enumera por força bruta todas as escalas viáveis e confirma que nenhu
 |---|---:|---|
 | Gateway | 107 | Equivalência com o `.circ` em 2048 casos, transporte, CLI |
 | Backend | 102 | Domínio, contrato, segurança, arquitetura, demo ponta a ponta |
-| Otimização | 29 | Cobertura, sensibilidade, ótimo por força bruta |
-| **Total** | **238** | |
+| Otimização | 32 | Cobertura, sensibilidade, ótimo por força bruta |
+| **Total** | **241** | |
 
 ### 6.2 Os três testes que sustentam as afirmações centrais
 
@@ -265,7 +265,7 @@ Um teste enumera por força bruta todas as escalas viáveis e confirma que nenhu
 
 ### 6.3 Decisões documentadas
 
-Vinte e oito ADRs em [`adr/`](adr/), uma decisão por arquivo, com contexto, alternativas descartadas e consequências — incluindo as negativas. Uma ADR aceita não é reescrita: se a decisão muda, nasce outra que substitui a anterior.
+Trinta e uma ADRs em [`adr/`](adr/), uma decisão por arquivo, com contexto, alternativas descartadas e consequências — incluindo as negativas. Uma ADR aceita não é reescrita: se a decisão muda, nasce outra que substitui a anterior.
 
 ---
 
@@ -275,7 +275,7 @@ Registradas por honestidade: um projeto que esconde o que não fez perde a confi
 
 **O circuito é digital; a eletrônica analógica é de papel.** O estágio de potência está integralmente dimensionado, com cálculo térmico e de saturação, mas não foi montado em bancada. Montá-lo custaria cerca de R$ 30 em componentes e é o caminho mais direto para fechar essa lacuna.
 
-**O histórico de acessos é sintético.** Os eventos nascem da mesma máquina de estados do gateway e são enviados pela mesma API — o `tentativa`, o `energia_mj` e a ordem dos estados saem corretos porque quem os produz é o circuito replicado. O que difere da operação real é apenas o relógio. Dados reais acumulados até novembro entram no mesmo banco e no mesmo modelo.
+**O histórico de acessos é sintético.** Os eventos nascem da mesma máquina de estados do gateway e são enviados pela mesma API — o `tentativa`, o `energia_mj` e a ordem dos estados saem corretos porque quem os produz é o circuito replicado. O que difere da operação real é apenas o relógio. Quando houver operação real, os dados entram no mesmo banco e no mesmo modelo, sem mudança de código.
 
 **O circuito tem uma senha.** O comparador de 4 bits valida um único código. A tabela `usuario` do banco já modela vários moradores, e o cenário de otimização assume uma portaria de condomínio — o circuito demonstra o controle de um ponto de acesso, não o sistema completo de credenciais.
 

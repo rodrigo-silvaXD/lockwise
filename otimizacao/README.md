@@ -93,10 +93,16 @@ python -m venv .venv
 .venv/Scripts/python -m lockwise_otimizacao.cli semear --dias 7 --chave "<a chave da API>"
 ```
 
-**Resolver:**
+**Resolver** com a demanda da API ao vivo (últimos sete dias):
 
 ```bash
 .venv/Scripts/python -m lockwise_otimizacao.cli resolver --dias 7 --saida relatorio.txt
+```
+
+Ou, sem rede, com a demanda da semana de 15 a 22/09/2026 que gerou o resultado acima, salva em [`docs/evidencias/demanda_horaria.json`](../docs/evidencias/demanda_horaria.json):
+
+```bash
+.venv/Scripts/python -m lockwise_otimizacao.cli resolver --arquivo ../docs/evidencias/demanda_horaria.json
 ```
 
 | Opção | Padrão | Efeito |

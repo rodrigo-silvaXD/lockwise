@@ -3,7 +3,7 @@
 Backend do sistema de controle de acesso. Recebe os eventos que o gateway produz a partir do circuito, persiste o histórico e expõe a **demanda horária** (entrada do modelo de otimização) e o **estado atual da fechadura** (para o painel).
 
 ```
-gateway ──POST /acessos, /alertas──▶  API  ──▶  Postgres (Render)
+gateway ──POST /acessos, /alertas──▶  API  ──▶  Postgres (Neon)
                                        │
        otimização ◀── GET /acessos/demanda-horaria
        painel     ◀── GET /fechadura, /alertas, /acessos

@@ -53,7 +53,7 @@ lockwise/
 │   ├── deploy.md                  como a API vai para o ar e o que fazer quando falha
 │   ├── relatorio.md              relatório técnico: as cinco disciplinas amarradas
 │   ├── eletronica.md             tabela-verdade, Karnaugh e transição de estados
-│   ├── adr/                       28 registros de decisão: o porquê de cada escolha
+│   ├── adr/                       31 registros de decisão: o porquê de cada escolha
 │   └── evidencias/                14 figuras da simulação + relatório da otimização
 ├── site/                          simulador interativo do circuito no navegador
 ├── gateway/                       gêmeo digital do circuito + POST para a API
@@ -154,7 +154,7 @@ O Logisim não fala HTTP. O gateway ([`gateway/`](gateway/)) é **a mesma máqui
 Cada transição gera um evento: `LIBERADO` (com `energia_mj = 18200`), `NEGADO`, `BLOQUEADO` (+ alerta) ou `DESBLOQUEIO_ADMIN`. Retry com backoff, fila offline em disco e autenticação por `X-API-Key`. Zero dependências.
 
 ```bash
-cd gateway && python -m pytest          # 103 testes
+cd gateway && python -m pytest          # 107 testes
 python -m lockwise_gateway.cli          # painel de pinos em modo eco
 ```
 
@@ -164,10 +164,10 @@ python -m lockwise_gateway.cli          # painel de pinos em modo eco
 
 [`backend/`](backend/) é a API que recebe os eventos do gateway, persiste o histórico e expõe a **demanda horária** (entrada da otimização) e o **estado da fechadura** (para o painel). FastAPI + SQLAlchemy; SQLite local, Postgres gerenciado em produção.
 
-Três padrões GoF, cada um com trabalho real: **State** projeta o estado da fechadura a partir dos eventos (a mesma FSM do circuito, pela terceira vez); **Strategy** é a política de supervisão que decide quando avisar alguém — `limite`, `horario`, `composta` — trocada por variável de ambiente; **Observer** avisa log e webhook quando um alerta nasce. SOLID está mapeado princípio a princípio no README do backend.
+Três padrões GoF, cada um com trabalho real: **State** projeta o estado da fechadura a partir dos eventos (a mesma FSM do circuito, pela terceira vez); **Strategy** é a política de supervisão que decide quando avisar alguém — `limite`, `horario`, `composta` ou `nenhuma` — trocada por variável de ambiente; **Observer** avisa log e webhook quando um alerta nasce. SOLID está mapeado princípio a princípio no README do backend.
 
 ```bash
-cd backend && .venv/Scripts/python -m pytest      # 69 testes, inclusive a demo ponta a ponta
+cd backend && .venv/Scripts/python -m pytest      # 102 testes, inclusive a demo ponta a ponta
 ```
 
 O teste `test_ponta_a_ponta.py` sobe a API real, roda o gateway real com `roteiros/demo.txt` e confere no banco: é a demo automatizada.
@@ -187,8 +187,10 @@ Seis turnos de 8 h começando a cada 4 h — cada hora coberta por dois turnos, 
 | economia | 3 | R$ 748,00 (**26,6%**) |
 
 ```bash
-cd otimizacao && .venv/Scripts/python -m lockwise_otimizacao.cli resolver --dias 7
+cd otimizacao && .venv/Scripts/python -m lockwise_otimizacao.cli resolver --arquivo ../docs/evidencias/demanda_horaria.json
 ```
+
+O arquivo é a demanda que a API devolveu para a semana de 15 a 22/09/2026, a mesma do [relatório da execução](docs/evidencias/relatorio_otimizacao.txt). Sem `--arquivo`, o modelo lê a API ao vivo e usa os últimos sete dias.
 
 ---
 
@@ -229,7 +231,7 @@ Ligue S3, S1 e S0 (a senha é `1011`), ligue CONFIRMA e pulse o clock duas vezes
 | [Arquitetura](docs/arquitetura.md) | C4 níveis 1–4, padrões GoF e SOLID com arquivo:linha |
 | [Otimização](otimizacao/README.md) | formulação do modelo e o resultado |
 | [Deploy](docs/deploy.md) | como a API vai para o ar e o que fazer quando algo falha |
-| [Decisões (ADR)](docs/adr/) | 28 registros: o porquê de cada escolha |
+| [Decisões (ADR)](docs/adr/) | 31 registros: o porquê de cada escolha |
 
 ---
 

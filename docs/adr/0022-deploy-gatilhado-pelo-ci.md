@@ -7,7 +7,7 @@ Situação: aceita
 
 O Render, quando conectado a um repositório, tem uma opção de deploy automático a cada commit na branch principal. É o caminho mais fácil: dois cliques e todo push vai para o ar.
 
-O problema é que "todo push" inclui o push com o teste quebrado. Com quatro pessoas mexendo em cinco disciplinas nas semanas que antecedem a avaliação, é questão de tempo até alguém enviar código que não passa. Se isso derrubar a API, e derrubar na véspera, perdemos o quesito que vale 35%.
+O problema é que "todo push" inclui o push com o teste quebrado. Com três pessoas mexendo em cinco disciplinas nas semanas que antecedem a avaliação, é questão de tempo até alguém enviar código que não passa. Se isso derrubar a API, e derrubar na véspera, perdemos o quesito que vale 35%.
 
 O requisito de cloud também pede pipeline de CI/CD, e "o Render faz deploy sozinho" é uma resposta pobre para "me mostre seu pipeline".
 

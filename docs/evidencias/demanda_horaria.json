@@ -1,0 +1,201 @@
+{
+  "de": "2026-09-15T19:04:11Z",
+  "ate": "2026-09-23T00:00:00Z",
+  "fuso": "America/Sao_Paulo",
+  "total_acessos": 933,
+  "total_energia_mj": 14942200,
+  "faixas": [
+    {
+      "hora": 0,
+      "acessos": 6,
+      "liberados": 5,
+      "negados": 1,
+      "bloqueados": 0,
+      "energia_mj": 91000
+    },
+    {
+      "hora": 1,
+      "acessos": 4,
+      "liberados": 3,
+      "negados": 1,
+      "bloqueados": 0,
+      "energia_mj": 54600
+    },
+    {
+      "hora": 2,
+      "acessos": 2,
+      "liberados": 2,
+      "negados": 0,
+      "bloqueados": 0,
+      "energia_mj": 36400
+    },
+    {
+      "hora": 3,
+      "acessos": 0,
+      "liberados": 0,
+      "negados": 0,
+      "bloqueados": 0,
+      "energia_mj": 0
+    },
+    {
+      "hora": 4,
+      "acessos": 0,
+      "liberados": 0,
+      "negados": 0,
+      "bloqueados": 0,
+      "energia_mj": 0
+    },
+    {
+      "hora": 5,
+      "acessos": 3,
+      "liberados": 3,
+      "negados": 0,
+      "bloqueados": 0,
+      "energia_mj": 54600
+    },
+    {
+      "hora": 6,
+      "acessos": 25,
+      "liberados": 22,
+      "negados": 3,
+      "bloqueados": 0,
+      "energia_mj": 400400
+    },
+    {
+      "hora": 7,
+      "acessos": 70,
+      "liberados": 63,
+      "negados": 7,
+      "bloqueados": 0,
+      "energia_mj": 1146600
+    },
+    {
+      "hora": 8,
+      "acessos": 56,
+      "liberados": 46,
+      "negados": 10,
+      "bloqueados": 0,
+      "energia_mj": 837200
+    },
+    {
+      "hora": 9,
+      "acessos": 32,
+      "liberados": 28,
+      "negados": 4,
+      "bloqueados": 0,
+      "energia_mj": 509600
+    },
+    {
+      "hora": 10,
+      "acessos": 33,
+      "liberados": 30,
+      "negados": 3,
+      "bloqueados": 0,
+      "energia_mj": 546000
+    },
+    {
+      "hora": 11,
+      "acessos": 39,
+      "liberados": 34,
+      "negados": 4,
+      "bloqueados": 1,
+      "energia_mj": 618800
+    },
+    {
+      "hora": 12,
+      "acessos": 67,
+      "liberados": 62,
+      "negados": 5,
+      "bloqueados": 0,
+      "energia_mj": 1128400
+    },
+    {
+      "hora": 13,
+      "acessos": 44,
+      "liberados": 38,
+      "negados": 6,
+      "bloqueados": 0,
+      "energia_mj": 691600
+    },
+    {
+      "hora": 14,
+      "acessos": 43,
+      "liberados": 40,
+      "negados": 3,
+      "bloqueados": 0,
+      "energia_mj": 728000
+    },
+    {
+      "hora": 15,
+      "acessos": 27,
+      "liberados": 27,
+      "negados": 0,
+      "bloqueados": 0,
+      "energia_mj": 491400
+    },
+    {
+      "hora": 16,
+      "acessos": 60,
+      "liberados": 54,
+      "negados": 6,
+      "bloqueados": 0,
+      "energia_mj": 982800
+    },
+    {
+      "hora": 17,
+      "acessos": 83,
+      "liberados": 74,
+      "negados": 9,
+      "bloqueados": 0,
+      "energia_mj": 1346800
+    },
+    {
+      "hora": 18,
+      "acessos": 104,
+      "liberados": 88,
+      "negados": 15,
+      "bloqueados": 1,
+      "energia_mj": 1601600
+    },
+    {
+      "hora": 19,
+      "acessos": 99,
+      "liberados": 90,
+      "negados": 9,
+      "bloqueados": 0,
+      "energia_mj": 1638000
+    },
+    {
+      "hora": 20,
+      "acessos": 58,
+      "liberados": 48,
+      "negados": 10,
+      "bloqueados": 0,
+      "energia_mj": 873600
+    },
+    {
+      "hora": 21,
+      "acessos": 41,
+      "liberados": 34,
+      "negados": 7,
+      "bloqueados": 0,
+      "energia_mj": 618800
+    },
+    {
+      "hora": 22,
+      "acessos": 25,
+      "liberados": 19,
+      "negados": 6,
+      "bloqueados": 0,
+      "energia_mj": 345800
+    },
+    {
+      "hora": 23,
+      "acessos": 12,
+      "liberados": 11,
+      "negados": 1,
+      "bloqueados": 0,
+      "energia_mj": 200200
+    }
+  ]
+}

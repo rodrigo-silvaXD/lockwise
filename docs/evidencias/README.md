@@ -24,3 +24,4 @@ Além das figuras do circuito:
 | Arquivo | Conteúdo |
 |---|---|
 | relatorio_otimizacao.txt | Execução do modelo de escala contra a API em produção, com a demanda lida do Postgres na Neon |
+| demanda_horaria.json | A demanda por hora que a API devolveu para 15 a 22/09/2026 (933 acessos). Reproduz o relatório acima sem rede |
