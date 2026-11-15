@@ -75,7 +75,7 @@ def test_timeout_fisico_agenda_fechamento_apos_liberar():
     assert agendados == [5.16]
     assert it.maquina.estado.nome == "AGUARDANDO"
     assert it.pinos.timeout is False
-    assert any("NE555" in l for l in linhas)
+    assert any("(555)" in l for l in linhas)
 
 
 def test_estado_lista_saidas_acesas():

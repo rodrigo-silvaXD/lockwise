@@ -39,14 +39,14 @@ def test_negados_acumulam_tentativas_e_permanecem_aguardando():
     assert isinstance(p.estado, Aguardando) and p.estado.tentativas == 2
 
 
-def test_liberado_vale_pelo_tempo_do_ne555_e_depois_expira():
+def test_liberado_vale_pelo_tempo_do_555_e_depois_expira():
     p = Projecao.reconstruir([acesso(Resultado.LIBERADO, 1, 0)])
     assert isinstance(p.estado, Liberado)
     assert p.vigente(em(1)).nome == "LIBERADO"
     assert p.vigente(em(TEMPO_TRAVA_ABERTA_S - 0.01)).nome == "LIBERADO"
     depois = p.vigente(em(TEMPO_TRAVA_ABERTA_S))
     assert isinstance(depois, Aguardando) and depois.tentativas == 0
-    assert depois.desde == em(TEMPO_TRAVA_ABERTA_S)  # o instante em que o NE555 fechou a trava
+    assert depois.desde == em(TEMPO_TRAVA_ABERTA_S)  # o instante em que o 555 fechou a trava
 
 
 def test_liberado_zera_as_tentativas_anteriores():

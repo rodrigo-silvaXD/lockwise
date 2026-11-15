@@ -31,7 +31,7 @@ Uma fechadura eletrônica que:
 | `SENHA_OK` | saída | a senha nos pinos confere |
 | `ERROS_C1` `ERROS_C0` | saída | contador de tentativas, 2 bits |
 
-`TRAVA_ABERTA` é o **atuador**: aciona o estágio de potência dimensionado em [`fisica.md §4`](fisica.md) — transistor BC337, diodo de roda livre e solenoide de 12 V.
+`TRAVA_ABERTA` comanda o **atuador**: junto com a saída do temporizador, libera o estágio de potência dimensionado em [`fisica.md §4`](fisica.md) — transistor BC337, diodo de roda livre e solenoide de 12 V.
 
 ### Composição
 
@@ -317,8 +317,8 @@ O circuito lógico decide; quem age é o estágio de potência. O memorial [`fis
 - **entradas** — resistores de pull-down de 10 kΩ, porque a entrada CMOS é um capacitor e, solta, assume qualquer valor (§2.2);
 - **clock** — filtro RC de 10 ms e Schmitt-trigger, porque é a única entrada sensível à borda (§2.3);
 - **indicadores** — 220 Ω por LED (§3);
-- **atuador** — a saída `TRAVA_ABERTA` aciona um BC337 em saturação, que chaveia o solenoide de 12 V / 300 mA, com diodo 1N4007 contra o pico reverso (§4);
-- **TIMEOUT** — NE555 monoestável de 5,16 s (§5).
+- **atuador** — o estado LIBERADO, combinado com a saída do temporizador numa porta AND, aciona um BC337 em saturação, que chaveia o solenoide de 12 V / 300 mA, com diodo 1N4007 contra o pico reverso (§4);
+- **TIMEOUT** — TLC555 monoestável de 5,16 s, que também define quanto tempo a bobina fica ligada (§5).
 
 E o número que atravessa todo o projeto: **18 200 mJ por liberação**, gravado em cada evento de acesso e somado por faixa horária no modelo de otimização.
 

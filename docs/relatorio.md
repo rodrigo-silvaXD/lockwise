@@ -26,7 +26,7 @@ O projeto atravessa cinco disciplinas, e o que as une não é o tema: é **um ú
 [OTIMIZAÇÃO]    escala de vigilância: 26,6% mais barata que a ingênua
 ```
 
-Resultados verificáveis: **241 testes automatizados**, pipeline de CI/CD verde, API pública em <https://lockwise-api.onrender.com>, e 31 registros de decisão documentando o porquê de cada escolha.
+Resultados verificáveis: **241 testes automatizados**, pipeline de CI/CD verde, API pública em <https://lockwise-api.onrender.com>, e 32 registros de decisão documentando o porquê de cada escolha.
 
 ---
 
@@ -126,7 +126,7 @@ Contra um V_CEO de 45 V. O diodo 1N4007 em antiparalelo limita o coletor a 12,8 
 
 ```
 P = 12 V × 292,5 mA + 5 V × 4,3 mA = 3,53 W
-T = 470 kΩ × 10 µF × ln 3 = 5,16 s          (NE555 monoestável)
+T = 470 kΩ × 10 µF × ln 3 = 5,16 s          (TLC555 monoestável)
 E = 3,53 × 5,16 ≈ 18,2 J = 18 200 mJ
 ```
 

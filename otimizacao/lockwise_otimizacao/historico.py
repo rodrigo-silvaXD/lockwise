@@ -126,7 +126,7 @@ def _tentar(
     eventos += maquina.pulsar_clock(pinos)
     yield from _carimbar(eventos, momento)
 
-    # Acesso liberado: o NE555 devolve a máquina a AGUARDANDO depois de 5,16 s.
+    # Acesso liberado: o 555 devolve a máquina a AGUARDANDO depois de 5,16 s.
     if maquina.estado.nome == "LIBERADO":
         maquina.pulsar_clock(Pinos(timeout=True))
 

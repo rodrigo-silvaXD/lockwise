@@ -247,7 +247,7 @@ classDiagram
 Duas diferenças em relação à máquina do circuito, ambas deliberadas:
 
 - **Não existe VERIFICANDO.** É transitório de uma borda de clock; a nuvem recebe o resultado, não o meio do caminho.
-- **`Liberado` expira sozinho.** O gateway não envia o evento de TIMEOUT, porque a duração é fixa por construção — o NE555 de [`fisica.md §5`](fisica.md). `vigente()` devolve `Aguardando` depois de 5,16 s.
+- **`Liberado` expira sozinho.** O gateway não envia o evento de TIMEOUT, porque a duração é fixa por construção — o temporizador 555 de [`fisica.md §5`](fisica.md), que também comanda a base do transistor. `vigente()` devolve `Aguardando` depois de 5,16 s.
 
 ---
 

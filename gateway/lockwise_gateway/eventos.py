@@ -18,7 +18,7 @@ SENHA = 0b1011
 # (12 V × 292,5 mA + 5 V × 4,3 mA) × 5,16 s = 3,53 W × 5,16 s ≈ 18,2 J.
 ENERGIA_LIBERACAO_MJ = 18_200
 
-# Duração da trava aberta, em segundos. NE555 monoestável, 470 kΩ × 10 µF × ln 3.
+# Duração da trava aberta, em segundos. TLC555 monoestável, 470 kΩ × 10 µF × ln 3.
 TEMPO_TRAVA_ABERTA_S = 5.16
 
 # O circuito tem uma senha, logo um morador. Registro 1 da tabela `usuario`.

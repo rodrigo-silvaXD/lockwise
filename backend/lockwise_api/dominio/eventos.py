@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from enum import Enum
 
-# Duração da trava aberta (docs/fisica.md, seção 5): NE555, 470 kΩ × 10 µF × ln 3.
+# Duração da trava aberta (docs/fisica.md, seção 5): TLC555, 470 kΩ × 10 µF × ln 3.
 # A nuvem não recebe evento de TIMEOUT — ela sabe que a trava fechou porque
 # conhece a física do temporizador.
 TEMPO_TRAVA_ABERTA_S = 5.16

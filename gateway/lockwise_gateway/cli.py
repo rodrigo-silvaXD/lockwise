@@ -133,7 +133,7 @@ class Interprete:
             self._saida(f"   POST {envio.rota} -> {envio.situacao}{codigo}{detalhe}")
 
         if self._timeout_fisico and novo.libera_trava and anterior is not novo:
-            self._saida(f"   trava aberta: TIMEOUT automatico em {TEMPO_TRAVA_ABERTA_S} s (NE555)")
+            self._saida(f"   trava aberta: TIMEOUT automatico em {TEMPO_TRAVA_ABERTA_S} s (555)")
             self._agendar(TEMPO_TRAVA_ABERTA_S, lambda: self.executar("fechar"))
 
     # ------------------------------------------------------------- macros
@@ -231,7 +231,7 @@ def montar_parser() -> argparse.ArgumentParser:
                    help="arquivo JSON Lines da fila offline")
     p.add_argument("--roteiro", type=Path, help="executa os comandos deste arquivo em vez do teclado")
     p.add_argument("--timeout-fisico", action="store_true",
-                   help=f"dispara TIMEOUT sozinho {TEMPO_TRAVA_ABERTA_S} s apos LIBERADO, como o NE555")
+                   help=f"dispara TIMEOUT sozinho {TEMPO_TRAVA_ABERTA_S} s apos LIBERADO, como o 555 do hardware")
     p.add_argument("--espera-acordar", type=float, default=60.0, metavar="SEGUNDOS",
                    help="quanto esperar a API acordar no arranque (0 desliga)")
     p.add_argument("--version", action="version", version=f"%(prog)s {__version__}")

@@ -64,7 +64,7 @@ def test_fechadura_liberada_no_passado_ja_esta_aguardando(api, chave):
     api.post("/acessos", json=acesso("LIBERADO"), headers=chave)  # T0 está no passado
     corpo = api.get("/fechadura").json()
     assert corpo["estado"] == "AGUARDANDO" and corpo["trava_fecha_em"] is None
-    # `desde` é o instante em que o NE555 fechou a trava
+    # `desde` é o instante em que o 555 fechou a trava
     assert corpo["desde"] == "2026-01-10T14:00:05.160000Z"
 
 

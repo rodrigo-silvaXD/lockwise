@@ -417,7 +417,7 @@ const PECAS = [
   { id:'PS1',  t:'pino', n:'S1', eq:'bit 1 da senha digitada', nota:'Pino de entrada.', loc:'pino', pos:[-30,-7] },
   { id:'PS0',  t:'pino', n:'S0', eq:'bit 0 da senha digitada', nota:'Pino de entrada.', loc:'pino', pos:[-30,-4] },
   { id:'PCONF',t:'pino', n:'CONFIRMA', eq:'pedido de verificação', nota:'Tira a máquina de AGUARDANDO e a leva para VERIFICANDO.', loc:'pino', pos:[-30,4] },
-  { id:'PTO',  t:'pino', n:'TIMEOUT', eq:'fim do tempo de trava aberta', nota:'No hardware vem do NE555: fecha a trava sozinho depois do tempo dimensionado.', loc:'pino', pos:[-30,8] },
+  { id:'PTO',  t:'pino', n:'TIMEOUT', eq:'fim do tempo de trava aberta', nota:'No hardware vem de um TLC555 (555 CMOS): fecha a trava sozinho depois do tempo dimensionado.', loc:'pino', pos:[-30,8] },
   { id:'PRST', t:'pino', n:'RESET', eq:'desbloqueio administrativo', nota:'Única saída de BLOQUEADO. Também zera o contador de erros.', loc:'pino', pos:[-30,12] },
 
   // --- comparador de senha ---

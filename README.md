@@ -53,7 +53,7 @@ lockwise/
 │   ├── deploy.md                  como a API vai para o ar e o que fazer quando falha
 │   ├── relatorio.md              relatório técnico: as cinco disciplinas amarradas
 │   ├── eletronica.md             tabela-verdade, Karnaugh e transição de estados
-│   ├── adr/                       31 registros de decisão: o porquê de cada escolha
+│   ├── adr/                       32 registros de decisão: o porquê de cada escolha
 │   └── evidencias/                14 figuras da simulação + relatório da otimização
 ├── site/                          simulador interativo do circuito no navegador
 ├── gateway/                       gêmeo digital do circuito + POST para a API
@@ -126,7 +126,7 @@ O Logisim simula a lógica; o memorial [`docs/fisica.md`](docs/fisica.md) descre
 | Transistor BC337 acionando a trava | bobina exige 300 mA; porta 74HC fornece 25 mA no máximo absoluto |
 | R_B = 1 kΩ na base | ganho forçado ≈ 80, três vezes abaixo do h_FE mínimo, garante saturação (V_CE = 0,3 V, P_Q = 91 mW) |
 | Diodo 1N4007 em antiparalelo com a bobina | v = −L·di/dt chegaria a centenas de volts contra V_CEO = 45 V; o diodo limita a 12,8 V |
-| Trava aberta por 5,16 s | NE555 monoestável: T = RC·ln 3 com 470 kΩ e 10 µF |
+| Trava aberta por 5,16 s | TLC555 monoestável: T = RC·ln 3 com 470 kΩ e 10 µF; a base do transistor só recebe corrente enquanto ele conta |
 | **Energia por liberação: 18 200 mJ** | 3,53 W × 5,16 s — é o valor gravado em `energia_mj` a cada acesso liberado |
 
 ---
@@ -231,7 +231,7 @@ Ligue S3, S1 e S0 (a senha é `1011`), ligue CONFIRMA e pulse o clock duas vezes
 | [Arquitetura](docs/arquitetura.md) | C4 níveis 1–4, padrões GoF e SOLID com arquivo:linha |
 | [Otimização](otimizacao/README.md) | formulação do modelo e o resultado |
 | [Deploy](docs/deploy.md) | como a API vai para o ar e o que fazer quando algo falha |
-| [Decisões (ADR)](docs/adr/) | 31 registros: o porquê de cada escolha |
+| [Decisões (ADR)](docs/adr/) | 32 registros: o porquê de cada escolha |
 
 ---
 

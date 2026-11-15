@@ -102,7 +102,7 @@ Contra a API em produção, no Windows, use o script — ele cuida das variávei
 ```bash
 export LOCKWISE_API_URL=https://lockwise-api.onrender.com
 export LOCKWISE_API_KEY=...
-python -m lockwise_gateway.cli --timeout-fisico   # TIMEOUT sozinho após 5,16 s, como o NE555
+python -m lockwise_gateway.cli --timeout-fisico   # TIMEOUT sozinho após 5,16 s, como o 555 do hardware
 ```
 
 | Opção | Variável | Efeito |
