@@ -27,12 +27,14 @@ O último item produz o número que atravessa todo o projeto: a **energia por li
 |---|---|---|
 | `S3 S2 S1 S0`, `CONFIRMA`, `RESET` | Chave + resistor de pull-down 10 kΩ | 2.2 |
 | `CLK` | Botão + filtro RC + inversor Schmitt 74HC14 | 2.3 |
-| `TIMEOUT` | Temporizador monoestável NE555 | 5 |
+| `TIMEOUT` | Temporizador monoestável TLC555 (versão CMOS do 555), através de um inversor 74HC14 | 5 |
 | `AGUARDANDO`, `VERIFICANDO`, `BLOQUEADO`, `SENHA_OK`, `ERROS_C1`, `ERROS_C0` | LED + resistor 220 Ω | 3 |
-| `TRAVA_ABERTA` | LED + resistor 220 Ω **e** estágio de potência (BC337 + 1N4007 + solenoide 12 V) | 4 |
+| `TRAVA_ABERTA` | LED + resistor 220 Ω; o estágio de potência (BC337 + 1N4007 + solenoide 12 V) recebe LIBERADO · SAÍDA_555 | 4 e 5 |
 | Portas e flip-flops | Família CMOS 74HC alimentada em 5 V | 2.1 |
 
 A composição do circuito simulado — 20 portas AND (15 de duas entradas, 5 de três), 5 OR (3 de duas, 2 de três), 6 NOT, 2 XOR e 4 flip-flops D — corresponde a 12 circuitos integrados da família 74HC: 4× 74HC08, 2× 74HC11, 1× 74HC32, 1× 74HC4075, 1× 74HC04, 1× 74HC86 e 2× 74HC74.
+
+Duas portas que sobram nesses CIs servem ao temporizador da seção 5: a AND de duas entradas livre do quarto 74HC08 e a AND de três entradas livre do segundo 74HC11. O 74HC14 do clock (seção 2.3) cede dois dos seus seis inversores ao mesmo temporizador. A implementação física não acrescenta nenhum CI de lógica.
 
 ### 1.3 Parâmetros adotados
 
@@ -104,7 +106,7 @@ I_PD = V_CC / R_PD = 5 V / 10 kΩ = 0,5 mA
 P_PD = V_CC · I_PD = 5 V × 0,5 mA = 2,5 mW
 ```
 
-Sete chaves (S3–S0, CONFIRMA, TIMEOUT, RESET) fechadas ao mesmo tempo somam 3,5 mA — desprezível, e cada resistor de 1/4 W trabalha a 1% de sua capacidade.
+Seis chaves (S3–S0, CONFIRMA, RESET) fechadas ao mesmo tempo somam 3,0 mA — desprezível, e cada resistor de 1/4 W trabalha a 1% de sua capacidade. TIMEOUT não é chave no hardware: vem do temporizador da seção 5, cuja saída é ativa nos dois níveis e dispensa pull-down.
 
 **Por que 10 kΩ e não outro valor.** Menor (1 kΩ) drenaria 5 mA por chave sem ganho de robustez. Maior (1 MΩ) tornaria V_entrada = 1 V com a fuga máxima, corroendo a margem de ruído. 10 kΩ é o compromisso padrão da indústria para CMOS a 5 V.
 
@@ -114,7 +116,7 @@ O mesmo raciocínio eletrostático explica a proteção contra **descarga eletro
 
 A máquina de estados é **síncrona**: todos os flip-flops mudam apenas na borda de subida de CLK. Isso tem uma consequência prática que divide as entradas em duas classes.
 
-**As entradas de dados** (S3–S0, CONFIRMA, TIMEOUT, RESET) são apenas *amostradas* na borda. Se a chave vibrar mecanicamente ao ser acionada, não importa: o valor só é lido quando o operador pulsa o CLK, milissegundos depois, com a chave já estável. Não precisam de filtro.
+**As entradas de dados** (S3–S0, CONFIRMA, RESET e o TIMEOUT que vem do temporizador) são apenas *amostradas* na borda. Se a chave vibrar mecanicamente ao ser acionada, não importa: o valor só é lido quando o operador pulsa o CLK, milissegundos depois, com a chave já estável. Não precisam de filtro.
 
 **O clock** é sensível à borda. Cada transição 0→1 que chega ao pino CLK é um ciclo da máquina. Uma chave mecânica, ao fechar, não produz uma transição — produz um trem de transições (*bounce*) durante 1 a 5 ms, às vezes até 20 ms, enquanto os contatos metálicos ricocheteiam. Sem tratamento, um único aperto poderia avançar a máquina de estados duas ou três vezes e o contador registraria erros que não aconteceram.
 
@@ -251,7 +253,7 @@ V_OH = 5,0 − 50 Ω × 11,1 mA = 4,44 V
 
 O LED acende com 11 mA — perfeitamente visível. Essa corrente está acima dos 4 mA nos quais o fabricante *garante* V_OH ≥ 4,4 V, mas bem abaixo do máximo absoluto de 25 mA por pino. A queda em V_OH não causa problema porque **o pino alimenta apenas o LED**, e não outra entrada lógica: não há nível lógico a preservar naquele nó.
 
-Se um mesmo pino precisasse acionar o LED **e** a próxima porta, seria obrigatório um *buffer*. É por isso que a saída `TRAVA_ABERTA`, que alimenta o LED e o transistor da trava, usa portas separadas do mesmo CI para cada carga.
+Se um mesmo pino precisasse acionar o LED **e** a próxima porta, seria obrigatório um *buffer*. É por isso que o transistor da trava não fica no mesmo pino do LED de `TRAVA_ABERTA`: ele é comandado por uma porta própria, a AND de três entradas que calcula LIBERADO · SAÍDA_555 (seção 4.2).
 
 ### 3.4 Corrente simultânea
 
@@ -282,23 +284,25 @@ A saída lógica precisa **comandar** um dispositivo que, por sua vez, **chaveia
 ### 4.2 O estágio de potência
 
 ```
-                              +12 V
-                                │
-                     ┌──────────┴──────────┐
-                     │                     │
-                     │   solenoide         ▲  D1  1N4007
-                     │   40 Ω / 100 mH     │  (catodo no +12 V)
-                     │                     │
-                     └──────────┬──────────┘
-                                │  coletor
-                                │
-TRAVA_ABERTA ──[ R_B = 1 kΩ ]───┤  BC337-40 (NPN)
- (saída 74HC, 5 V)              │
-                                │  emissor
-                               GND
+                                    +12 V
+                                      │
+                           ┌──────────┴──────────┐
+                           │                     │
+                           │   solenoide         ▲  D1  1N4007
+                           │   40 Ω / 100 mH     │  (catodo no +12 V)
+                           │                     │
+                           └──────────┬──────────┘
+                                      │  coletor
+ LIBERADO ──┐                         │
+            AND ──[ R_B = 1 kΩ ]──────┤  BC337-40 (NPN)
+ SAÍDA_555 ─┘ (74HC, 5 V)             │
+                                      │  emissor
+                                     GND
 ```
 
-O transistor NPN opera como chave. Com `TRAVA_ABERTA` = 0, a base está em 0 V, o transistor está em **corte**, nenhuma corrente flui pela bobina. Com `TRAVA_ABERTA` = 1, a corrente de base leva o transistor à **saturação**: ele se comporta como um contato fechado entre coletor e emissor, com uma pequena queda residual V_CE(sat).
+O transistor NPN opera como chave. Com a saída da porta AND em 0, a base está em 0 V, o transistor está em **corte**, nenhuma corrente flui pela bobina. Com a saída em 1, a corrente de base leva o transistor à **saturação**: ele se comporta como um contato fechado entre coletor e emissor, com uma pequena queda residual V_CE(sat).
+
+**Por que a porta AND.** A porta é a AND de três entradas que sobra no segundo 74HC11, ligada a Q1, Q̄0 e à saída do temporizador: Q1·Q̄0 é o próprio estado LIBERADO. A base recebe corrente só enquanto a máquina está em LIBERADO **e** o temporizador da seção 5 está contando. Sem ela, com a base ligada direto em `TRAVA_ABERTA`, a bobina ficaria energizada até o pulso de clock seguinte ao TIMEOUT — e o clock é acionado à mão, então isso poderia levar segundos ou minutos. Os 5,16 s da seção 5, e a energia da seção 6, deixariam de valer. Com a porta, a bobina liga exatamente pelo tempo do temporizador. O LED de `TRAVA_ABERTA` continua mostrando o estado LIBERADO até a máquina voltar a AGUARDANDO.
 
 ### 4.3 Corrente de coletor
 
@@ -442,7 +446,9 @@ Quatro milijoules por desligamento — desprezível para o 1N4007 (que suporta 1
 
 No Logisim, `TIMEOUT` é uma chave que o operador aciona para devolver a máquina ao estado AGUARDANDO. No hardware, esse sinal vem de um **temporizador monoestável** disparado pela entrada no estado LIBERADO, que define por quanto tempo a trava permanece energizada.
 
-O circuito é o NE555 (ou TLC555, versão CMOS) em configuração monoestável, e sua física é a carga de um capacitor por um resistor — o mesmo fenômeno da seção 2.3, agora usado para medir tempo.
+O circuito é um TLC555, a versão CMOS do 555, em configuração monoestável, e sua física é a carga de um capacitor por um resistor — o mesmo fenômeno da seção 2.3, agora usado para medir tempo.
+
+### 5.1 A duração
 
 Ao ser disparado, o 555 libera o capacitor C_T, que carrega por R_T a partir de 0 V:
 
@@ -464,6 +470,31 @@ R_T = 470 kΩ,  C_T = 10 µF   →   T = 470 kΩ × 10 µF × 1,0986 = 5,16 s
 
 **Tolerância.** Capacitores eletrolíticos têm tolerância de ±20% e resistores de ±5%. O intervalo real fica entre 3,9 e 6,5 s. Para o LOCKWISE isso é aceitável; se a precisão importasse, um capacitor de tântalo ou filme (±10%) estreitaria a faixa para 4,4–5,9 s.
 
+**Fuga do capacitor.** No fim da carga, a corrente que ainda chega a C_T é pequena:
+
+```
+I = (V_CC − ⅔·V_CC) / R_T = (5 − 3,33) V / 470 kΩ = 3,55 µA
+```
+
+Um capacitor que vazasse corrente dessa ordem nunca chegaria a 3,33 V. Por isso C_T deve ser um eletrolítico de baixa fuga ou de filme. A entrada do TLC555 drena apenas picoampères e não pesa na conta.
+
+### 5.2 As ligações
+
+- **Disparo (pino 2).** Recebe o inverso de LIBERADO · CLK, feito pela AND de duas entradas que sobra no quarto 74HC08 e por um inversor do 74HC14. O pulso de clock que leva a máquina a LIBERADO ainda está alto quando o estado muda, então o pino 2 fica em no máximo 0,33 V — abaixo do limiar de disparo de ⅓·V_CC = 1,67 V — enquanto o botão está apertado. O aperto dura décimos de segundo, bem menos que T. Se o botão ficasse apertado por mais de 5,16 s, a saída só cairia quando ele fosse solto.
+- **Saída (pino 3) → base do transistor.** Entra na AND de três entradas que comanda o BC337 (seção 4.2). A bobina fica energizada exatamente T, sem depender de quando vem o próximo pulso de clock.
+- **Saída (pino 3) → TIMEOUT.** Outro inversor do 74HC14 entrega TIMEOUT = 1 quando o tempo acaba. Fora do ciclo a saída do 555 está em 0 e TIMEOUT vale 1, mas a máquina só considera esse sinal no estado LIBERADO.
+- **Controle (pino 5) → 10 nF ao terra.** O pino 5 é a referência interna de ⅔·V_CC. Um ruído de +50 mV nela mudaria o tempo:
+
+  ```
+  T' = R_T·C_T · ln[V_CC / (V_CC − 3,383 V)] = 4,70 s × ln(5 / 1,617) = 4,70 s × 1,129 = 5,31 s   (+2,8%)
+  X_C (10 nF, 1 MHz) = 1 / (2π × 10⁶ × 10 × 10⁻⁹) = 15,9 Ω
+  ```
+
+  Com reatância de 15,9 Ω a 1 MHz, o capacitor desvia esse ruído para o terra.
+- **RESET (pino 4) e alimentação (pino 8)** em +5 V; descarga (pino 7) e limiar (pino 6) juntos no nó entre R_T e C_T.
+
+**Por que o TLC555 e não o NE555.** A saída alta do NE555 bipolar fica cerca de 1,4 a 1,7 V abaixo da alimentação — 3,3 a 3,6 V em 5 V —, no limite dos 3,5 V que uma entrada 74HC exige para ler 1 (seção 2.1). A do TLC555 chega praticamente a 5 V. O TLC555 também consome ≈ 0,2 mA em repouso, contra ≈ 3 mA do NE555. A equação do tempo é a mesma para os dois.
+
 O sinal `TIMEOUT` é o único elemento **assíncrono** do sistema — o 555 não sabe do clock. Isso não é problema justamente pela arquitetura síncrona da seção 2.3: a máquina apenas amostra `TIMEOUT` na próxima borda de CLK. O temporizador pode ser lento e ruidoso; a máquina de estados o lê de forma limpa.
 
 ---
@@ -479,7 +510,7 @@ T_aberta  = 5,16 s
 E_liberação = P_atuação × T_aberta = 3,53 W × 5,16 s ≈ 18,2 J  =  18 200 mJ
 ```
 
-Os 4,3 mJ de energia magnética da bobina (seção 4.6) e os 68 mW do LED `TRAVA_ABERTA` estão dentro do arredondamento.
+Os 4,3 mJ de energia magnética da bobina (seção 4.6) e os 68 mW do LED `TRAVA_ABERTA` estão dentro do arredondamento. T_aberta é de fato o tempo em que a bobina fica energizada porque a base do transistor passa pela porta AND com a saída do temporizador (seção 4.2).
 
 **Onde esse número vai.** O gateway envia, a cada evento com resultado `LIBERADO`, o campo `energia_mj = 18200`. Eventos `NEGADO` e `BLOQUEADO` não acionam a trava e registram `energia_mj = 0`. O backend persiste o valor na tabela `acesso`, e o módulo de otimização pode somá-lo por faixa horária para compor o custo energético da operação junto ao custo de vigilância.
 
@@ -494,10 +525,10 @@ Uma única fonte externa de 12 V alimenta a trava diretamente e a lógica atrav�
 ```
  fonte 12 V ──┬──────────────────────────▶ solenoide (via BC337)
               │
-              └──[ 7805 ]──▶ 5 V ──┬──▶ CIs 74HC (≈ 12)
+              └──[ 7805 ]──▶ 5 V ──┬──▶ CIs 74HC (12 + 74HC14)
                                    ├──▶ LEDs (até 4 simultâneos)
                                    ├──▶ pull-downs das chaves
-                                   ├──▶ NE555
+                                   ├──▶ TLC555
                                    └──▶ base do BC337
 ```
 
@@ -507,13 +538,13 @@ Uma única fonte externa de 12 V alimenta a trava diretamente e a lógica atrav�
 |---|---|---|
 | LEDs, 4 simultâneos | 44,4 mA | seção 3.4 |
 | Base do BC337 | 4,3 mA | seção 4.4, só no estado LIBERADO |
-| Pull-downs, 7 chaves fechadas | 3,5 mA | seção 2.2, pior caso |
-| NE555 em repouso | 3 mA | folha de dados (TLC555: < 1 mA) |
-| 12 CIs 74HC, estáticos | 0,2 mA | ≤ 20 µA por CI; dinâmico desprezível a < 10 Hz |
-| **Total** | **≈ 56 mA** | |
+| Pull-downs, 6 chaves fechadas | 3,0 mA | seção 2.2, pior caso |
+| TLC555 em repouso | 0,2 mA | folha de dados (um NE555 consumiria ≈ 3 mA) |
+| 13 CIs 74HC (12 + 74HC14), estáticos | 0,26 mA | ≤ 20 µA por CI; dinâmico desprezível a < 10 Hz |
+| **Total** | **≈ 52 mA** | |
 
 ```
-P_5V = 5 V × 56 mA = 0,28 W
+P_5V = 5 V × 52 mA = 0,26 W
 ```
 
 ### 7.2 Regulador 7805
@@ -521,30 +552,32 @@ P_5V = 5 V × 56 mA = 0,28 W
 Um regulador linear derruba a tensão excedente dissipando-a como calor. A corrente de entrada é praticamente igual à de saída, mais a corrente de repouso (≈ 5 mA):
 
 ```
-P_7805 = (V_in − V_out) × I_out = (12 − 5) V × 56 mA = 0,39 W
+P_7805 = (V_in − V_out) × I_out = (12 − 5) V × 52 mA = 0,36 W
 ```
 
 Encapsulamento TO-220 sem dissipador, R_th(j-a) ≈ 65 K/W:
 
 ```
-ΔT = 0,39 W × 65 K/W ≈ 25 K   →   T_j ≈ 50 °C   (limite: 125 °C)   ✓
+ΔT = 0,36 W × 65 K/W ≈ 24 K   →   T_j ≈ 49 °C   (limite: 125 °C)   ✓
 ```
 
-Dispensa dissipador. A eficiência do 7805 aqui é 5/12 ≈ 42% — baixa, mas sobre uma potência de 0,28 W isso custa 0,39 W de calor. Um conversor chaveado economizaria 0,3 W e introduziria ruído de comutação junto à lógica; não vale a troca.
+Dispensa dissipador. A eficiência do 7805 aqui é 5/12 ≈ 42% — baixa, mas sobre uma potência de 0,26 W isso custa 0,36 W de calor. Um conversor chaveado economizaria 0,3 W e introduziria ruído de comutação junto à lógica; não vale a troca.
+
+O fabricante pede um capacitor de 330 nF na entrada e um de 100 nF na saída, junto aos pinos. Por dentro, o 7805 é um amplificador realimentado, e a indutância dos fios até a fonte pode fazê-lo oscilar. Os capacitores fecham esse caminho para o ruído: a 1 MHz, X_C = 1 / (2π f C) vale 0,48 Ω para o de 330 nF e 1,59 Ω para o de 100 nF.
 
 ### 7.3 Barramento de 12 V e escolha da fonte
 
 | Carga | Corrente | Quando |
 |---|---|---|
 | Solenoide via BC337 | 292,5 mA | estado LIBERADO |
-| Entrada do 7805 | 61 mA | sempre |
-| **Pico** | **≈ 354 mA** | |
+| Entrada do 7805 | 57 mA | sempre (52 mA + 5 mA de consumo próprio) |
+| **Pico** | **≈ 350 mA** | |
 
 ```
-P_pico = 12 V × 354 mA ≈ 4,2 W
+P_pico = 12 V × 350 mA ≈ 4,2 W
 ```
 
-Uma fonte de **12 V / 1 A** (12 W) oferece margem de 2,8× sobre o pico. Um capacitor eletrolítico de 100 µF no barramento de 12 V absorve o transitório de acionamento — que, como visto na seção 4.6, já é suavizado pela indutância da própria bobina.
+Uma fonte de **12 V / 1 A** (12 W) oferece margem de 2,9× sobre o pico. Um capacitor eletrolítico de 100 µF no barramento de 12 V absorve o transitório de acionamento — que, como visto na seção 4.6, já é suavizado pela indutância da própria bobina.
 
 ---
 
@@ -559,33 +592,37 @@ Uma fonte de **12 V / 1 A** (12 W) oferece margem de 2,8× sobre o pico. Um capa
 | Resistor de base | 1 kΩ, 1/4 W | I_B = 3,7–4,3 mA; β_F ≈ 70–80; overdrive > 3× (4.4) |
 | Transistor | BC337-40 | I_C = 292,5 mA de 800 mA; P_Q = 91 mW de 625 mW; T_j ≈ 43 °C (4.3–4.5) |
 | Diodo de roda livre | 1N4007 | limita V_C a 12,8 V contra V_CEO = 45 V; absorve 4,3 mJ (4.6) |
-| Temporizador | NE555, 470 kΩ + 10 µF | T = RC·ln 3 = 5,16 s (5) |
+| Temporizador | TLC555, 470 kΩ + 10 µF; 10 nF no pino 5 | T = RC·ln 3 = 5,16 s; 50 mV de ruído no pino 5 mudariam T em 2,8% (5) |
+| Comando da trava | AND de LIBERADO com a saída do 555 | bobina energizada exatamente 5,16 s, com clock manual (4.2) |
 | Energia por liberação | **18 200 mJ** | 3,53 W × 5,16 s (6) |
-| Regulador | 7805 sem dissipador | 0,39 W; T_j ≈ 50 °C (7.2) |
-| Fonte | 12 V / 1 A | pico de 354 mA / 4,2 W (7.3) |
+| Regulador | 7805 sem dissipador; 330 nF na entrada, 100 nF na saída | 0,36 W; T_j ≈ 49 °C (7.2) |
+| Fonte | 12 V / 1 A | pico de 350 mA / 4,2 W (7.3) |
 
 ### Lista de componentes da implementação física
 
 | Qtd | Componente | Função |
 |---|---|---|
-| 12 | CIs 74HC (4× 08, 2× 11, 32, 4075, 04, 86, 2× 74) | lógica do circuito simulado |
-| 1 | 74HC14 | Schmitt-trigger do clock |
-| 1 | NE555 ou TLC555 | temporizador TIMEOUT |
+| 12 | CIs 74HC (4× 08, 2× 11, 32, 4075, 04, 86, 2× 74) | lógica do circuito simulado; uma AND livre do 74HC08 e uma AND3 livre do 74HC11 servem ao temporizador |
+| 1 | 74HC14 | Schmitt-trigger do clock; dois inversores no disparo e no TIMEOUT do temporizador |
+| 1 | TLC555 | temporizador TIMEOUT |
 | 1 | BC337-40 | chave de potência da trava |
 | 1 | 1N4007 | diodo de roda livre |
 | 1 | 7805 | regulador 5 V |
 | 1 | Solenoide 12 V / 300 mA | atuador (trava) |
 | 7 | LED 5 mm vermelho | indicadores |
 | 7 | Resistor 220 Ω 1/4 W | limitação dos LEDs |
-| 7 | Resistor 10 kΩ 1/4 W | pull-down das entradas |
+| 7 | Resistor 10 kΩ 1/4 W | 6 pull-downs das entradas e o resistor de carga do filtro de clock |
 | 1 | Resistor 1 kΩ 1/4 W | base do BC337 |
 | 1 | Resistor 100 Ω 1/4 W | descarga do filtro de clock |
 | 1 | Resistor 470 kΩ 1/4 W | temporização do 555 |
 | 1 | Capacitor 10 µF | temporização do 555 |
+| 1 | Capacitor 10 nF cerâmico | pino 5 (controle) do 555 |
 | 1 | Capacitor 1 µF | filtro de clock |
-| ≈ 14 | Capacitor 100 nF cerâmico | desacoplamento |
+| 14 | Capacitor 100 nF cerâmico | desacoplamento, um por CI (12 + 74HC14 + TLC555) |
+| 1 | Capacitor 330 nF cerâmico | entrada do 7805 |
+| 1 | Capacitor 100 nF cerâmico | saída do 7805 |
 | 1 | Capacitor 100 µF eletrolítico | barramento de 12 V |
-| 8 | Chave / botão | entradas |
+| 7 | Chave / botão | 6 chaves de entrada e o botão do clock |
 
 ---
 
@@ -593,6 +630,9 @@ Uma fonte de **12 V / 1 A** (12 W) oferece margem de 2,8× sobre o pico. Um capa
 
 **Por que a trava não é ligada direto na saída da porta lógica?**
 Porque a bobina exige 300 mA e a porta fornece 25 mA no máximo absoluto — 12 vezes menos. E porque a trava é de 12 V e a lógica de 5 V; mesmo sem queimar, a força cairia a 17% e a trava não abriria. Seção 4.1.
+
+**Por que a base do transistor passa por uma porta AND com a saída do 555?**
+Para a bobina ficar ligada exatamente 5,16 s. A máquina só sai de LIBERADO no pulso de clock seguinte ao TIMEOUT, e o clock é manual. Ligada direto em `TRAVA_ABERTA`, a bobina ficaria energizada até alguém pulsar o clock, e a energia por liberação deixaria de ser constante. Seção 4.2.
 
 **Para que serve o diodo em antiparalelo com a bobina?**
 Quando o transistor corta, a bobina gera uma tensão reversa v = −L·di/dt para manter a corrente. Sem o diodo, essa tensão chega a centenas de volts e destrói o transistor, que suporta 45 V. O diodo oferece um caminho para a corrente decair, limitando a tensão a 12,8 V. Seção 4.6.
@@ -628,7 +668,7 @@ A energia em milijoules de uma liberação: 12 V × 292,5 mA de bobina, mais 5 V
 - Nexperia. *74HC/HCT04, 74HC/HCT08, 74HC/HCT74, 74HC/HCT14 — Product data sheets.* Níveis lógicos, correntes de saída, atrasos de propagação.
 - onsemi. *BC337, BC337-25, BC337-40 — Amplifier Transistors, NPN Silicon.* h_FE, V_CE(sat), P_tot, R_th(j-a).
 - Vishay. *1N4001 to 1N4007 — General Purpose Plastic Rectifier.*
-- Texas Instruments. *NE555 / TLC555 — Precision Timers.* Configuração monoestável.
+- Texas Instruments. *TLC555 — LinCMOS Timer* e *NE555 — Precision Timer.* Configuração monoestável, níveis de saída e consumo.
 - STMicroelectronics. *L78xx — Positive voltage regulator ICs.* Dissipação e resistência térmica do 7805.
 - Halliday, D.; Resnick, R.; Walker, J. *Fundamentos de Física, vol. 3 — Eletromagnetismo.* Capacitância, circuitos RC, indutância, lei de Faraday–Lenz.
 - Sedra, A. S.; Smith, K. C. *Microeletrônica.* Operação do TBJ em saturação; portas CMOS.

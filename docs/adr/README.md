@@ -20,7 +20,7 @@ Regras que seguimos:
 | [0003](0003-portas-e-flip-flops-discretos.md) | Circuito com portas e flip-flops discretos, sem componentes prontos | eletrônica | aceita |
 | [0004](0004-bloqueio-antecipado-e-contador-saturado.md) | Bloqueio antecipado e contador saturado | eletrônica | aceita |
 | [0005](0005-maquina-de-estados-sincrona.md) | Máquina de estados síncrona | eletrônica | aceita |
-| [0006](0006-implementacao-fisica-de-referencia.md) | Implementação física de referência: 74HC, BC337, 1N4007, NE555 | física | aceita |
+| [0006](0006-implementacao-fisica-de-referencia.md) | Implementação física de referência: 74HC, BC337, 1N4007, NE555 | física | aceita; temporizador e comando da trava revistos pela 0032 |
 | [0007](0007-energia-por-liberacao-como-constante.md) | Energia por liberação como constante do sistema | física | aceita |
 | [0008](0008-gateway-como-gemeo-digital.md) | Gateway como gêmeo digital, não integração com o Logisim | gateway | aceita |
 | [0009](0009-equivalencia-provada-contra-o-circ.md) | Equivalência provada por teste, contra o arquivo .circ | gateway | aceita |
@@ -46,6 +46,7 @@ Regras que seguimos:
 | [0029](0029-teto-na-versao-do-pulp.md) | Teto na versão maior do PuLP | otimização | aceita |
 | [0030](0030-placa-em-webgl-em-vez-de-tinkercad.md) | A placa de portas em WebGL, não no Tinkercad | eletrônica | aceita; fatos corrigidos pela 0031 |
 | [0031](0031-correcao-dos-fatos-da-adr-0030.md) | Correção dos fatos da ADR 0030 | eletrônica | aceita |
+| [0032](0032-trava-comandada-pelo-temporizador.md) | Trava comandada pelo temporizador, com TLC555 | física | aceita |
 
 ## Modelo para uma ADR nova
 

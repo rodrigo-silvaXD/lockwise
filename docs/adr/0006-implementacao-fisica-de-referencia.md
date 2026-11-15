@@ -1,7 +1,7 @@
 # ADR 0006 — Implementação física de referência: 74HC, BC337, 1N4007, NE555
 
 Data: 2026-09-16
-Situação: aceita
+Situação: aceita; o temporizador e o comando da trava foram revistos pela [ADR 0032](0032-trava-comandada-pelo-temporizador.md)
 
 ## Contexto
 
